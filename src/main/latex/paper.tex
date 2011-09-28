@@ -9,10 +9,8 @@
 \usepackage{subfigure}
 \usepackage[format=plain,labelfont=bf,up]{caption}
 \usepackage{hyperref}
-\usepackage{minted}
-\usemintedstyle{friendly}
-\bibliography{documentation.bib}
-\title{Impaired Vision \\ Ein Augmented-Reality-Simulator für Sehstörungen}
+\bibliography{paper.bib}
+\title{Tenzing \\ A SQL Implementation On The MapReduce Framework}
 \author{Willi Schönborn}
 \date{\today}
 \begin{document}
@@ -24,30 +22,24 @@
 \end{figure}
 
 \section*{Einleitung}
-Als Teil der Lehrveranstaltung \textit{Multimediatechnik Vertiefung} an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein Projekt mit Bezügen zu den Bereichen Multimedia und Wahrnehmung entstehen. Das Ziel dieses Dokumentes ist es die Ideen, Konzepte sowie die Ergebnisse dieses Projektes vorzustellen.
+Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzepte} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein wissenschaftliches Paper ausgewählt, untersucht und bewertet werden. Das Ziel dieses Dokumentes ist es die Ergebnisse dieser Semesterarbeit zusammenzufassen.
 
-\section*{Augmented Reality}
-Unter \textit{Augmented Reality} versteht man die computergestützte Erweiterung der Realitätswahrnehmung \cite{WP-AR}. Es gibt diverse doch sehr ausschweifende Definitionen dieses Begriffs. Innerhalb dieses Dokumentes wird Augmented Reality als die visuelle Darstellung von Informationen verstanden, also die Ergänzung von Bildern oder Videos mit computergenerierten Zusatzinformationen oder virtuellen Objekten mittels Einblendung/Überlagerung \cite{WP-AR}. Abbildung \ref{augmented-reality} zeigt eine typische Anwendung der Prinzipien von Augmented Reality anhand einer Anwendung für Smartphones, die es erlaubt geographische Informationen über Objekte die sich im Sichtfeld des Betrachters befinden direkt über das Kamerabild zu legen. Mithilfe solcher Augmented-Reality-Anwendungen entsteht eine neuartige Wahrnehmung der Umgebung. Genau an dieser Stelle setzt die Idee dieses Projektes an: Eine ungewohnte Sicht auf gewohnte Dinge zu ermöglichen.
+Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong.
 
-\begin{listing}[H]
-\begin{minted}{java}
-@Override
-public void configure(Camera camera) {
-    final Camera.Parameters parameters = camera.getParameters();
-    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
-    camera.setParameters(parameters);
-}
-\end{minted}
-\caption{Aktivierung des Makro-Fokus}
-\label{macro-focus}
-\end{listing}
+\section*{Kurzbeschreibung}
+Tenzing beschreibt eine SQL92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}.
 
+Ausgewählt wurde das Paper 
+
+\newpage
+
+\nocite{GFS}
+\nocite{GOOGLE-TENZING}
+\nocite{GOOGLE-MAPREDUCE}
+\nocite{GOOGLE-GFS}
+\nocite{WP-SQL92}
+\nocite{WP-SQL99}
 \printbibliography
-
-\listoffigures
-
-\renewcommand\listoflistingscaption{Quellcodeverzeichnis}
-\listoflistings
 
 \end{document}
 
