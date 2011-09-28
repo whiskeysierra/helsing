@@ -1,0 +1,53 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{csquotes}
+\usepackage[ngerman]{babel}
+\usepackage{biblatex}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage[format=plain,labelfont=bf,up]{caption}
+\usepackage{hyperref}
+\usepackage{minted}
+\usemintedstyle{friendly}
+\bibliography{documentation.bib}
+\title{Impaired Vision \\ Ein Augmented-Reality-Simulator für Sehstörungen}
+\author{Willi Schönborn}
+\date{\today}
+\begin{document}
+
+\begin{figure}[H]
+\centering
+\includegraphics{beuth.png}
+\maketitle
+\end{figure}
+
+\section*{Einleitung}
+Als Teil der Lehrveranstaltung \textit{Multimediatechnik Vertiefung} an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein Projekt mit Bezügen zu den Bereichen Multimedia und Wahrnehmung entstehen. Das Ziel dieses Dokumentes ist es die Ideen, Konzepte sowie die Ergebnisse dieses Projektes vorzustellen.
+
+\section*{Augmented Reality}
+Unter \textit{Augmented Reality} versteht man die computergestützte Erweiterung der Realitätswahrnehmung \cite{WP-AR}. Es gibt diverse doch sehr ausschweifende Definitionen dieses Begriffs. Innerhalb dieses Dokumentes wird Augmented Reality als die visuelle Darstellung von Informationen verstanden, also die Ergänzung von Bildern oder Videos mit computergenerierten Zusatzinformationen oder virtuellen Objekten mittels Einblendung/Überlagerung \cite{WP-AR}. Abbildung \ref{augmented-reality} zeigt eine typische Anwendung der Prinzipien von Augmented Reality anhand einer Anwendung für Smartphones, die es erlaubt geographische Informationen über Objekte die sich im Sichtfeld des Betrachters befinden direkt über das Kamerabild zu legen. Mithilfe solcher Augmented-Reality-Anwendungen entsteht eine neuartige Wahrnehmung der Umgebung. Genau an dieser Stelle setzt die Idee dieses Projektes an: Eine ungewohnte Sicht auf gewohnte Dinge zu ermöglichen.
+
+\begin{listing}[H]
+\begin{minted}{java}
+@Override
+public void configure(Camera camera) {
+    final Camera.Parameters parameters = camera.getParameters();
+    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
+    camera.setParameters(parameters);
+}
+\end{minted}
+\caption{Aktivierung des Makro-Fokus}
+\label{macro-focus}
+\end{listing}
+
+\printbibliography
+
+\listoffigures
+
+\renewcommand\listoflistingscaption{Quellcodeverzeichnis}
+\listoflistings
+
+\end{document}
+
