@@ -1,0 +1,41 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{csquotes}
+\usepackage[ngerman]{babel}
+\usepackage{biblatex}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage[format=plain,labelfont=bf,up]{caption}
+\usepackage{hyperref}
+\bibliography{bibliography}
+\title{Tenzing \\ A SQL Implementation On The MapReduce Framework}
+\author{Willi Schönborn}
+\date{\today}
+\begin{document}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{beuth.eps}
+\maketitle
+\end{figure}
+
+\section*{Einleitung}
+Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzepte} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} soll im Rahmen einer Semesterarbeit ein wissenschaftliches Paper ausgewählt, untersucht und bewertet werden. Das Ziel dieses Dokumentes ist es den ausgewählten Artikel kurz vorzustellen, sowie den Plan für das weitere Vorgehen festzuhalten.
+
+\section*{Referenz}
+Bearbeitet werden soll das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist der Artikel als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong. Das Abstract sowie ein Link zum Paper als PDF-Download finden sich unter \cite{GOOGLE-TENZING}.
+
+\section*{Begründung}
+Das Paper wurde aus mehreren Gründen ausgewählt: Es wurde erst vor wenigen Wochen publiziert - ist also hochaktuell. Weiterhin beschreibt es einen ausgesprochen spannenden Ansatz: Die Kombination zweier mächtiger und doch sehr verschiedener Technologien: MapReduce, ein Framework für Adhoc-Analysen auf Datenmengen im Petabyte-Bereich, und SQL, eine standardisierte, mengenorientierte Abfragesprache für relationale Datenbank-Managementsysteme. Oft werden beide Technologien und Ansätze als konträr angesehen, was diesen Artikel und den darin beschriebenen Ansatz sehr interessant, wenn auch nicht einzigartig, macht.
+
+\section*{Vorgehensweise und weiterführende Literatur}
+Im Rahmen der nächsten Wochen wird das Ziel sein, das Paper sowie eng verwandte Sekundärliteratur zu studieren. Dazu zählen vor allem die beiden Google-Paper über MapReduce \cite{MAPREDUCE} und das Google File System \cite{GFS}. Beide Paper sind, wie auch der Tenzing-Artikel, auf der Google-Seite als Download verfügbar \cite{GOOGLE-MAPREDUCE}\cite{GOOGLE-GFS}. Eine weitere wichtige Quelle für das Thema \textit{MapReduce} im Allgemeinen und Hadoop \cite{HADOOP}, als Open-Source-Implementierung des MapReduce-Papers, im Speziellen ist Hadoop: The Definitive Guide \cite{HADOOP-GUIDE}. Für Hadoop gibt es zwei vergleichbare Ansätze: Hive \cite{HIVE} und Pig \cite{PIG}. Beide Projekte haben sich zum Ziel gesetzt eine einfache und doch mächtige Hochsprache für MapReduce-Jobs zu entwickeln. Leider sind sowohl Hive als auch Pig noch relative neue Projekte, weshalb es noch keine Fachliteratur gibt. Hier wird vorerst die jeweilige Projekt-Webseite als Quelle genutzt.
+\newline
+Das Kapitel \textit{Fachlicher Hintergrund}, als Ergebnis des kommenden Meilensteins M2, soll eine schlüssige Einführung in das Thema MapReduce enthalten. Dazu zählen sowohl die Motivation, die zugrundeliegenden Konzepte und Ideen als auch Open-Source-Implementierungen wie Apache Hadoop. Darauf aufbauend soll die Motivation zur Entwicklung von Tenzing als auch konkrete Implementierungsdetails thematisiert werden. Gegebenenfalls kann Tenzing im Kontext von vergleichbaren Ansätzen wie Hive und Pig betrachtet werden.
+
+\printbibliography
+
+\end{document}
+
