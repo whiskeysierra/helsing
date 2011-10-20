@@ -12,6 +12,7 @@
 \usepackage[format=plain,labelfont=bf,up]{caption}
 \setcounter{secnumdepth}{-1} 
 \usepackage{hyperref}
+\usepackage{nameref}
 \usepackage{minted}
 \usemintedstyle{friendly}
 \bibliography{bibliography}
@@ -38,11 +39,13 @@ Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzept
 Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong.
 
 \section{Kurzbeschreibung}
-Tenzing beschreibt eine SQL92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}.
+Tenzing beschreibt eine SQL92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}. Die beiden grundelegenden Technologien werden in den Kapiteln \textit{\nameref{sql}} und \textit{\nameref{mapreduce}}, unter Berücksichtigung des Hauptthemas, näher erläutert.
 
 \newpage
 
 \section{SQL}
+\label{sql}
+
 SQL steht für \textit{Structured Query Language} und ist eine mengenorientierte, deklarative Abfragesprache für Datenbank-Management-Systeme.
 
 Standardisierung
@@ -294,8 +297,8 @@ aka LEFT JOIN
     \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
     \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
     \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
     \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
   \end{tabular}
 \caption{Left Outer Join}
@@ -403,6 +406,7 @@ USING keyword
 \newpage
 
 \section{MapReduce}
+\label{mapreduce}
 
 \subsection{Definition}
 
