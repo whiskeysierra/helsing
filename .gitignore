@@ -39,6 +39,8 @@ pom.xml.releaseBackup
 
 /target
 
+/src/main/latex/*/*.bbl
+/src/main/latex/*/*.blg
 /src/main/latex/*/*-blx.bib
 /src/main/latex/*/*.aux
 /src/main/latex/*/*.fdb_latexmk
