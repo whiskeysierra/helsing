@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.whiskeysierra.beuth.pat</groupId>
+    <artifactId>tenzing</artifactId>
+    <version>0.1</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>latex-maven-plugin</artifactId>
+                <version>1.1</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
