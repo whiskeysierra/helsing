@@ -37,8 +37,16 @@ project.xml
 release.properties
 pom.xml.releaseBackup
 
-/src/main/latex/*
-!/src/main/latex/*/*.tex
-!/src/main/latex/*/*.bib
-!/src/main/latex/*/*.eps
-!/src/main/latex/*/*.png
+/target
+
+/src/main/latex/*/*-blx.bib
+/src/main/latex/*/*.aux
+/src/main/latex/*/*.fdb_latexmk
+/src/main/latex/*/*.lof
+/src/main/latex/*/*.lol
+/src/main/latex/*/*.lot
+/src/main/latex/*/*.out
+/src/main/latex/*/*.pdf
+/src/main/latex/*/*.synctex.gz
+/src/main/latex/*/*.toc
+
