@@ -8,6 +8,7 @@
 \usepackage{graphicx}
 \usepackage{epstopdf}
 \usepackage{subfigure}
+\usepackage{array}
 \usepackage[table]{xcolor}
 \usepackage[format=plain,labelfont=bf,up]{caption}
 \setcounter{tocdepth}{4}
@@ -151,7 +152,7 @@ SELECT id, name FROM City;
    8 & Lyon \\ \hline
    9 & Stockholm \\ \hline
   \end{tabular}
-\caption{Beispiel einer Projektion}
+\caption{Ergebnis einer Projektion}
 \label{tab:projection}
 \end{table}
 \end{minipage}
@@ -201,7 +202,7 @@ SELECT * FROM City WHERE population > 2500000;
    6 & New York City & 8175133 & 4 \\ \hline
    7 & Los Angeles & 3831868 & 4 \\ \hline
   \end{tabular}
-\caption{Beispiel einer Selektion}
+\caption{Ergebnis einer Selektion}
 \label{tab:selection}
 \end{table}
 \end{minipage}
@@ -217,7 +218,7 @@ SELECT country_id, AVG(population) FROM City
 GROUP BY country_id 
 ORDER BY AVG(population) DESC;
 \end{minted}
-\caption{Gruppierung}
+\caption{SQL-Query für eine Gruppierung mit Aggregatfunktion}
 \label{lst:group}
 \end{listing}
 
@@ -234,7 +235,7 @@ Die Ergebnistabelle \ref{tab:group} zeigt das Ergebnis des Queries aus Listing \
     1 & 2412471 \\ \hline
     3 & 1343121 \\ \hline
   \end{tabular}
-\caption{Beispiel einer Gruppierung mit Aggregatfunktion}
+\caption{Ergebnis einer Gruppierung mit Aggregatfunktion}
 \label{tab:group}
 \end{table}
 
@@ -246,7 +247,7 @@ SQL bietet Unterstützung für die drei wichtigsten Mengenoperationen: die Verei
 \begin{minted}{sql}
 SELECT id, name FROM City UNION SELECT id, name FROM Country;
 \end{minted}
-\caption{Query für eine Vereinigung}
+\caption{SQL-Query für eine Vereinigung}
 \label{lst:union}
 \end{listing}
 
@@ -327,7 +328,7 @@ Abbildung \ref{fig:union} und Tabelle \ref{tab:union} zeigen das Ergebnis des Un
     4 & United States \\ \hline
     5 & Japan \\ \hline
   \end{tabular}
-\caption{Beispiel einer Vereinigung}
+\caption{Ergebnis einer Vereinigung}
 \label{tab:union}
 \end{table}
 \end{minipage}
@@ -425,7 +426,7 @@ WHERE city.country_id = country.id;
    Los Angeles & United States \\ \hline
    Lyon & France \\ \hline
   \end{tabular}
-\caption{Beispiel eines Inner Joins}
+\caption{Ergebnis eines Inner Joins}
 \label{tab:inner-join}
 \end{table}
 \end{minipage}
@@ -447,7 +448,7 @@ FROM City city
 LEFT JOIN Country country 
 ON city.country_id = country.id;
 \end{minted}
-\caption{Beispiel eines Left Joins}
+\caption{SQL-Query für einen Left Join}
 \label{lst:left-join}
 \end{listing}
 
@@ -515,7 +516,7 @@ ON city.country_id = country.id;
    Lyon & France \\ \hline
    Stockholm & NULL \\ \hline
   \end{tabular}
-\caption{Beispiel eines Left Joins}
+\caption{Ergebnis eines Left Joins}
 \label{tab:left-join}
 \end{table}
 \end{minipage}
@@ -532,7 +533,7 @@ FROM City city
 RIGHT JOIN Country country 
 ON city.country_id = country.id;
 \end{minted}
-\caption{Beispiel eines Right Joins}
+\caption{SQL-Query für einen Right Join}
 \label{lst:right-join}
 \end{listing}
 
@@ -600,7 +601,7 @@ ON city.country_id = country.id;
    Lyon & France \\ \hline
    NULL & Japan \\ \hline
   \end{tabular}
-\caption{Beispiel eines Right Joins}
+\caption{Ergebnis eines Right Joins}
 \label{tab:right-join}
 \end{table}
 \end{minipage}
@@ -617,7 +618,7 @@ FROM City city
 FULL JOIN Country country 
 ON city.country_id = country.id;
 \end{minted}
-\caption{Beispiel eines Full Joins}
+\caption{SQL-Query für einen Full Join}
 \label{lst:full-join}
 \end{listing}
 
@@ -687,7 +688,7 @@ ON city.country_id = country.id;
    Stockholm & NULL \\ \hline
    NULL & Japan \\ \hline
   \end{tabular}
-\caption{Beispiel eines Full Joins}
+\caption{Ergebnis eines Full Joins}
 \label{tab:full-join}
 \end{table}
 \end{minipage}
@@ -704,9 +705,11 @@ FROM City a
 LEFT JOIN City b
 ON a.country_id = b.country_id AND a.id <> b.id;
 \end{minted}
-\caption{Beispiel eines Self Joins}
+\caption{SQL-Query für einen Self Join}
 \label{lst:self-join}
 \end{listing}
+
+Der in Listing \ref{lst:self-join} definierte Self Join auf der Tabelle \texttt{City} liefert als Ergebnis Paare Städten die im gleichen Land liegen. Das Ergebnis dieser Abfrage ist in Tabelle \ref{tab:self-join} zu sehen.
 
 \begin{minipage}{\textwidth}
 \begin{minipage}[b]{0.49\textwidth}
@@ -776,31 +779,189 @@ ON a.country_id = b.country_id AND a.id <> b.id;
     Lyon & Paris \\ \hline
     Stockholm & NULL \\ \hline
   \end{tabular}
-\caption{Beispiel eines Self Joins}
+\caption{Ergebnis eines Self Joins}
 \label{tab:self-join}
 \end{table}
 \end{minipage}
 \end{minipage}
 
+\newpage
 \subsubsection{Equi-Join}
-USING keyword
+Ein Equi-Join ist, ähnlich des Self Joins, kein eigener Join-Typ im klassischen Sinne. Ein Join wird dann als Equi-Join bezeichnet wenn die Join-Bedingung als Operator ausschließlich die Gleichheit \texttt{=}, engl. equality, verwendet.
+
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT city.name, country.name 
+FROM City city
+JOIN Country country 
+ON city.id = country.id;
+\end{minted}
+\caption{SQL-Query für einen Equi-Join}
+\label{lst:equi-join}
+\end{listing}
+
+Für den Sonderfall dass beide Spalten den gleichen Namen haben kann nach SQL/92-Standard das Schlüsselwort \texttt{USING} verwendet werden.
+
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT city.name, country.name 
+FROM City city
+JOIN Country country 
+USING (id);
+\end{minted}
+\caption{SQL-Query für einen Equi-Join mit dem Schlüsselwort \texttt{USING}}
+\label{lst:equi-join-using}
+\end{listing}
 
 \subsubsection{Natural Join}
+Natural Joins sind sehr eng mit Equi-Joins verwandt. Bei einem Natural Join werden alle Spalten der beteiligten Tabellen für die Join-Bedingung genutzt wenn sie den gleichen Namen haben.
 
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT city.name, country.name 
+FROM City city
+NATURAL JOIN Country country;
+\end{minted}
+\caption{SQL-Query für einen Natural Join}
+\label{lst:natural-join}
+\end{listing}
+
+\newpage
 \subsubsection{Semi-Join}
+Semi- und Anti-Joins haben eine Besonderheit die sie von allen anderen Join-Arten unterscheiden. Im eigentlichen SQL-Query kommt in keiner Weise das Schlüsselwort \texttt{JOIN} vor. Stattdessen wird im Falle des Semi-Joins ein Sub-Query mit dem Schlüsselwort \texttt{EXISTS} verwendet. Alternativ wäre auch ein Sub-Query mit \texttt{IN} möglich. SQL-Engines verarbeiten diese Queries sehr ähnlich zu normalen Joins. Der Vorteil für den Aufrufer ist, dass Tupel aus der linken Tabelle maximal einmal auftreten, unabhängig davon wieviele Treffer das Sub-Query liefert. Bei einem normalen Join würde die Anzahl der Treffer auf der rechten Seite bestimmen wie oft Treffer auf der linken Seite ausgegeben werden. Semi-Joins sind in der Regel eine performante Alternative zu \texttt{DISTINCT} und \texttt{GROUP BY}.
+
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT *
+FROM Country country
+WHERE EXISTS (SELECT * FROM City city WHERE city.country_id = country.id);
+\end{minted}
+\caption{SQL-Query für einen Semi-Join}
+\label{lst:semi-join}
+\end{listing}
+
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l |}
+    \hline
+    id & name & country\protect{\textunderscore}code \\ \hline
+    \hline
+    1 & Deutschland & DE \\ \hline
+    2 & United Kingdom & UK \\ \hline
+    3 & France & FR \\ \hline
+    4 & United States & US \\ \hline
+  \end{tabular}
+\end{table}
+
+\subsubsection{Anti-Join}
+Anti-Joins sind wie negierte Semi-Joins. Statt der Schlüsselwörter \texttt{EXISTS} und \texttt{IN} werden \texttt{NOT EXISTS} bzw. \texttt{NOT IN} verwendet. Der Name \textit{Anti}-Join rührt daher, dass klassische Joins dazu benutzt werden, um Zusammenhänge und Übereinstimmungen zu finden respektive auszunutzen. Anti-Joins hingegen sind der präferierte Weg wenn die Anforderung verlangt, dass Tupel in der linken Tabelle keine Treffer in der rechten haben.
+
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT country.name
+FROM Country country
+WHERE NOT EXISTS (SELECT * FROM City city WHERE city.country_id = country.id);
+\end{minted}
+\caption{SQL-Query für einen Anti-Join}
+\label{lst:anti-join}
+\end{listing}
+
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l |}
+    \hline
+    id & name & country\protect{\textunderscore}code \\ \hline
+    \hline
+    5 & Japan & JP \\ \hline
+  \end{tabular}
+\end{table}
 
 \newpage
 
 \subsection{Join-Algorithmen}
 \label{sec:algorithms}
 
+In aktuellen relationalen Datenbanken gibt es verschiedene Algorithmen um Joins algorithmisch umzusetzen. Einige dieser Algorithmen sind für bestimmte Arten von Joins besser geeignet als andere. Zu den Faktoren, die eine Rolle bei der Auswahl des besten Algorithmus für eine konkrete Abfrage spielen, zählen unter anderem die Größe der involvierten Relationen/Tabellen sowie die Art der Join-Bedingung.
+
 \subsubsection{Nested-Loop-Join}
+\label{sec:nested-loop}
+Nested-Loop-Joins sind die einfachste Art der Bildung von Joins. Zwei geschachtelten Schleifen laufen sowohl über die linke als auch die rechte Relation. Für jedes Tupel-Paar das so gebildet wird entscheidet die Join-Bedingung ob es ein Treffer ist oder nicht. Listing \ref{lst:nested-loop} zeigt den schematischen Ansatz anhand eines kurzen Quellcode-Ausschnitts. Die Funktion \texttt{emit} soll exemplarisch dazu dienen den gefunden Treffer auszugeben.
+
+Der Vorteil des Nested-Loop-Join-Algorithmus ist, dass er für jede Art von Join anwendbar ist. Zusätzlich kann er erweitert werden, für den Fall, dass ein Join mehr als zwei Relationen beinhaltet. Der negative Aspekt dieses Algorithmus ist sein Rechenaufwand. Schon bei zwei Relationen muss für jeden Tupel der linken Seite ein kompletter Tablescan der rechten Seite ausgeführt werden. Die Anzahl der Schleifendurchläufe errechnet sich aus dem Produkt der Größen der beiden Tabellen.
+
+\begin{listing}[H]
+\begin{minted}{javascript}
+for (var left in leftTable) {
+    for (var right in rightTable) {
+        if (predicate(left, right)) {
+            emit(left, right);
+        }
+    }
+}
+\end{minted}
+\caption{Nested-Loop-Join}
+\label{lst:nested-loop}
+\end{listing}
 
 \subsubsection{Block-Nested-Loop-Join}
+Der Block-Nested-Loop-Join-Algorithmus ist eine Verbesserung des \nameref{lst:nested-loop}-Algorithmus. Der Ansatz ist, nicht für jeden Tupel aus der linken Tabelle einen kompletten Tablescan der rechten Tabelle ausführen zu müssen, sondern Blöcke zu bilden. Dadurch wird nur noch blockweise durch die Tabelle gelaufen. Dadurch ergibt sich, bedingt durch weniger wahlfreie Zugriffe und mehr sequentielle Leseoperationen auf der Festplatte, eine höhere Ausführgeschwindigkeit. Alle sonstigen Vorteile des Nested-Loop-Join-Algorithmus gelten in gleicher weise für die blockweise Variante.
 
+\begin{listing}[H]
+\begin{minted}{javascript}
+for (var leftBLock in leftTable) {
+    for (var rightBlock in rightTable) {
+        for (var left in leftBlock)  {
+            for (var right in rightBlock) {
+                if (predicate(left, right)) {
+                    emit(left, right);
+                }
+            }
+        }
+    }
+}
+\end{minted}
+\caption{Block-Nested-Loop-Join}
+\label{lst:block-nested-loop}
+\end{listing}
+
+\newpage
 \subsubsection{Sort/Merge-Join}
+sort on join attribute, merge, stack pointer, compare, uses indices
+natural, equi
+
+\begin{figure}[H]
+\centering
+\subfigure[]{
+  \begin{tabular}{| c | c | c | c | c |}
+    \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \noalign{\smash{\llap{\lower2pt\hbox{\tt $\longrightarrow$}}}}
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+  \end{tabular}
+}
+\hspace*{1cm}
+\subfigure[]{
+  \begin{tabular}{| c | c | c | c | c |}
+    \hline
+    \cellcolor{cell-odd} \\ \hline
+    \noalign{\smash{\llap{\lower2pt\hbox{\tt $\longrightarrow$}}}}
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+  \end{tabular}
+}
+\caption{Schematische Darstellung des Sort/Merge-Join-Algorithmus}
+\end{figure}
 
 \subsubsection{Hash-Join}
+hashtable on left, loop right, non empty bucket -> hit
+equality operator
 
 \newpage
 
