@@ -10,15 +10,18 @@
 \usepackage{subfigure}
 \usepackage[table]{xcolor}
 \usepackage[format=plain,labelfont=bf,up]{caption}
+\setcounter{tocdepth}{4}
 \setcounter{secnumdepth}{-1} 
 \usepackage{hyperref}
 \usepackage{nameref}
 \usepackage{minted}
 \usemintedstyle{friendly}
 \bibliography{paper}
-\title{Tenzing \\ A SQL Implementation On The MapReduce Framework}
+\title{Tenzing \\ Eine SQL-Implementierung auf Basis des MapReduce-Frameworks}
 \author{Willi Schönborn}
 \date{\today}
+\definecolor{cell}{HTML}{1BB2E0}
+\definecolor{cell-odd}{HTML}{7EE01B}
 \begin{document}
 
 \begin{figure}[H]
@@ -36,40 +39,33 @@
 \section{Einleitung}
 Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzepte} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein wissenschaftliches Paper ausgewählt, untersucht und bewertet werden. Das Ziel dieses Dokumentes ist es die Ergebnisse dieser Semesterarbeit zusammenzufassen.
 
-Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong.
-
 \section{Kurzbeschreibung}
-Tenzing beschreibt eine SQL92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}. Die beiden grundelegenden Technologien werden in den Kapiteln \textit{\nameref{sql}} und \textit{\nameref{mapreduce}}, unter Berücksichtigung des Hauptthemas, näher erläutert.
+Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong.
+Tenzing ist eine SQL92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}. Die beiden zugrundeliegenden Technologien werden in den Kapiteln \textit{\nameref{sql}} und \textit{\nameref{mapreduce}}, im Kontext des Hauptthemas, näher erläutert.
 
 \newpage
 
 \section{SQL}
 \label{sql}
-
-SQL steht für \textit{Structured Query Language} und ist eine mengenorientierte, deklarative Abfragesprache für Datenbank-Management-Systeme.
-
-Standardisierung
-
-DML
-DDL
+SQL steht für \textit{Structured Query Language} und ist eine standardisierte, mengenorientierte und deklarative Datenbanksprache die in vielen Datenbank-Management-Systemen zum Einsatz kommt. SQL bietet Möglichkeiten zur Definition, Manipulation und zur Abfrage von Daten an. Für die Definition und die Manipulation existieren zwei Sprachen die jeweils eine Teilmenge von SQL bilden: die \textit{Data Definition Language} (DDL) und die \textit{Data Manipulation Language} (DML). Beide werden zwar zum Teil von Tenzing unterstützt, der eigentliche Schwerpunkt liegt aber klar auf der Abfrage von Daten. Aus diesem Grund wird in den folgenden Kapiteln verstärkt auf den Abfrage-Teil von SQL eingegangen.
 
 \subsection{Syntax und Sprachelemente}
-\definecolor{cell}{HTML}{1BB2E0}
-\definecolor{cell-odd}{HTML}{7EE01B}
+Listing \ref{sql-syntax} zeigt die wichtigsten Bestandteile eines SQL-Queries in Form einer Form einer sehr einfachen Grammatik. Alle abgebildeten Teile der SQL-Query-Syntax werden in den folgenden Unterkapiteln kurz anhand eines Beispiels und einer visuellen Darstellung erklärt.
 
 \begin{listing}[H]
 \begin{minted}{sql}
-SELECT [DISTINCT] ((literal|field|function) [AS alias])+
-FROM table [AS alias] [, table [AS alias]]+
-[[[LEFT|RIGHT] [INNER|OUTER]] JOIN table [AS alias] [ON condition]]+
+SELECT field+
+FROM table+
+[[[LEFT|RIGHT] [INNER|OUTER]] JOIN table [ON condition]]+
 [WHERE condition [(AND|OR) condition]+]
-[GROUP BY (attribute)+
-[HAVING condition]]
-[ORDER BY (attribute [ASC|DESC])+];
+[GROUP BY attribute+;
 \end{minted}
 \caption{SQL Query-Syntax}
 \label{sql-syntax}
 \end{listing}
+
+\subsection{Referenztabellen und Beispieldaten}
+Die folgenden Abbildungen stellen die Struktur zweier Datenbank-Tabellen sowie entsprechende Beispieldaten dar. Beide Tabellen werden in den folgenden Abschnitten als Grundlage genutzt um einzelne Merkmale und Eigenschaften von SQL anhand von konkreten Beispielen zu erklären.
 
 \begin{table}[H]
 \centering
@@ -102,75 +98,173 @@ FROM table [AS alias] [, table [AS alias]]+
   \end{tabular}
 }
 \caption{Beispiel-Tabellen}
+\label{example}
 \end{table}
 
+\newpage
 \subsection{Projektion}
+Bei der Projektion werden einzelne Spalten einer Tabelle selektiert. Dazu werden in der Projektionsklausel, zu erkennen am Schlüsselwort \texttt{SELECT}, einfach, wie in Listing \ref{lst:projection} dargestellt, die gewünschten Spaltennamen aufgezählt.
 
 \begin{listing}[H]
 \begin{minted}{sql}
-SELECT name, population FROM City;
+SELECT id, name FROM City;
 \end{minted}
-\caption{Projektion}
+\caption{SQL-Query für eine Projektion}
+\label{lst:projection}
 \end{listing}
 
+\begin{minipage}{\textwidth}
+\begin{minipage}[b]{0.49\textwidth}
 \begin{figure}[H]
 \centering
-  \begin{tabular}{| c | c | c | c | c |}
+  \begin{tabular}{| c | c | c | c |}
     \hline
-     & \cellcolor{cell} & \cellcolor{cell} & & \cellcolor{cell} \\ \hline
-     & \cellcolor{cell} & \cellcolor{cell} & & \cellcolor{cell} \\ \hline
-     & \cellcolor{cell} & \cellcolor{cell} & & \cellcolor{cell} \\ \hline
-     & \cellcolor{cell} & \cellcolor{cell} & & \cellcolor{cell} \\ \hline
-     & \cellcolor{cell} & \cellcolor{cell} & & \cellcolor{cell} \\ \hline
+     \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+     \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+     \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+     \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+     \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+     \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+     \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+     \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+     \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
   \end{tabular}
-\caption{Projektion}
+\caption{Schema einer Projektion}
+\label{fig:projection}
 \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.49\textwidth}
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l | l |}
+    \hline
+    id & name \\ \hline
+    \hline
+   1 & Berlin \\ \hline
+   2 & München \\ \hline
+   3 & London \\ \hline
+   4 & Paris \\ \hline
+   5 & Edinburgh \\ \hline
+   6 & New York City \\ \hline
+   7 & Los Angeles \\ \hline
+   8 & Lyon \\ \hline
+   9 & Stockholm \\ \hline
+  \end{tabular}
+\caption{Beispiel einer Projektion}
+\label{tab:projection}
+\end{table}
+\end{minipage}
+\end{minipage}
 
 \subsection{Selektion}
+Eine Selektion arbeitet im Gegensatz zur Projektion nicht auf den Spalten, sondern auf den Zeilen. Weil die Spalten die Struktur einer Tabelle definieren und die Zeilen die eigentlichen Daten enthalten gibt es in der Regel eine Vielzahl mehr Zeilen als Spalten. Weiterhin sind Zeilen nicht zwangsläufig mit einen eindeutigen Bezeichner versehen wie es für Spalten der Fall ist. Aus diesem Grund reicht es meist nicht aus die gewünschten Zeilen aufzuzählen wie es bei der Projektion der Fall ist. Stattdessen kommen Bedingungen in Form einer \texttt{WHERE}-Klausel zum Einsatz. Tenzing unterstützt alle gängigen Prädikate wie \texttt{AND}. \texttt{OR}. \texttt{LIKE} und \texttt{BETWEEN}.
 
 \begin{listing}[H]
 \begin{minted}{sql}
-SELECT * FROM City WHERE population > 250000;
+SELECT * FROM City WHERE population > 2500000;
 \end{minted}
-\caption{Selektion}
+\caption{SQL-Query für eine Selektion}
+\label{lst:selection}
 \end{listing}
 
+\begin{minipage}{\textwidth}
+\begin{minipage}[b]{0.49\textwidth}
 \begin{figure}[H]
 \centering
-  \begin{tabular}{| c | c | c | c | c |}
+  \begin{tabular}{| c | c | c | c |}
     \hline
-     & &  & &\\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
-     & &  & &\\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} \\ \hline
+     & &  & \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} \\ \hline
+     & &  & \\ \hline
+     & &  & \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} \\ \hline
+     & &  & \\ \hline
+     & &  & \\ \hline
   \end{tabular}
-\caption{Selektion}
+\caption{Schema einer Selektion}
+\label{fig:selection}
 \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.49\textwidth}
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l | l |}
+    \hline
+    id & name & population & country\protect{\textunderscore}id \\ \hline
+    \hline
+   1 & Berlin & 3471756 & 1 \\ \hline
+   3 & London & 7825200 & 2 \\ \hline
+   6 & New York City & 8175133 & 4 \\ \hline
+   7 & Los Angeles & 3831868 & 4 \\ \hline
+  \end{tabular}
+\caption{Beispiel einer Selektion}
+\label{tab:selection}
+\end{table}
+\end{minipage}
+\end{minipage}
 
+\newpage
 \subsection{Gruppierung und Aggregatfunktionen}
+SQL im Allgemeinen und Tenzing im Speziellen haben einen starken Fokus auf die Datenanalyse. Dazu zählen vorallem die statistische Analyse von Datenbeständen. SQL bietet für diesen Fall sogenannte Aggregatfunktionen in Kombination mit der \texttt{GROUP BY}-Klausel. Mithilfe einer Aggregatfunktionen wird für eine Gruppe ein einzelner Wert berechnet. Die Bildung dieser Gruppen wird durch die Angabe der \texttt{GROUP BY}-Klausel geregelt. Wird keine solche Klausel angegeben bezieht sich die Aggregatfunktion auf die gesamte Menge aller ausgewählten Tupel. Tenzing unterstützt neben den klassischen Aggregatfunktionen wie \texttt{SUM}, \texttt{COUNT}, \texttt{MIN}, \texttt{MAX} und \texttt{COUNT DISTINCT} wichtige statistische Aggregatfunktionen wie \texttt{CORR}, \texttt{COVAR} und \texttt{STDDEV} für den Korrelationskoeffizienten, die empirische Kovarianz respektive die Standardabweichung.
 
 \begin{listing}[H]
 \begin{minted}{sql}
-SELECT country_id, AVG(population) FROM City GROUP BY country_id ORDER BY AVG(population) DESC;
+SELECT country_id, AVG(population) FROM City 
+GROUP BY country_id 
+ORDER BY AVG(population) DESC;
 \end{minted}
 \caption{Gruppierung}
+\label{lst:group}
 \end{listing}
 
-\subsection{Union}
+Die Ergebnistabelle \ref{tab:group} zeigt das Ergebnis des Queries aus Listing \ref{lst:group}. Berechnet wurde die durchschnittliche Bevölkerungsstärke pro Land.
+
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l | l |}
+    \hline
+     country\protect{\textunderscore}id & AVG(population) \\ \hline
+    \hline
+    4 & 6003500 \\ \hline
+    2 & 4155660 \\ \hline
+    1 & 2412471 \\ \hline
+    3 & 1343121 \\ \hline
+  \end{tabular}
+\caption{Beispiel einer Gruppierung mit Aggregatfunktion}
+\label{tab:group}
+\end{table}
+
+\newpage
+\subsection{Mengenoperationen}
+SQL bietet Unterstützung für die drei wichtigsten Mengenoperationen: die Vereinigung, der Durchschnitt und die Differenz. Die Bedingung für die beteiligten Mengen ist eine kompatible Projektion. Das heißt die entsprechenden Operationen können nur ausgeführt werden wenn die gleiche Anzahl Spalten selekiert wurden. Mathematisch betrachtet müssen die Tupel aller beteiligten Mengen die gleiche Länge haben. Tenzing unterstützt die Vereinigung und die Differenz von Megen in Form der Schlüsselwörter \texttt{UNION} und \texttt{MINUS}.
 
 \begin{listing}[H]
 \begin{minted}{sql}
 SELECT id, name FROM City UNION SELECT id, name FROM Country;
 \end{minted}
-\caption{Union}
+\caption{Query für eine Vereinigung}
+\label{lst:union}
 \end{listing}
 
+Abbildung \ref{fig:union} und Tabelle \ref{tab:union} zeigen das Ergebnis des Union-Queries aus Listing \ref{lst:union} über die Beispieltabellen \texttt{City} und \texttt{Country}.
+
+\begin{minipage}{\textwidth}
+\begin{minipage}[b]{0.49\textwidth}
 \begin{figure}[H]
 \centering
 \subfigure[]{
   \begin{tabular}{| c | c | c | c | c |}
     \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
     \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
     \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
     \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
@@ -181,10 +275,12 @@ SELECT id, name FROM City UNION SELECT id, name FROM Country;
     \hline
     \cellcolor{cell-odd} & \cellcolor{cell-odd} & \cellcolor{cell-odd} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
     \cellcolor{cell-odd} & \cellcolor{cell-odd} & \cellcolor{cell-odd} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} & \cellcolor{cell-odd} & \cellcolor{cell-odd} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} & \cellcolor{cell-odd} & \cellcolor{cell-odd} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} & \cellcolor{cell-odd} & \cellcolor{cell-odd} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
   \end{tabular}
 }
 \end{figure}
-
 \begin{figure}[H]
 \centering
   \begin{tabular}{| c | c | c | c | c |}
@@ -192,16 +288,59 @@ SELECT id, name FROM City UNION SELECT id, name FROM Country;
     \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
     \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
     \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell-odd} & \cellcolor{cell-odd} & \cellcolor{cell-odd} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} & \cellcolor{cell-odd} & \cellcolor{cell-odd} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} & \cellcolor{cell-odd} & \cellcolor{cell-odd} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
     \cellcolor{cell-odd} & \cellcolor{cell-odd} & \cellcolor{cell-odd} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
     \cellcolor{cell-odd} & \cellcolor{cell-odd} & \cellcolor{cell-odd} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
   \end{tabular}
-\caption{Union}
+\caption{Schema einer Vereinigung}
+\label{fig:union}
 \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.49\textwidth}
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l | l |}
+    \hline
+    id & name\\ \hline
+    \hline
+   1 & Berlin \\ \hline
+   2 & München \\ \hline
+   3 & London \\ \hline
+   4 & Paris \\ \hline
+   5 & Edinburgh \\ \hline
+   6 & New York City \\ \hline
+   7 & Los Angeles \\ \hline
+   8 & Lyon \\ \hline
+   9 & Stockholm  \\ \hline
+    1 & Deutschland \\ \hline
+    2 & United Kingdom \\ \hline
+    3 & France \\ \hline
+    4 & United States \\ \hline
+    5 & Japan \\ \hline
+  \end{tabular}
+\caption{Beispiel einer Vereinigung}
+\label{tab:union}
+\end{table}
+\end{minipage}
+\end{minipage}
 
+\newpage
 \subsection{Joins}
-blabla
+Joins, dt. \textit{Verbund}, zählen einerseits zu den mächtigsten Werkzeugen von relationalen Datenbank-Management-Systemen, gleichzeitig aber auch, im Bezug zur Ausführung, zu den aufwändigsten. In den folgenden Abschnitten werden kurz alle verschiedenen Arten von Joins kurz beschrieben und anhand eines Beispiels verdeutlicht. Im Kapitel \nameref{sec:algorithms} werden die unterschiedlichen Möglichkeiten erläutert wie Joins auf Datenbank-Ebene implementiert werden können. Tenzing unterstützt alle genannten Join-Typen.
+
+Ein Join kann als ein bedingtes kartesisches Produkt verstanden werden. Dabei wird jeder Tupel aus der linken mit einem Tupel aus der rechten Tabelle kombiniert.  Durch eine Bedingung, bestehend aus Prädikaten, kann das Ergebnis dieser Operation eingeschränkt werden.
 
 \subsubsection{Inner Join}
+Bei einem Inner Join werden Tupel nur dann in die Ergebnismenge übernommen wenn alle beteiligten Tupel die entsprechende Bedingung erfüllen. Am konkreten Beispiel in Listing \ref{lst:explicit-inner-join} werden nur die Städte ausgegeben, zu denen es ein konkretes Land im Datenbestand gibt. Der Ergebnis dieses Joins ist in Tabelle \ref{tab:inner-join} zu sehen. Für Inner Joins gibt es zwei unterschiedliche Schreibweisen: eine implizite und eine explizite. Listing \ref{lst:explicit-inner-join} und \ref{lst:implicit-inner-join} zeigen beide Varianten.
 
 \begin{listing}[H]
 \begin{minted}{sql}
@@ -211,6 +350,7 @@ JOIN Country country
 ON city.country_id = country.id;
 \end{minted}
 \caption{Expliziter Inner Join}
+\label{lst:explicit-inner-join}
 \end{listing}
 
 \begin{listing}[H]
@@ -220,169 +360,427 @@ FROM City city, Country country
 WHERE city.country_id = country.id;
 \end{minted}
 \caption{Impliziter Inner Join}
+\label{lst:inplicit-inner-join}
 \end{listing}
 
+\begin{minipage}{\textwidth}
+\begin{minipage}[b]{0.49\textwidth}
 \begin{figure}[H]
 \centering
 \subfigure[]{
   \begin{tabular}{| c | c | c |}
     \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
   \end{tabular}
 }
 \subfigure[]{
   \begin{tabular}{| c | c |}
     \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
   \end{tabular}
 }
 \end{figure}
-
 \begin{figure}[H]
 \centering
   \begin{tabular}{| c | c | c | c | c |}
     \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
   \end{tabular}
-\caption{Inner Join}
+\caption{Schema eines Inner Joins}
 \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.49\textwidth}
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l | l |}
+    \hline
+    city.name & country.name\\ \hline
+    \hline
+   Berlin & Deutschland \\ \hline
+   München & Deutschland \\ \hline
+   London & United Kingdom \\ \hline
+   Paris & France \\ \hline
+   Edinburgh & United Kingdom \\ \hline
+   New York City & United States \\ \hline
+   Los Angeles & United States \\ \hline
+   Lyon & France \\ \hline
+  \end{tabular}
+\caption{Beispiel eines Inner Joins}
+\label{tab:inner-join}
+\end{table}
+\end{minipage}
+\end{minipage}
 
 \subsubsection{Cross Join}
-kartesisches Produkt, inner join ohne predikate
+Ein Cross Join ist, wie alle Joins, ein kartesisches Produkt mit der Ausnahme, dass keine Bedingung angewandt wird. Das bedeutet, dass jeder Tupel mit jedem anderen Tupel aus allen anderen beteiligten Tabellen kombiniert wird. Da die Ergebnismenge eines Cross Joins auf den oben vorgestellten Beispieltabellen bereits 45 Tupel enthalten würde, wird an dieser Stelle auf die Darstellung verzichtet.
+
+\subsubsection{Outer Join}
+Outer Joins erlauben es, im Gegensatz zum Inner Join, Tupel auch dann in die Ergebnismenge zu übernehmen, wenn nur ein Tupel der beteiligten Tabellen die zugehörige Bedingung erfüllt. Dadurch entstehen drei verschiedene Möglichkeiten: der \texttt{LEFT JOIN}, der \texttt{RIGHT JOIN} und der \texttt{FULL JOIN}.
 
 \subsubsection{Left Outer Join}
-explicit only!
-aka LEFT JOIN
+Der Left Outer Join, oder auch nur Left Join, existiert im Gegensatz zum Inner Join nur in expliziter Form. Die Ergebnismenge enthält jeden Tupel aus der linken Tabelle mindestens einmal, unabhängig davon ob Tupel in den anderen beteiligten Tabellen existieren die die Bedingung erfüllen oder nicht.
 
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT city.name, country.name 
+FROM City city
+LEFT JOIN Country country 
+ON city.country_id = country.id;
+\end{minted}
+\caption{Beispiel eines Left Joins}
+\label{lst:left-join}
+\end{listing}
+
+\begin{minipage}{\textwidth}
+\begin{minipage}[b]{0.49\textwidth}
 \begin{figure}[H]
 \centering
 \subfigure[]{
   \begin{tabular}{| c | c | c |}
     \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
   \end{tabular}
 }
 \subfigure[]{
   \begin{tabular}{| c | c |}
     \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
   \end{tabular}
 }
 \end{figure}
-
 \begin{figure}[H]
 \centering
-  \begin{tabular}{| c | c | c | c | c |}
+  \begin{tabular}{| c | c |}
     \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \\ \hline
   \end{tabular}
-\caption{Left Outer Join}
+\caption{Schema eines Left Joins}
 \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.49\textwidth}
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l | l |}
+    \hline
+    city.name & country.name\\ \hline
+    \hline
+   Berlin & Deutschland \\ \hline
+   München & Deutschland \\ \hline
+   London & United Kingdom \\ \hline
+   Paris & France \\ \hline
+   Edinburgh & United Kingdom \\ \hline
+   New York City & United States \\ \hline
+   Los Angeles & United States \\ \hline
+   Lyon & France \\ \hline
+   Stockholm & NULL \\ \hline
+  \end{tabular}
+\caption{Beispiel eines Left Joins}
+\label{tab:left-join}
+\end{table}
+\end{minipage}
+\end{minipage}
 
+\newpage
 \subsubsection{Right Outer Join}
-aka RIGHT JOIN
+Der Right Outer Join, oder auch nur Right Join, ist äquivalent zum Left Join mit der Ausnahme, dass Tupel aus der rechten Seite des Verbundes mindestens einmal in der Ergebnismenge auftreten.
 
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT city.name, country.name 
+FROM City city
+RIGHT JOIN Country country 
+ON city.country_id = country.id;
+\end{minted}
+\caption{Beispiel eines Right Joins}
+\label{lst:right-join}
+\end{listing}
+
+\begin{minipage}{\textwidth}
+\begin{minipage}[b]{0.49\textwidth}
 \begin{figure}[H]
 \centering
 \subfigure[]{
   \begin{tabular}{| c | c | c |}
     \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
   \end{tabular}
 }
 \subfigure[]{
   \begin{tabular}{| c | c |}
     \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
   \end{tabular}
 }
 \end{figure}
-
 \begin{figure}[H]
 \centering
-  \begin{tabular}{| c | c | c | c | c |}
+  \begin{tabular}{| c | c |}
     \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    & & &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    & & &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    & \cellcolor{cell-odd} \\ \hline
   \end{tabular}
-\caption{Right Outer Join}
+\caption{Schema eines Right Joins}
 \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.49\textwidth}
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l | l |}
+    \hline
+    city.name & country.name\\ \hline
+    \hline
+   Berlin & Deutschland \\ \hline
+   München & Deutschland \\ \hline
+   London & United Kingdom \\ \hline
+   Paris & France \\ \hline
+   Edinburgh & United Kingdom \\ \hline
+   New York City & United States \\ \hline
+   Los Angeles & United States \\ \hline
+   Lyon & France \\ \hline
+   NULL & Japan \\ \hline
+  \end{tabular}
+\caption{Beispiel eines Right Joins}
+\label{tab:right-join}
+\end{table}
+\end{minipage}
+\end{minipage}
 
+\newpage
 \subsubsection{Full Outer Join}
+Ein Full Outer Join, oder nur Full Join, ist eine Kombination der Eigenschaften eines Left- und eines Right Joins. Bei einem Full Join werden Tupel dann in die Ergebnismenge übernommen, wenn mindestens ein Tupel aller beteiligten Tabellen die zugehörige Bedingung erfüllt.
+
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT city.name, country.name 
+FROM City city
+FULL JOIN Country country 
+ON city.country_id = country.id;
+\end{minted}
+\caption{Beispiel eines Full Joins}
+\label{lst:full-join}
+\end{listing}
+
+\begin{minipage}{\textwidth}
+\begin{minipage}[b]{0.49\textwidth}
 \begin{figure}[H]
 \centering
 \subfigure[]{
   \begin{tabular}{| c | c | c |}
     \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
   \end{tabular}
 }
 \subfigure[]{
   \begin{tabular}{| c | c |}
     \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-odd} \\ \hline
   \end{tabular}
 }
 \end{figure}
-
 \begin{figure}[H]
 \centering
-  \begin{tabular}{| c | c | c | c | c |}
+  \begin{tabular}{| c | c |}
     \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
-    & & &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    & & &  \cellcolor{cell-odd} & \cellcolor{cell-odd} \\ \hline
-    \cellcolor{cell} & \cellcolor{cell} & \cellcolor{cell} & & \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \\ \hline
+    & \cellcolor{cell-odd} \\ \hline
   \end{tabular}
-\caption{Full Outer Join}
+\caption{Schema eines Full Joins}
 \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.49\textwidth}
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l | l |}
+    \hline
+    city.name & country.name\\ \hline
+    \hline
+   Berlin & Deutschland \\ \hline
+   München & Deutschland \\ \hline
+   London & United Kingdom \\ \hline
+   Paris & France \\ \hline
+   Edinburgh & United Kingdom \\ \hline
+   New York City & United States \\ \hline
+   Los Angeles & United States \\ \hline
+   Lyon & France \\ \hline
+   Stockholm & NULL \\ \hline
+   NULL & Japan \\ \hline
+  \end{tabular}
+\caption{Beispiel eines Full Joins}
+\label{tab:full-join}
+\end{table}
+\end{minipage}
+\end{minipage}
 
+\newpage
 \subsubsection{Self Join}
+Ein Self Join ist kein eigener Join-Typ in engeren Sinne; er beschreibt lediglich einen Join bei dem eine Tabelle mit sich selbst gejoint wird.
+
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT a.name, b.name 
+FROM City a
+LEFT JOIN City b
+ON a.country_id = b.country_id AND a.id <> b.id;
+\end{minted}
+\caption{Beispiel eines Self Joins}
+\label{lst:self-join}
+\end{listing}
+
+\begin{minipage}{\textwidth}
+\begin{minipage}[b]{0.49\textwidth}
+\begin{figure}[H]
+\centering
+\subfigure[]{
+  \begin{tabular}{| c | c | c |}
+    \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+  \end{tabular}
+}
+\subfigure[]{
+  \begin{tabular}{| c | c |}
+    \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+    \cellcolor{cell} \\ \hline
+  \end{tabular}
+}
+\end{figure}
+\begin{figure}[H]
+\centering
+  \begin{tabular}{| c | c |}
+    \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell} & \\ \hline
+  \end{tabular}
+\caption{Schema eines Self Joins}
+\end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.49\textwidth}
+\begin{table}[H]
+\centering
+  \begin{tabular}{| l | l | l | l |}
+    \hline
+    a.name & b.name\\ \hline
+    \hline
+    Berlin & München \\ \hline
+    München & Berlin \\ \hline
+    London & Edinburgh \\ \hline
+    Paris & Lyon \\ \hline
+    Edinburgh & London \\ \hline
+    New York City & Los Angeles \\ \hline
+    Los Angeles & New York City \\ \hline
+    Lyon & Paris \\ \hline
+    Stockholm & NULL \\ \hline
+  \end{tabular}
+\caption{Beispiel eines Self Joins}
+\label{tab:self-join}
+\end{table}
+\end{minipage}
+\end{minipage}
 
 \subsubsection{Equi-Join}
 USING keyword
@@ -394,6 +792,7 @@ USING keyword
 \newpage
 
 \subsection{Join-Algorithmen}
+\label{sec:algorithms}
 
 \subsubsection{Nested-Loop-Join}
 
