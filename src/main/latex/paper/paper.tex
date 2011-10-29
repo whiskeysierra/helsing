@@ -11,7 +11,6 @@
 \usepackage{array}
 \usepackage[table]{xcolor}
 \usepackage[format=plain,labelfont=bf,up]{caption}
-\setcounter{tocdepth}{4}
 \setcounter{secnumdepth}{-1} 
 \usepackage{hyperref}
 \usepackage{nameref}
@@ -21,8 +20,15 @@
 \title{Tenzing \\ Eine SQL-Implementierung auf Basis des MapReduce-Frameworks}
 \author{Willi Schönborn}
 \date{\today}
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+  {-3.25ex\@plus -1ex \@minus -.2ex}%
+  {1.5ex \@plus .2ex}%
+  {\normalfont\normalsize\bfseries}}
+\makeatother
 \definecolor{cell}{HTML}{1BB2E0}
 \definecolor{cell-odd}{HTML}{7EE01B}
+\definecolor{cell-special}{HTML}{FF3D00}
 \begin{document}
 
 \begin{figure}[H]
@@ -48,7 +54,7 @@ Tenzing ist eine SQL92-kompatible Implementierung auf Basis des Google-eigenen M
 
 \section{SQL}
 \label{sql}
-SQL steht für \textit{Structured Query Language} und ist eine standardisierte, mengenorientierte und deklarative Datenbanksprache die in vielen Datenbank-Management-Systemen zum Einsatz kommt. SQL bietet Möglichkeiten zur Definition, Manipulation und zur Abfrage von Daten an. Für die Definition und die Manipulation existieren zwei Sprachen die jeweils eine Teilmenge von SQL bilden: die \textit{Data Definition Language} (DDL) und die \textit{Data Manipulation Language} (DML). Beide werden zwar zum Teil von Tenzing unterstützt, der eigentliche Schwerpunkt liegt aber klar auf der Abfrage von Daten. Aus diesem Grund wird in den folgenden Kapiteln verstärkt auf den Abfrage-Teil von SQL eingegangen.
+SQL steht für \textit{Structured Query Language} und ist eine standardisierte, mengenorientierte und deklarative Datenbanksprache die in vielen Datenbank-Management-Systemen zum Einsatz kommt. SQL bietet Möglichkeiten zur Definition, Manipulation und zur Abfrage von Daten an \cite{Codd}. Für die Definition und die Manipulation existieren zwei Sprachen die jeweils eine Teilmenge von SQL bilden: die \textit{Data Definition Language} (DDL) und die \textit{Data Manipulation Language} (DML). Beide werden zwar zum Teil von Tenzing unterstützt, der eigentliche Schwerpunkt liegt aber klar auf der Abfrage von Daten. Aus diesem Grund wird in den folgenden Kapiteln verstärkt auf den Abfrage-Teil von SQL eingegangen.
 
 \subsection{Syntax und Sprachelemente}
 Listing \ref{sql-syntax} zeigt die wichtigsten Bestandteile eines SQL-Queries in Form einer Form einer sehr einfachen Grammatik. Alle abgebildeten Teile der SQL-Query-Syntax werden in den folgenden Unterkapiteln kurz anhand eines Beispiels und einer visuellen Darstellung erklärt.
@@ -439,6 +445,7 @@ Ein Cross Join ist, wie alle Joins, ein kartesisches Produkt mit der Ausnahme, d
 Outer Joins erlauben es, im Gegensatz zum Inner Join, Tupel auch dann in die Ergebnismenge zu übernehmen, wenn nur ein Tupel der beteiligten Tabellen die zugehörige Bedingung erfüllt. Dadurch entstehen drei verschiedene Möglichkeiten: der \texttt{LEFT JOIN}, der \texttt{RIGHT JOIN} und der \texttt{FULL JOIN}.
 
 \subsubsection{Left Outer Join}
+\label{sec:left-join}
 Der Left Outer Join, oder auch nur Left Join, existiert im Gegensatz zum Inner Join nur in expliziter Form. Die Ergebnismenge enthält jeden Tupel aus der linken Tabelle mindestens einmal, unabhängig davon ob Tupel in den anderen beteiligten Tabellen existieren die die Bedingung erfüllen oder nicht.
 
 \begin{listing}[H]
@@ -524,6 +531,7 @@ ON city.country_id = country.id;
 
 \newpage
 \subsubsection{Right Outer Join}
+\label{sec:right-join}
 Der Right Outer Join, oder auch nur Right Join, ist äquivalent zum Left Join mit der Ausnahme, dass Tupel aus der rechten Seite des Verbundes mindestens einmal in der Ergebnismenge auftreten.
 
 \begin{listing}[H]
@@ -787,6 +795,7 @@ Der in Listing \ref{lst:self-join} definierte Self Join auf der Tabelle \texttt{
 
 \newpage
 \subsubsection{Equi-Join}
+\label{sec:equi-join}
 Ein Equi-Join ist, ähnlich des Self Joins, kein eigener Join-Typ im klassischen Sinne. Ein Join wird dann als Equi-Join bezeichnet wenn die Join-Bedingung als Operator ausschließlich die Gleichheit \texttt{=}, engl. equality, verwendet.
 
 \begin{listing}[H]
@@ -814,6 +823,7 @@ USING (id);
 \end{listing}
 
 \subsubsection{Natural Join}
+\label{sec:natural-join}
 Natural Joins sind sehr eng mit Equi-Joins verwandt. Bei einem Natural Join werden alle Spalten der beteiligten Tabellen für die Join-Bedingung genutzt wenn sie den gleichen Namen haben.
 
 \begin{listing}[H]
@@ -851,9 +861,11 @@ WHERE EXISTS (SELECT * FROM City city WHERE city.country_id = country.id);
     3 & France & FR \\ \hline
     4 & United States & US \\ \hline
   \end{tabular}
+\caption{Ergebnis eines Semi-Joins}
 \end{table}
 
 \subsubsection{Anti-Join}
+\label{sec:anti-join}
 Anti-Joins sind wie negierte Semi-Joins. Statt der Schlüsselwörter \texttt{EXISTS} und \texttt{IN} werden \texttt{NOT EXISTS} bzw. \texttt{NOT IN} verwendet. Der Name \textit{Anti}-Join rührt daher, dass klassische Joins dazu benutzt werden, um Zusammenhänge und Übereinstimmungen zu finden respektive auszunutzen. Anti-Joins hingegen sind der präferierte Weg wenn die Anforderung verlangt, dass Tupel in der linken Tabelle keine Treffer in der rechten haben.
 
 \begin{listing}[H]
@@ -874,6 +886,7 @@ WHERE NOT EXISTS (SELECT * FROM City city WHERE city.country_id = country.id);
     \hline
     5 & Japan & JP \\ \hline
   \end{tabular}
+\caption{Ergebnis eines Anti-Joins}
 \end{table}
 
 \newpage
@@ -881,7 +894,7 @@ WHERE NOT EXISTS (SELECT * FROM City city WHERE city.country_id = country.id);
 \subsection{Join-Algorithmen}
 \label{sec:algorithms}
 
-In aktuellen relationalen Datenbanken gibt es verschiedene Algorithmen um Joins algorithmisch umzusetzen. Einige dieser Algorithmen sind für bestimmte Arten von Joins besser geeignet als andere. Zu den Faktoren, die eine Rolle bei der Auswahl des besten Algorithmus für eine konkrete Abfrage spielen, zählen unter anderem die Größe der involvierten Relationen/Tabellen sowie die Art der Join-Bedingung.
+In aktuellen relationalen Datenbanken gibt es verschiedene Algorithmen um Joins programmatisch umzusetzen. Einige dieser Algorithmen sind für bestimmte Arten von Joins besser geeignet als andere. Zu den Faktoren, die eine Rolle bei der Auswahl des besten Algorithmus für eine konkrete Abfrage spielen, zählen unter anderem die Größe der involvierten Relationen/Tabellen sowie die Art der Join-Bedingung.
 
 \subsubsection{Nested-Loop-Join}
 \label{sec:nested-loop}
@@ -904,7 +917,7 @@ for (var left in leftTable) {
 \end{listing}
 
 \subsubsection{Block-Nested-Loop-Join}
-Der Block-Nested-Loop-Join-Algorithmus ist eine Verbesserung des \nameref{lst:nested-loop}-Algorithmus. Der Ansatz ist, nicht für jeden Tupel aus der linken Tabelle einen kompletten Tablescan der rechten Tabelle ausführen zu müssen, sondern Blöcke zu bilden. Dadurch wird nur noch blockweise durch die Tabelle gelaufen. Dadurch ergibt sich, bedingt durch weniger wahlfreie Zugriffe und mehr sequentielle Leseoperationen auf der Festplatte, eine höhere Ausführgeschwindigkeit. Alle sonstigen Vorteile des Nested-Loop-Join-Algorithmus gelten in gleicher weise für die blockweise Variante.
+Der Block-Nested-Loop-Join-Algorithmus ist eine Verbesserung des \nameref{lst:nested-loop}-Algorithmus. Der Ansatz ist, nicht für jeden Tupel aus der linken Tabelle einen kompletten Tablescan der rechten Tabelle ausführen zu müssen, sondern Blöcke zu bilden. Dadurch wird nur noch blockweise durch die Tabelle gelaufen. Dadurch ergibt sich, bedingt durch weniger wahlfreie Zugriffe und mehr sequentielle Leseoperationen auf der Festplatte, eine höhere Ausführgeschwindigkeit. Alle sonstigen Vorteile des Nested-Loop-Join-Algorithmus gelten in gleicher Weise für die blockweise Variante.
 
 \begin{listing}[H]
 \begin{minted}{javascript}
@@ -926,8 +939,13 @@ for (var leftBLock in leftTable) {
 
 \newpage
 \subsubsection{Sort/Merge-Join}
-sort on join attribute, merge, stack pointer, compare, uses indices
-natural, equi
+Der Sort/Merge-Join-Algorithmus ist, im Gegensatz zu den Nested-Loop-Join-Algorithmen, nur für \nameref{sec:natural-join}s und \nameref{sec:equi-join}s anwendbar. Der Algorithmus besteht aus zwei Schritten: dem Sortieren (engl. \textit{sort}) und dem Zusammenführen (engl. \textit{merge}):
+
+\paragraph{Sortieren}
+Beide Relationen werden nach den Spalten sortiert die für den Join ausgewählt wurden. An dieser Stelle kann es von großem Vorteil sein wenn ein Datenbank-Index für die entsprechenden Spalten im Vorfeld bereits angelegt wurde und das Datenbank-Management-System nicht zur Laufzeit den gesamten Datenbestand sortieren muss. Das Sortieren führt dazu, dass Tupel mit gleichen Join-Attributen in Gruppen hintereinander liegen. Diese Tatsache wird im nächsten Schritt des Algorithmus ausgenutzt.
+
+\paragraph{Zusammenführen}
+Die beim Sortieren entstandenen Gruppen von Tupeln werden jetzt paarweise miteinander gejoint. Das heißt wenn es auf beiden Seiten eine Gruppe für den gleichen Wert gibt, so werden die Elemente dieser Gruppen mithilfe des kartesischen Produkts, kombiniert und zur Ergebnismenge hinzugefügt. Wenn nun einzelne Gruppen nur auf einer der beiden Seiten auftauchen, also auf der jeweiligen Gegenseite keine entsprechende Gruppe existiert, so können ganze Gruppen und damit teilweise große Bereiche der Relationen komplett übersprungen werden. Je nach Art des Joins lässt sich diese Trick nur für eine der beiden Seiten (vgl. \nameref{sec:left-join}/\nameref{sec:right-join}) anwenden oder gegebenenfalls komplett umdrehen (vgl. \nameref{sec:anti-join}). Abbildung \ref{fig:sort-merge} zeigt eine schematische Darstellung der paarweisen Gruppenbildung. Die Pfeile repräsentieren die aktuelle Position innerhalb der Relation während die hervorgehobenen Bereiche die aktuellen Gruppen sind
 
 \begin{figure}[H]
 \centering
@@ -938,30 +956,38 @@ natural, equi
     \cellcolor{cell} \\ \hline
     \cellcolor{cell} \\ \hline
     \cellcolor{cell} \\ \hline
-    \noalign{\smash{\llap{\lower2pt\hbox{\tt $\longrightarrow$}}}}
     \cellcolor{cell} \\ \hline
+    \noalign{\smash{\llap{\lower2pt\hbox{\tt $\longrightarrow$}}}}
+    \cellcolor{cell-special} \\ \hline
+    \cellcolor{cell-special} \\ \hline
     \cellcolor{cell} \\ \hline
     \cellcolor{cell} \\ \hline
   \end{tabular}
 }
-\hspace*{1cm}
+\hspace*{.5cm}
 \subfigure[]{
   \begin{tabular}{| c | c | c | c | c |}
     \hline
     \cellcolor{cell-odd} \\ \hline
     \noalign{\smash{\llap{\lower2pt\hbox{\tt $\longrightarrow$}}}}
-    \cellcolor{cell-odd} \\ \hline
+    \cellcolor{cell-special} \\ \hline
+    \cellcolor{cell-special} \\ \hline
+    \cellcolor{cell-special} \\ \hline
     \cellcolor{cell-odd} \\ \hline
     \cellcolor{cell-odd} \\ \hline
     \cellcolor{cell-odd} \\ \hline
   \end{tabular}
 }
-\caption{Schematische Darstellung des Sort/Merge-Join-Algorithmus}
+\caption{Schematische Darstellung der Merge-Phase des Sort/Merge-Join-Algorithmus}
+\label{fig:sort-merge}
 \end{figure}
 
+Der Sort/Merge-Join-Algorithmus hat den Vorteil, dass beide Relationen nur einmal komplett, während des Zusammenführens, durchlaufen werden müssen. Das reduziert die Komplexität und damit merklich den Rechenaufwand sowie die Ausführdauer.
+
 \subsubsection{Hash-Join}
-hashtable on left, loop right, non empty bucket -> hit
-equality operator
+Der Hash-Join-Algorithmus arbeitet ebenfalls in zwei Phasen. In der ersten Phase wird für eine der beiden Relationen eine Hashtabelle angelegt. Alle Tupel der ausgewählten Relation werden in diese Hashtabelle eingefügt wobei das Join-Attribut der Schlüssel ist. In der Regel wird für diesen Schritt die kleine der beiden Relationen verwendet, um den Speicherbedarf zu reduzieren. In der zweiten Phase wird nun die andere Relation durchlaufen und für jeden Tupel geprüft ob es ein entsprechendes Bucket in der Hashtabelle gibt. Falls ein solches Bucket existiert werden die Tupel verglichen, da ein identischer Hashwert nicht zwangsläufig identische Urbilder zur Folge hat. Die kartesisches Produkte der so gefundenen Treffer werden zur Ergebnismenge hinzugefügt.
+
+Durch die Nutzung von Hashfunktionen ist der Hash-Join-Algorithmus nur für Equi-Joins anwendbar, das heißt die Join-Bedingung darf nur Gleichheits-Prädikate enthalten. Durch die Negation der Gleichheit lassen sich mit Hash-Joins sowohl Semi- als auch Anti-Joins implementieren.
 
 \newpage
 
@@ -983,8 +1009,14 @@ Hadoop MapReduce is a software framework for easily writing applications which p
 \end{quote}
 
 \subsection{Motivation}
+commodity hardware, terabyte datasets, data analysis, processing, simplified programming model, fail safe
 
 \subsection{Funktionsweise}
+fp-style, map per input line, (combine), sort, reduce per key
+
+\section{Tenzing}
+
+\subsection{Motivation}
 
 \begin{figure}[H]
 \centering
@@ -1003,7 +1035,6 @@ Googles Implementierung des MapReduce-Frameworks ist nicht öffentlich verfügba
 \nocite{GOOGLE-GFS}
 \nocite{KemperEickler}
 \nocite{KandziaKlein}
-\nocite{Codd}
 \nocite{Selinger}
 \nocite{Zeller}
 \nocite{Ioannidis}
