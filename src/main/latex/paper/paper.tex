@@ -8,6 +8,7 @@
 \usepackage{graphicx}
 \usepackage{epstopdf}
 \usepackage{subfigure}
+\usepackage{graphvizzz}
 \usepackage{array}
 \usepackage[table]{xcolor}
 \usepackage[format=plain,labelfont=bf,up]{caption}
@@ -212,7 +213,7 @@ SELECT * FROM City WHERE population > 2500000;
 
 \newpage
 \subsection{Gruppierung und Aggregatfunktionen}
-SQL im Allgemeinen und Tenzing im Speziellen haben einen starken Fokus auf die Datenanalyse. Dazu zählen vorallem die statistische Analyse von Datenbeständen. SQL bietet für diesen Fall sogenannte Aggregatfunktionen in Kombination mit der \texttt{GROUP BY}-Klausel. Mithilfe einer Aggregatfunktionen wird für eine Gruppe ein einzelner Wert berechnet. Die Bildung dieser Gruppen wird durch die Angabe der \texttt{GROUP BY}-Klausel geregelt. Wird keine solche Klausel angegeben bezieht sich die Aggregatfunktion auf die gesamte Menge aller ausgewählten Tupel. Tenzing unterstützt neben den klassischen Aggregatfunktionen wie \texttt{SUM}, \texttt{COUNT}, \texttt{MIN}, \texttt{MAX} und \texttt{COUNT DISTINCT} wichtige statistische Aggregatfunktionen wie \texttt{CORR}, \texttt{COVAR} und \texttt{STDDEV} für den Korrelationskoeffizienten, die empirische Kovarianz respektive die Standardabweichung.
+SQL im Allgemeinen und Tenzing im Speziellen haben einen starken Fokus auf die Datenanalyse. Dazu zählen vorallem die statistische Analyse von Datenbeständen. SQL bietet für diesen Fall sogenannte Aggregatfunktionen in Kombination mit der \texttt{GROUP BY}-Klausel. Mithilfe einer Aggregatfunktionen wird für eine Gruppe ein einzelner Wert berechnet. Die Bildung dieser Gruppen wird durch die Angabe der \texttt{GROUP BY}-Klausel geregelt. Wird keine solche Klausel angegeben bezieht sich die Aggregatfunktion auf die gesamte Menge aller ausgewählten Tupel. Tenzing unterstützt neben den klassischen Aggregatfunktionen wie \texttt{SUM}, \texttt{COUNT}, \texttt{MIN}, \texttt{MAX} und \texttt{COUNT DISTINCT} wichtige statistische Aggregatfunktionen wie \texttt{CORR}, \texttt{COVAR} und \texttt{STDDEV} für den Korrelationskoeffizienten, die empirische Kovarianz und die Standardabweichung.
 
 \begin{listing}[H]
 \begin{minted}{sql}
@@ -792,7 +793,7 @@ Der in Listing \ref{lst:self-join} definierte Self Join auf der Tabelle \texttt{
 \newpage
 \subsubsection{Equi-Join}
 \label{sec:equi-join}
-Ein Equi-Join ist, ähnlich des Self Joins, kein eigener Join-Typ im klassischen Sinne. Ein Join wird dann als Equi-Join bezeichnet wenn die Join-Bedingung als Operator ausschließlich die Gleichheit \texttt{=}, engl. equality, verwendet.
+Ein Equi-Join ist, ähnlich des Self Joins, kein eigener Join-Typ im klassischen Sinne. Ein Join wird dann als Equi-Join bezeichnet wenn die Join-Bedingung als Operator ausschließlich die Gleichheit (\texttt{=}), engl. \textit{equality}, verwendet.
 
 \begin{listing}[H]
 \begin{minted}{sql}
@@ -1018,7 +1019,7 @@ Das eigentliche Modell auf dem MapReduce basiert ist ausgesprochen einfach. Das 
     \item \paragraph{Input}
 Das MapReduce-Framework liest die zu verarbeitenden Daten ein. In der Regel handelt es sich hier um Text-Dateien im CSV-Format. Jede Zeile wird an die Map-Funktion übergeben.
     \item \paragraph{Map}
-Die Map-Funktion parst den Input und gibt eine beliebige Anzahl von Schlüssel-Werte-Paaren aus. Listing \ref{lst:map} zeigt eine exemplarische Implementierung für ein Word-Count-Programm. Für jedes Wort in der Zeile wird als Schlüssel das gefundene Wort ausgegeben und als Wert eine \texttt{1}. Dieses Paar kann interpretiert werden als: \textit{Das Wort w wurde einmal gefunden}. Das Framework wird die Daten möglichst gleichmäßig auf alle Mapper, also Knoten die die Map-Funktione implementieren, verteilen um soviel Arbeit wie möglich parallel auszuführen.
+Die Map-Funktion parst den Input und gibt eine beliebige Anzahl von Schlüssel-Werte-Paaren aus. Listing \ref{lst:map} zeigt eine exemplarische Implementierung für ein Word-Count-Programm. Für jedes Wort in der Zeile wird als Schlüssel das gefundene Wort ausgegeben und als Wert eine \texttt{1}. Dieses Paar kann interpretiert werden als: \textit{Das Wort w wurde einmal gefunden}. Das Framework wird die Daten möglichst gleichmäßig auf alle Mapper, also Knoten die die Map-Funktion implementieren, verteilen um soviel Arbeit wie möglich parallel auszuführen.
     \item \paragraph{Combine}
 Nachdem ein Knoten alle ihm zugeteilten Zeilen durchgearbeitet hat geht er in die Combine-Phase über. Diese Phase dient nur dazu, um Daten lokal bereits zu aggregieren um die Netzwerklast zu reduzieren. In unserem Beispiel könnte an dieser Stelle die gleiche Implementierung verwendet werden wie für die Reduce-Funktion.
     \item \paragraph{Merge}
@@ -1073,19 +1074,47 @@ Abbildung \ref{fig:mapreduce} zeigt die Map- und Reduce-Phasen noch einmal in ei
 Die Autoren des Tenzing-Papers zählen viele Motivations-Faktoren auf. Die wichtigsten werden in den folgenden Abschnitten kurz genannt und erläutert.
 
 \subsubsection{Einfachere Schnittstellen}
-
-\subsubsection{Geringe Latenzen}
-
-\subsubsection{Effizienz}
-Heterogenes System, nutzt Datenbank-Optimierungen
+Obwohl MapReduce komplexe Berechnungen erfolgreich hinter einem ausgesprochen simplen Programmier-Modell versteckt ist die Einstiegshürde für Nicht-Programmierer doch noch relativ hoch. Im internen Betrieb von Google verlangt die Nutzung des MapReduce-Frameworks ein gewisseses Verständnis von verteilten System sowie C++ und/oder Java.
 
 \subsubsection{SQL-Kompatibilität}
+Eng verwandt mit dem Wunsch nach einfacheren Schnittstellen ist die Unterstützung des SQL/92-Standards. Viele Entwickler haben ein profundes Wissen über SQL. Die Akzeptanz von Tenzing ist damit wesentlich größer. Der Einsatz in anderen Gebieten wird dadurch ebenfalls unterstützt.
+
+\subsubsection{Geringe Latenzen}
+Klassische MapReduce-Jobs sind in der Lage mit extrem großen Daten umzugehen. In der Regel benötigen diese Berechnungen aber mehrere Minuten, in einzelnen Fällen auch bis zu einigen Stunden. Für effektive statistische Analysen soll Tenzing die Möglichkeit bieten solche Laufzeiten in den einstelligen Sekunden-Bereich zu drücken.
+
+\subsubsection{Effizienz}
+Viele heterogene Systeme, die wie Tenzing auf unterschiedlichen Persistenzmechanismen beruhen, entwerfen entsprechende Schnittstellen um Unterschiede wegzuabstrahieren. Tenzing will die diversen Optimierungen der zugrundeliegenden Systeme nutzen. Zu diesem Zweck ist Tenzing so konzipiert, dass Meta-Informationen über die Persistenz-System bekannt sind und vom Query Optimizer berücksichtigt werden können.
 
 \subsubsection{Skalierbarkeit}
+Viel Entwicklungszeit ist bei Google bereits in die Entwicklung des Google File Systems sowie des MapReduce-Frameworks geflossen. Beide Technologien sind stark auf massive Skalierbarkeit ausgelegt. Tenzing will sich diese Eigenschaften zunutze machen, indem es auf Basis des MapReduce-Frameworks entwickelt und ausgeführt wird.
 
 \subsection{Architektur}
+Tenzing besteht aus vier Kern-Komponenten \cite{TENZING}:
 
-graphviz?
+\begin{figure}[H]
+\centering
+\circledigraph[height=0.75\textwidth]{architecture} {
+    Client Interface    
+    Query Server
+    Distributed Worker Pool
+    Metadata Server
+}
+\caption{Tenzing Achitektur}
+\label{fig:architecture}
+\end{figure}
+
+\begin{enumerate}
+\item \paragraph{Client Interfaces}
+Für die Kommunikation mit Tenzing stehen ein Command Line Interface, ein Web User Interface sowie eine API zu Verfügung. Die API bietet die größte Flexibilität während das Web Interface für die meisten Analysten ausreichend ist.
+\item \paragraph{Query Server}
+Der \textit{Query Server} nimmt Tenzing-Queries an, führt diverse Optimierungen durch und erstellt einen detaillierten Ausführplan.
+\item \paragraph{Distributed Worker Pool}
+Die Worker im \textit{Distributed Worker Pool} bekommen den Ausführplan eines Queries vom \textit{Query Server} und führen die entsprechenden MapReduce-Jobs aus
+\item \paragraph{Metadata Server}
+Der \textit{Metadata Server} speichert diverse Metadaten wie zum Beispiel Tabellennamen, Schemas sowie Adressen und Pfade für Dateien.
+\end{enumerate}
+
+graphviz!
 
 \newpage
 
