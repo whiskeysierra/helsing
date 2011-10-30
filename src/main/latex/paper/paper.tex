@@ -19,7 +19,7 @@
 \usemintedstyle{friendly}
 \bibliography{paper}
 \title{Tenzing \\ Eine SQL-Implementierung auf Basis des MapReduce-Frameworks}
-\author{Willi Schönborn}
+\author{Willi Schönborn \\  Matr.-Nr.: 774190}
 \date{\today}
 \makeatletter
 \renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
@@ -1088,16 +1088,25 @@ Viele heterogene Systeme, die wie Tenzing auf unterschiedlichen Persistenzmechan
 \subsubsection{Skalierbarkeit}
 Viel Entwicklungszeit ist bei Google bereits in die Entwicklung des Google File Systems sowie des MapReduce-Frameworks geflossen. Beide Technologien sind stark auf massive Skalierbarkeit ausgelegt. Tenzing will sich diese Eigenschaften zunutze machen, indem es auf Basis des MapReduce-Frameworks entwickelt und ausgeführt wird.
 
+\newpage
 \subsection{Architektur}
 Tenzing besteht aus vier Kern-Komponenten \cite{TENZING}:
 
 \begin{figure}[H]
 \centering
-\circledigraph[height=0.75\textwidth]{architecture} {
-    Client Interface    
-    Query Server
-    Distributed Worker Pool
-    Metadata Server
+\digraph[height=0.75\textwidth]{architecture} {
+    node [shape="box"]
+    edge [dir="both"]
+    client [label="Client Interfaces"]
+    query [label="Query Server"]
+    meta [label="Metadata Server"]
+    pool [label="Worker Pool"]
+    data [label="Data"]
+    client -> query
+    query -> pool
+    query -> meta
+    query -> data
+    pool -> data
 }
 \caption{Tenzing Achitektur}
 \label{fig:architecture}
@@ -1113,8 +1122,6 @@ Die Worker im \textit{Distributed Worker Pool} bekommen den Ausführplan eines Q
 \item \paragraph{Metadata Server}
 Der \textit{Metadata Server} speichert diverse Metadaten wie zum Beispiel Tabellennamen, Schemas sowie Adressen und Pfade für Dateien.
 \end{enumerate}
-
-graphviz!
 
 \newpage
 

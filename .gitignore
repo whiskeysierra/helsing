@@ -39,16 +39,18 @@ pom.xml.releaseBackup
 
 /target
 
+/src/main/latex/*/*.aux
 /src/main/latex/*/*.bbl
 /src/main/latex/*/*.blg
 /src/main/latex/*/*-blx.bib
-/src/main/latex/*/*.aux
+/src/main/latex/*/*.dot
 /src/main/latex/*/*.fdb_latexmk
 /src/main/latex/*/*.lof
 /src/main/latex/*/*.lol
 /src/main/latex/*/*.lot
 /src/main/latex/*/*.out
 /src/main/latex/*/*.pdf
+/src/main/latex/*/*.run.xml
 /src/main/latex/*/*.synctex.gz
 /src/main/latex/*/*.toc
 
