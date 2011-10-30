@@ -44,11 +44,7 @@
 \newpage
 
 \section{Einleitung}
-Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzepte} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein wissenschaftliches Paper ausgewählt, untersucht und bewertet werden. Das Ziel dieses Dokumentes ist es die Ergebnisse dieser Semesterarbeit zusammenzufassen.
-
-\section{Kurzbeschreibung}
-Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong.
-Tenzing ist eine SQL92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}. Die beiden zugrundeliegenden Technologien werden in den Kapiteln \textit{\nameref{sql}} und \textit{\nameref{mapreduce}}, im Kontext des Hauptthemas, näher erläutert.
+Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzepte} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein wissenschaftliches Paper ausgewählt, untersucht und bewertet werden. Das Ziel dieses Dokumentes ist es die Ergebnisse dieser Semesterarbeit zusammenzufassen. Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong. Tenzing ist eine SQL/92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}. Die beiden zugrundeliegenden Technologien werden in den Kapiteln \nameref{sql} und \nameref{mapreduce}, im Kontext des Hauptthemas, näher erläutert.
 
 \newpage
 
@@ -985,7 +981,7 @@ Die beim Sortieren entstandenen Gruppen von Tupeln werden jetzt paarweise mitein
 Der Sort/Merge-Join-Algorithmus hat den Vorteil, dass beide Relationen nur einmal komplett, während des Zusammenführens, durchlaufen werden müssen. Das reduziert die Komplexität und damit merklich den Rechenaufwand sowie die Ausführdauer.
 
 \subsubsection{Hash-Join}
-Der Hash-Join-Algorithmus arbeitet ebenfalls in zwei Phasen. In der ersten Phase wird für eine der beiden Relationen eine Hashtabelle angelegt. Alle Tupel der ausgewählten Relation werden in diese Hashtabelle eingefügt wobei das Join-Attribut der Schlüssel ist. In der Regel wird für diesen Schritt die kleine der beiden Relationen verwendet, um den Speicherbedarf zu reduzieren. In der zweiten Phase wird nun die andere Relation durchlaufen und für jeden Tupel geprüft ob es ein entsprechendes Bucket in der Hashtabelle gibt. Falls ein solches Bucket existiert werden die Tupel verglichen, da ein identischer Hashwert nicht zwangsläufig identische Urbilder zur Folge hat. Die kartesisches Produkte der so gefundenen Treffer werden zur Ergebnismenge hinzugefügt.
+Der Hash-Join-Algorithmus arbeitet ebenfalls in zwei Phasen. In der ersten Phase wird für eine der beiden Relationen eine Hashtabelle angelegt. Alle Tupel der ausgewählten Relation werden in diese Hashtabelle eingefügt wobei das Join-Attribut der Schlüssel ist. In der Regel wird für diesen Schritt die kleinere der beiden Relationen verwendet, um den Speicherbedarf zu reduzieren. In der zweiten Phase wird nun die andere Relation durchlaufen und für jeden Tupel geprüft ob es ein entsprechendes Bucket in der Hashtabelle gibt. Falls ein solches Bucket existiert werden die Tupel verglichen, da ein identischer Hashwert nicht zwangsläufig identische Urbilder zur Folge hat. Die kartesisches Produkte der so gefundenen Treffer werden zur Ergebnismenge hinzugefügt.
 
 Durch die Nutzung von Hashfunktionen ist der Hash-Join-Algorithmus nur für Equi-Joins anwendbar, das heißt die Join-Bedingung darf nur Gleichheits-Prädikate enthalten. Durch die Negation der Gleichheit lassen sich mit Hash-Joins sowohl Semi- als auch Anti-Joins implementieren.
 
@@ -993,9 +989,9 @@ Durch die Nutzung von Hashfunktionen ist der Hash-Join-Algorithmus nur für Equi
 
 \section{MapReduce}
 \label{mapreduce}
+Da Tenzing auf Googles MapReduce-Framework aufbaut wird im folgenden Kapitel kurz die \nameref{sec:mapreduce-motivation} sowie die \nameref{sec:mapreduce-operation} erklärt.
 
 \subsection{Definition}
-
 \begin{quote}
 MapReduce is a programming model and an associated implementation for processing and generating large data sets. \cite{MAPREDUCE}
 \end{quote}
@@ -1009,27 +1005,90 @@ Hadoop MapReduce is a software framework for easily writing applications which p
 \end{quote}
 
 \subsection{Motivation}
-commodity hardware, terabyte datasets, data analysis, processing, simplified programming model, fail safe
+\label{sec:mapreduce-motivation}
+Googles Motivation für die Entwicklung des MapReduce-Frameworks ist die Analyse von Daten in extrem großen Mengen. Aktuell bewegen sich diese Datenmengen bereits im Petabyte-Bereich \cite{TENZING}. Die Verarbeitung dieser Datenmengen soll für den Anwender beziehungsweise den Programmierer so einfach wie möglich sein. Die Komplexität eines verteilten, nebenläufigen Systems soll abstrahiert werden. Zusätzlich spielt massive Skalierbarkeit natürlich eine große Rolle. Bei zunehmendem Datenbestand soll es möglich sein weitere Knoten zum Cluster hinzuzufügen und so die Rechenkraft linear zu steigern. Zu diesem Zweck verfolgt Google den Ansatz, statt weniger hochwertiger Server, viele dafür aber durchschnittliche Maschinen, so genannter \textit{Commodity Hardware} zu betreiben. Bei einem normalen Betrieb von mehreren Tausend, handelsüblichen Rechnern kommt selbstverständlich regelmäßig zu Ausfällen einzelner Knoten. MapReduce ist darauf ausgelegt mit dem Ausfall von Knoten umzugehen. 
+
+Googles Implementierung des MapReduce-Frameworks ist nicht öffentlich verfügbar. Die Apache Software Foundation hat sich mit dem Hadoop-Projekt zum Ziel gesetzt ein freies MapReduce-Ecosystem zu entwickeln. Der Erfolg von MapReduce geht Hand in Hand mit verteilten Dateisystemen. Google nutzt intern das Google File System \cite{GFS}. Hadoop bietet mit dem HDFS ebenfalls ein proprietäres, verteiltes Dateisystem an. Der Vorteil für MapReduce liegt darin, dass Persistierung und die Verarbeitung dieser Daten so optimiziert werden kann, dass wiederum viel Netzwerkverkehr eingespart werden kann. Diese Technik wird oft als \textit{Data Colocation} bezeichnet.
 
 \subsection{Funktionsweise}
-fp-style, map per input line, (combine), sort, reduce per key
+\label{sec:mapreduce-operation}
+Das eigentliche Modell auf dem MapReduce basiert ist ausgesprochen einfach. Das Herzstück bilden zwei, vom Anwender geschriebene Funktionen, \texttt{map} und \texttt{reduce}. Die  Der gesamte Rest wird vom Framework bereit gestellt. Die beiden genannten Funktionen sind Anlehnungen an oftmals gleichnamige Konstrukte aus der Funktionalen Programmierung. Eine typische Ausführung eines MapReduce-Jobs gliedert sich in folgende Schritte:
 
-\section{Tenzing}
+\begin{enumerate}
+    \item \paragraph{Input}
+Das MapReduce-Framework liest die zu verarbeitenden Daten ein. In der Regel handelt es sich hier um Text-Dateien im CSV-Format. Jede Zeile wird an die Map-Funktion übergeben.
+    \item \paragraph{Map}
+Die Map-Funktion parst den Input und gibt eine beliebige Anzahl von Schlüssel-Werte-Paaren aus. Listing \ref{lst:map} zeigt eine exemplarische Implementierung für ein Word-Count-Programm. Für jedes Wort in der Zeile wird als Schlüssel das gefundene Wort ausgegeben und als Wert eine \texttt{1}. Dieses Paar kann interpretiert werden als: \textit{Das Wort w wurde einmal gefunden}. Das Framework wird die Daten möglichst gleichmäßig auf alle Mapper, also Knoten die die Map-Funktione implementieren, verteilen um soviel Arbeit wie möglich parallel auszuführen.
+    \item \paragraph{Combine}
+Nachdem ein Knoten alle ihm zugeteilten Zeilen durchgearbeitet hat geht er in die Combine-Phase über. Diese Phase dient nur dazu, um Daten lokal bereits zu aggregieren um die Netzwerklast zu reduzieren. In unserem Beispiel könnte an dieser Stelle die gleiche Implementierung verwendet werden wie für die Reduce-Funktion.
+    \item \paragraph{Merge}
+Nachdem alle Knoten ihre Ergebnisse übermittelt haben kombiniert das Framework alls Paare mit dem gleichen Schlüssel zu einer Liste. Diese Schlüssel-Listen-Paare werden dann an die Reduce-Funktion weitergegeben.
+    \item \paragraph{Reduce}
+Die Reduce-Funktion erhält als Input einen Schlüssel und eine Menge von Werten. Listing \ref{lst:reduce} zeigt, wieder am Beispiel des Word-Count-Programms, wie eine solche Funktion implementiert werden kann. Die Ausführung der Reduce-Funktionen kann wiederum parallel passieren.
+    \item \paragraph{Output}
+Wie bereits nach der Map-Phase, werden auch nach der Reduce-Phase wieder alle Ergebnisse gesammelt und ausgegeben. Es kann vorkommen, dass ein einzelner MapReduce-Job nicht aussreicht, um eine bestimmte Analyse berechnen oder der Code zu komplex wird. Da sowohl der Input als auch der Output eines MapReduce-Jobs in der Regel textbasierte, zeilenorientierte Dateiformate sind, lassen sich mehrere MapReduce-Jobs in einer Kette hintereinander ausführen.
+\end{enumerate}
 
-\subsection{Motivation}
+\begin{listing}[H]
+\begin{minted}{javascript}
+function map(line) {
+    for (var word in line) {
+        emit(word, 1);
+    }
+}
+\end{minted}
+\caption{Beispiel einer Map-Funktion}
+\label{lst:map}
+\end{listing}
+
+\begin{listing}[H]
+\begin{minted}{javascript}
+function reduce(key, values) {
+    var sum = 0;
+    for (var count in values) {
+        sum += count;
+    }
+    return sum;
+}
+\end{minted}
+\caption{Beispiel einer Reduce-Funktion}
+\label{lst:reduce}
+\end{listing}
+
+\newpage
+Abbildung \ref{fig:mapreduce} zeigt die Map- und Reduce-Phasen noch einmal in einer grafischen Darstellung.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{mapreduce.png}
 \caption{Die zwei Phasen eines MapReduce-Jobs \protect\cite{GARFINKEL}}
+\label{fig:mapreduce}
 \end{figure}
-
-\subsection{Open Source}
-Googles Implementierung des MapReduce-Frameworks ist nicht öffentlich verfügbar. Die Apache Software Foundation hat sich mit dem Hadoop-Projekt zum Ziel gesetzt ein freies MapReduce-Ecosystem zu entwickeln.
 
 \newpage
 
-\nocite{GFS}
+\section{Tenzing}
+
+\subsection{Motivation}
+Die Autoren des Tenzing-Papers zählen viele Motivations-Faktoren auf. Die wichtigsten werden in den folgenden Abschnitten kurz genannt und erläutert.
+
+\subsubsection{Einfachere Schnittstellen}
+
+\subsubsection{Geringe Latenzen}
+
+\subsubsection{Effizienz}
+Heterogenes System, nutzt Datenbank-Optimierungen
+
+\subsubsection{SQL-Kompatibilität}
+
+\subsubsection{Skalierbarkeit}
+
+\subsection{Architektur}
+
+graphviz?
+
+\newpage
+
 \nocite{GOOGLE-TENZING}
 \nocite{GOOGLE-MAPREDUCE}
 \nocite{GOOGLE-GFS}
