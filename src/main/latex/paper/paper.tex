@@ -11,6 +11,7 @@
 \usepackage{graphvizzz}
 \usepackage{array}
 \usepackage[table]{xcolor}
+\usepackage{multirow}
 \usepackage[format=plain,labelfont=bf,up]{caption}
 \setcounter{secnumdepth}{-1} 
 \usepackage{hyperref}
@@ -1125,28 +1126,61 @@ Der \textit{Metadata Server} speichert diverse Metadaten wie zum Beispiel Tabell
 
 \newpage
 
+\section{Apache\texttrademark Hadoop}
+auch wenn Hadoop nach den Google Papers (GFS , MapReduce, Bigtable, etc) modelliert wurde lohnt ein Vergleich um Tenzing bewerten zu können. Google veröffentlicht Papers, aber keinen Code! Hadoop = Open Source Alternative
+
+\begin{figure}[H]
+\centering
+  \LARGE
+  \renewcommand*\arraystretch{1.1}
+  \begin{tabular}{| c | c | c |}
+    \hline \textbf{Pig} & \textbf{Hive} & \textbf{Sqoop}\\ 
+    Data Flow & Query Language & SQL Import/Export \\ \hline
+    \noalign{\smallskip}
+    \hline \multicolumn{3}{|c|}{\textbf{MapReduce}} \\ 
+    \multicolumn{3}{|c|}{Job Scheduling/Execution System} \\ \hline
+    \noalign{\smallskip}
+    \cline{1-2} \multicolumn{2}{|c|}{\textbf{HBase}} \\ 
+    \multicolumn{2}{|c|}{Column Database} \\ \cline{1-2}
+    \noalign{\smallskip}
+    \hline \multicolumn{3}{|c|}{\textbf{HDFS}} \\ 
+    \multicolumn{3}{|c|}{Distributed File System} \\ \hline
+  \end{tabular}
+\caption{Das Hadoop-Ökosystem}
+\end{figure}
+
+\newpage
+
 \section{Tenzing im Vergleich}
 
 \subsection{Apache\texttrademark HBase}
-Google BigTable Clone
+Google BigTable Clone \cite{HBase} \cite{BigTable}
 
 \subsection{Apache\texttrademark Pig}
-vgl. Sawzall? (http://wiki.apache.org/incubator/PigProposal)
+vgl. Sawzall \cite{Sawzall}? (http://wiki.apache.org/incubator/PigProposal)
 
 \subsection{Apache\texttrademark Hive}
 Pseudo-SQL, HiveQL, https://cwiki.apache.org/confluence/display/Hive/Home, HDFS oder HBase
 
 \subsection{HadoopDB}
+\cite{HadoopDB2009}
 benutzt Hive, am ehesten mit Tenzing vergleichbar, nicht SQL-konform
 MySQL + Postgres Support, gleichzeitig?
-Scheint Datenquellen-spezifische Eigenschaften nicht zu berücksichtigen.
+Scheint Datenquellen-spezifische Eigenschaften nicht zu berücksichtigen. nur RDBMS
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{hadoopdb-architecture.png}
-\caption{HadoopDB Architektur}
+\caption{HadoopDB Architektur \cite{HadoopDB2010}}
 \label{fig:hadoopdb}
 \end{figure}
+
+\subsection{Fazit}
+keine open source entsprechung?
+
+\newpage
+
+\section{Eigener Ansatz}
 
 \newpage
 
