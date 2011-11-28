@@ -1153,20 +1153,28 @@ auch wenn Hadoop nach den Google Papers (GFS , MapReduce, Bigtable, etc) modelli
 
 \section{Tenzing im Vergleich}
 
-\subsection{Apache\texttrademark HBase}
+\subsection{Apache\texttrademark  HBase}
 Google BigTable Clone \cite{HBase} \cite{BigTable}
 
-\subsection{Apache\texttrademark Pig}
-vgl. Sawzall \cite{Sawzall}? (http://wiki.apache.org/incubator/PigProposal)
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{hbase-architecture.png}
+\caption{HBase Architektur \cite{docstoc}}
+\label{fig:hbase}
+\end{figure}
 
-\subsection{Apache\texttrademark Hive}
+\subsection{Apache\texttrademark  Pig}
+vgl. Sawzall \cite{Sawzall}? (http://wiki.apache.org/incubator/PigProposal)
+comparison to sql: \cite{pdfcast}
+
+\subsection{Apache\texttrademark  Hive}
 Pseudo-SQL, HiveQL, https://cwiki.apache.org/confluence/display/Hive/Home, HDFS oder HBase
 
 \subsection{HadoopDB}
 \cite{HadoopDB2009}
 benutzt Hive, am ehesten mit Tenzing vergleichbar, nicht SQL-konform
 MySQL + Postgres Support, gleichzeitig?
-Scheint Datenquellen-spezifische Eigenschaften nicht zu berücksichtigen. nur RDBMS
+Scheint Datenquellen-spezifische Eigenschaften nicht zu berücksichtigen. nur RDBMS (Column Stores in Planung)
 
 \begin{figure}[H]
 \centering
@@ -1174,6 +1182,9 @@ Scheint Datenquellen-spezifische Eigenschaften nicht zu berücksichtigen. nur RD
 \caption{HadoopDB Architektur \cite{HadoopDB2010}}
 \label{fig:hadoopdb}
 \end{figure}
+
+\subsection{PACT}
+Paper \textit{MapReduce and PACT - Comparing Data Parallel Programming Models} \cite{PACT}
 
 \subsection{Fazit}
 keine open source entsprechung?
