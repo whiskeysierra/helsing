@@ -1,6 +1,6 @@
 \documentclass[a4paper]{article}
 \usepackage[utf8]{inputenc}
-\usepackage{fullpage}
+%\usepackage{fullpage}
 \usepackage{csquotes}
 \usepackage[ngerman]{babel}
 \usepackage{biblatex}
@@ -12,7 +12,7 @@
 \usepackage{array}
 \usepackage[table]{xcolor}
 \usepackage{multirow}
-\usepackage[format=plain,labelfont=bf,up]{caption}
+\usepackage[format=plain,labelfont=bf,up,justification=centering]{caption}
 \setcounter{secnumdepth}{-1} 
 \usepackage{hyperref}
 \usepackage{nameref}
@@ -40,22 +40,19 @@
 \end{figure}
 
 \newpage
-
 \tableofcontents
 
 \newpage
-
 \section{Einleitung}
 Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzepte} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein wissenschaftliches Paper ausgewählt, untersucht und bewertet werden. Das Ziel dieses Dokumentes ist es die Ergebnisse dieser Semesterarbeit zusammenzufassen. Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong. Tenzing ist eine SQL/92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}. Die beiden zugrundeliegenden Technologien werden in den Kapiteln \nameref{sql} und \nameref{mapreduce}, im Kontext des Hauptthemas, näher erläutert.
 
 \newpage
-
 \section{SQL}
 \label{sql}
 SQL steht für \textit{Structured Query Language} und ist eine standardisierte, mengenorientierte und deklarative Datenbanksprache die in vielen Datenbank-Management-Systemen zum Einsatz kommt. SQL bietet Möglichkeiten zur Definition, Manipulation und zur Abfrage von Daten an \cite{Codd}. Für die Definition und die Manipulation existieren zwei Sprachen die jeweils eine Teilmenge von SQL bilden: die \textit{Data Definition Language} (DDL) und die \textit{Data Manipulation Language} (DML). Beide werden zwar zum Teil von Tenzing unterstützt, der eigentliche Schwerpunkt liegt aber klar auf der Abfrage von Daten. Aus diesem Grund wird in den folgenden Kapiteln verstärkt auf den Abfrage-Teil von SQL eingegangen.
 
 \subsection{Syntax und Sprachelemente}
-Listing \ref{sql-syntax} zeigt die wichtigsten Bestandteile eines SQL-Queries in Form einer Form einer sehr einfachen Grammatik. Alle abgebildeten Teile der SQL-Query-Syntax werden in den folgenden Unterkapiteln kurz anhand eines Beispiels und einer visuellen Darstellung erklärt.
+Listing \ref{sql-syntax} zeigt die wichtigsten Bestandteile eines SQL-Queries in Form einer sehr einfachen Grammatik. Alle abgebildeten Teile der SQL-Query-Syntax werden in den folgenden Unterkapiteln kurz anhand eines Beispiels und einer visuellen Darstellung erklärt.
 
 \begin{listing}[H]
 \begin{minted}{sql}
@@ -69,6 +66,7 @@ FROM table+
 \label{sql-syntax}
 \end{listing}
 
+\newpage
 \subsection{Referenztabellen und Beispieldaten}
 Die folgenden Abbildungen stellen die Struktur zweier Datenbank-Tabellen sowie entsprechende Beispieldaten dar. Beide Tabellen werden in den folgenden Abschnitten als Grundlage genutzt um einzelne Merkmale und Eigenschaften von SQL anhand von konkreten Beispielen zu erklären.
 
@@ -118,8 +116,6 @@ SELECT id, name FROM City;
 \label{lst:projection}
 \end{listing}
 
-\begin{minipage}{\textwidth}
-\begin{minipage}[b]{0.49\textwidth}
 \begin{figure}[H]
 \centering
   \begin{tabular}{| c | c | c | c |}
@@ -137,9 +133,7 @@ SELECT id, name FROM City;
 \caption{Schema einer Projektion}
 \label{fig:projection}
 \end{figure}
-\end{minipage}
-\hfill
-\begin{minipage}[b]{0.49\textwidth}
+
 \begin{table}[H]
 \centering
   \begin{tabular}{| l | l | l | l |}
@@ -159,9 +153,8 @@ SELECT id, name FROM City;
 \caption{Ergebnis einer Projektion}
 \label{tab:projection}
 \end{table}
-\end{minipage}
-\end{minipage}
 
+\newpage
 \subsection{Selektion}
 Eine Selektion arbeitet im Gegensatz zur Projektion nicht auf den Spalten, sondern auf den Zeilen. Weil die Spalten die Struktur einer Tabelle definieren und die Zeilen die eigentlichen Daten enthalten gibt es in der Regel eine Vielzahl mehr Zeilen als Spalten. Weiterhin sind Zeilen nicht zwangsläufig mit einen eindeutigen Bezeichner versehen wie es für Spalten der Fall ist. Aus diesem Grund reicht es meist nicht aus die gewünschten Zeilen aufzuzählen wie es bei der Projektion der Fall ist. Stattdessen kommen Bedingungen in Form einer \texttt{WHERE}-Klausel zum Einsatz. Tenzing unterstützt alle gängigen Prädikate wie \texttt{AND}. \texttt{OR}. \texttt{LIKE} und \texttt{BETWEEN}.
 
@@ -173,8 +166,6 @@ SELECT * FROM City WHERE population > 2500000;
 \label{lst:selection}
 \end{listing}
 
-\begin{minipage}{\textwidth}
-\begin{minipage}[b]{0.49\textwidth}
 \begin{figure}[H]
 \centering
   \begin{tabular}{| c | c | c | c |}
@@ -192,9 +183,7 @@ SELECT * FROM City WHERE population > 2500000;
 \caption{Schema einer Selektion}
 \label{fig:selection}
 \end{figure}
-\end{minipage}
-\hfill
-\begin{minipage}[b]{0.49\textwidth}
+
 \begin{table}[H]
 \centering
   \begin{tabular}{| l | l | l | l |}
@@ -209,8 +198,6 @@ SELECT * FROM City WHERE population > 2500000;
 \caption{Ergebnis einer Selektion}
 \label{tab:selection}
 \end{table}
-\end{minipage}
-\end{minipage}
 
 \newpage
 \subsection{Gruppierung und Aggregatfunktionen}
@@ -344,6 +331,10 @@ Joins, dt. \textit{Verbund}, zählen einerseits zu den mächtigsten Werkzeugen v
 
 Ein Join kann als ein bedingtes kartesisches Produkt verstanden werden. Dabei wird jeder Tupel aus der linken mit einem Tupel aus der rechten Tabelle kombiniert.  Durch eine Bedingung, bestehend aus Prädikaten, kann das Ergebnis dieser Operation eingeschränkt werden.
 
+\subsubsection{Cross Join}
+Ein Cross Join ist, wie alle Joins, ein kartesisches Produkt mit der Ausnahme, dass keine Bedingung angewandt wird. Das bedeutet, dass jeder Tupel mit jedem anderen Tupel aus allen anderen beteiligten Tabellen kombiniert wird. Da die Ergebnismenge eines Cross Joins auf den oben vorgestellten Beispieltabellen bereits 45 Tupel enthalten würde, wird an dieser Stelle auf die Darstellung verzichtet.
+
+\newpage
 \subsubsection{Inner Join}
 Bei einem Inner Join werden Tupel nur dann in die Ergebnismenge übernommen wenn alle beteiligten Tupel die entsprechende Bedingung erfüllen. Am konkreten Beispiel in Listing \ref{lst:explicit-inner-join} werden nur die Städte ausgegeben, zu denen es ein konkretes Land im Datenbestand gibt. Der Ergebnis dieses Joins ist in Tabelle \ref{tab:inner-join} zu sehen. Für Inner Joins gibt es zwei unterschiedliche Schreibweisen: eine implizite und eine explizite. Listing \ref{lst:explicit-inner-join} und \ref{lst:implicit-inner-join} zeigen beide Varianten.
 
@@ -435,9 +426,6 @@ WHERE city.country_id = country.id;
 \end{table}
 \end{minipage}
 \end{minipage}
-
-\subsubsection{Cross Join}
-Ein Cross Join ist, wie alle Joins, ein kartesisches Produkt mit der Ausnahme, dass keine Bedingung angewandt wird. Das bedeutet, dass jeder Tupel mit jedem anderen Tupel aus allen anderen beteiligten Tabellen kombiniert wird. Da die Ergebnismenge eines Cross Joins auf den oben vorgestellten Beispieltabellen bereits 45 Tupel enthalten würde, wird an dieser Stelle auf die Darstellung verzichtet.
 
 \subsubsection{Outer Join}
 Outer Joins erlauben es, im Gegensatz zum Inner Join, Tupel auch dann in die Ergebnismenge zu übernehmen, wenn nur ein Tupel der beteiligten Tabellen die zugehörige Bedingung erfüllt. Dadurch entstehen drei verschiedene Möglichkeiten: der \texttt{LEFT JOIN}, der \texttt{RIGHT JOIN} und der \texttt{FULL JOIN}.
@@ -914,6 +902,7 @@ for (var left in leftTable) {
 \label{lst:nested-loop}
 \end{listing}
 
+\newpage
 \subsubsection{Block-Nested-Loop-Join}
 Der Block-Nested-Loop-Join-Algorithmus ist eine Verbesserung des \nameref{lst:nested-loop}-Algorithmus. Der Ansatz ist, nicht für jeden Tupel aus der linken Tabelle einen kompletten Tablescan der rechten Tabelle ausführen zu müssen, sondern Blöcke zu bilden. Dadurch wird nur noch blockweise durch die Tabelle gelaufen. Dadurch ergibt sich, bedingt durch weniger wahlfreie Zugriffe und mehr sequentielle Leseoperationen auf der Festplatte, eine höhere Ausführgeschwindigkeit. Alle sonstigen Vorteile des Nested-Loop-Join-Algorithmus gelten in gleicher Weise für die blockweise Variante.
 
@@ -935,7 +924,6 @@ for (var leftBLock in leftTable) {
 \label{lst:block-nested-loop}
 \end{listing}
 
-\newpage
 \subsubsection{Sort/Merge-Join}
 Der Sort/Merge-Join-Algorithmus ist, im Gegensatz zu den Nested-Loop-Join-Algorithmen, nur für \nameref{sec:natural-join}s und \nameref{sec:equi-join}s anwendbar. Der Algorithmus besteht aus zwei Schritten: dem Sortieren (engl. \textit{sort}) und dem Zusammenführen (engl. \textit{merge}):
 
@@ -1057,7 +1045,6 @@ function reduce(key, values) {
 \label{lst:reduce}
 \end{listing}
 
-\newpage
 Abbildung \ref{fig:mapreduce} zeigt die Map- und Reduce-Phasen noch einmal in einer grafischen Darstellung.
 
 \begin{figure}[H]
@@ -1068,7 +1055,6 @@ Abbildung \ref{fig:mapreduce} zeigt die Map- und Reduce-Phasen noch einmal in ei
 \end{figure}
 
 \newpage
-
 \section{Tenzing}
 
 \subsection{Motivation}
@@ -1095,7 +1081,7 @@ Tenzing besteht aus vier Kern-Komponenten \cite{TENZING}:
 
 \begin{figure}[H]
 \centering
-\digraph[height=0.75\textwidth]{architecture} {
+\digraph[height=0.5\textwidth]{architecture} {
     node [shape="box"]
     edge [dir="both"]
     client [label="Client Interfaces"]
@@ -1125,13 +1111,15 @@ Der \textit{Metadata Server} speichert diverse Metadaten wie zum Beispiel Tabell
 \end{enumerate}
 
 \newpage
+\section{Tenzing im Vergleich}
+In diesem Kapitel wird Tenzing mit diversen Systemen und Lösungsansätzen verglichen die eine ähnliche Zielsetzung haben wie Tenzing. Einige dieser Lösungen sind näher am Konzept von Tenzing, andere schlagen einen komplett unterschiedlichen Weg ein. Das Ziel dieser Vergleiche ist es Tenzing hinsichtlich bestimmter Eigenschaften fundierter bewerten zu können.
 
-\section{Apache\texttrademark Hadoop}
-auch wenn Hadoop nach den Google Papers (GFS , MapReduce, Bigtable, etc) modelliert wurde lohnt ein Vergleich um Tenzing bewerten zu können. Google veröffentlicht Papers, aber keinen Code! Hadoop = Open Source Alternative
+\subsection{Apache Hadoop}
+Das Apache Hadoop Projekt hat es sich zum Ziel gesetzt die Technologien, die in den Papers \textit{MapReduce: Simplified Data Processing on Large Clusters} \cite{MAPREDUCE}, \textit{The Google File System} \cite{GFS} und \textit{BigTable: A Distributed Storage System for Structured Data} \cite{BigTable} beschrieben werden, als Open-Source-Implementierung bereitzustellen. Hadoop ist heute eines der größten Apache Top-Level-Projekte. Für viele Teilbereiche existieren mittlerweile Sub-Projekte die zusammen das Hadoop -Ökosystem bilden. Einige dieser Projekte werden in den folgenden Kapiteln mit Tenzing verglichen.
 
 \begin{figure}[H]
 \centering
-  \LARGE
+  \Large
   \renewcommand*\arraystretch{1.1}
   \begin{tabular}{| c | c | c |}
     \hline \textbf{Pig} & \textbf{Hive} & \textbf{Sqoop}\\ 
@@ -1147,14 +1135,15 @@ auch wenn Hadoop nach den Google Papers (GFS , MapReduce, Bigtable, etc) modelli
     \multicolumn{3}{|c|}{Distributed File System} \\ \hline
   \end{tabular}
 \caption{Das Hadoop-Ökosystem}
+\label{fig:hadoop-ecosystem}
 \end{figure}
 
-\newpage
+Abbildung \ref{fig:hadoop-ecosystem} zeigt die wichtigsten Teile des Hadoop-Ökosystems. HBase, Pig und Hive werden in den folgenden Kapiteln genauer untersucht. Das \textit{Job Scheduling/Execution System} ist direkt nach dem MapReduce-Paper und das verteilte Dateisystem \textit{HDFS} nach dem \textit{Google File System} \cite{GFS} modelliert. Sqoop hat es sich zum Ziel gesetzt Daten aus relationalen Datenbanken in HDFS zu im- und aus HDFS in relationale Datenbanken zu exportieren. Die typischen Anwendungsfälle von Tenzing und Sqoop unterscheiden sich sehr weshalb Sqoop in diesem Kapitel nicht genauer bearbeitet wird.
 
-\section{Tenzing im Vergleich}
+\subsection{Apache HBase}
+Apache HBase \cite{HBase} gilt als die führende Open-Source-Implementierung der BigTable-Technologie\cite{BigTable}. HBase ist ein \enquote{sparse, distributed, persistent multidimensional sorted Map} \cite{JavaMagazin}. HBase arbeitet also nicht wie traditionelle Datenbanken sondern kann eher als ein mehrdimensionelles, assoziatives Array betrachtet werden. Spalten können beliebig hinzugefügt werden und nicht jede Zeile im Datenbestand muss einen Wert für diese Spalten enthalten. Zusätzlich zu den zwei Dimensionen (Spalten und Zeilen) werden Zellen über Zeitstempel versioniert.
 
-\subsection{Apache\texttrademark  HBase}
-Google BigTable Clone \cite{HBase} \cite{BigTable}
+Ähnlich wie das MapReduce-Framework und HDFS arbeitet auch HBase mit einem Master-Server und sogenannten RegionServers. Abbildung \ref{fig:hbase} veranschaulicht die Architektur anhand eines Diagramms. HBase, wie auch BigTable, bietet keine eigene Abfragesprache. Zugriffe auf die Daten laufen über APIs die in vielen verschiedenen Programmiersprachen angeboten werden.
 
 \begin{figure}[H]
 \centering
@@ -1163,16 +1152,21 @@ Google BigTable Clone \cite{HBase} \cite{BigTable}
 \label{fig:hbase}
 \end{figure}
 
-\subsection{Apache\texttrademark  Pig}
-vgl. Sawzall \cite{Sawzall}? (http://wiki.apache.org/incubator/PigProposal)
-comparison to sql: \cite{pdfcast}
+HBase wäre ein wichtiger Bestandteil einer Open-Source-Variante von Tenzing aber kein eigenständiger Konkurrent oder gleichwertiger Ersatz.
 
-\subsection{Apache\texttrademark  Hive}
-Pseudo-SQL, HiveQL, https://cwiki.apache.org/confluence/display/Hive/Home, HDFS oder HBase
+\subsection{Apache Pig}
+Im Rahmen des Apache Pig Projektes wurde \textit{PigLatin} entwickelt, eine prozedurale Hochsprache für Abfragen die in MapReduce-Jobs kompiliert wird. PigLatin hat einige Ähnlichkeiten zu Sawzall \cite{Sawzall} das ebenfalls von Google entwickelt wurde. Beide Sprachen sind imperativ wobei ein Sawzall-Programm genau einem MapReduce-Job entspricht währen Pig-Programme in mehrere solcher Jobs kompiliert werden können \cite{PigWiki}. Die Motivation von Pig ist es, MapReduce-Jobs mit weniger Quellcode und dadurch mit weniger Aufwand in kürzerer Zeit zu schreiben \cite{pdfcast}. PigLatin übernimmt eine Sprachkonstrukte und Schlüsselwörter aus dem SQL-Standard was den Einstieg für SQL-Kenner erleichtert.
+
+Pig und Tenzing teilen die Motivation das Analysieren von großen Datenmengen mithilfe von MapReduce zu vereinfachen. SQL und PigLatin sind beides extrem spezialisierte Hochsprachen die es erlauben sehr ausdrucksstark Abfragen zu schreiben. Der Ansatz bei Tenzing, den SQL92-Standard so strikt wie möglich einzuhalten, hat seine Berechntigung wenn man bedenkt wieviele Programmierer und Analysten SQL beherrschen. Nichtsdestotrotz wäre Pig, wie auch HBase, ein wichtiger Bestandteil einer Open-Source-Variante von Tenzing da es MapReduce-Spezifika gegebenenfalls besser unterstützt als SQL.
+
+\subsection{Apache Hive}
+Hive beschreibt sich selbst als \textit{data warehouse software [that] facilitates querying and managing large datasets residing in distributed storage} \cite{HiveWiki}. Als Abfragesprache bietet als Hive einen SQL-Dialekt an: HIve-QL oder oft einfach nur QL. Als Data Warehouse System aggregiert Hive Daten aus HDFS-Dateien oder HBase. Eine Eigenschaft die Tenzing und Hive teilen. Ob Hive dabei spezifische Eigenschaften und Optimierungsmöglichkeiten der jeweiligen Datenquellen ausnutzt um die Ausführzeit von Abfragen zu reduzieren war leider nicht zu ermitteln. Generell haben Hive-Queries eine Laufzeit im Minuten-Bereich; Hive ist also nicht für Echtzeit-Abfragen geeignite. Allerdings bietet Hive, ähnlich wie Tenzing, auch die Möglichkeit über sogenannte \textit{User-Defined Functions} die Sprache um Funktionen und Features zu erweitern. Von den bisher untersuchten System hat Hive, im Vergleich zu Tenzing, die meisten vergleichbaren und ähnlichen Ansätze und Eigenschaften. 
+
+TODO: worker pool von tenzing?!
 
 \subsection{HadoopDB}
 \cite{HadoopDB2009}
-benutzt Hive, am ehesten mit Tenzing vergleichbar, nicht SQL-konform
+benutzt Hive
 MySQL + Postgres Support, gleichzeitig?
 Scheint Datenquellen-spezifische Eigenschaften nicht zu berücksichtigen. nur RDBMS (Column Stores in Planung)
 
@@ -1190,11 +1184,9 @@ Paper \textit{MapReduce and PACT - Comparing Data Parallel Programming Models} \
 keine open source entsprechung?
 
 \newpage
-
 \section{Eigener Ansatz}
 
 \newpage
-
 \nocite{GOOGLE-TENZING}
 \nocite{GOOGLE-MAPREDUCE}
 \nocite{GOOGLE-GFS}
@@ -1207,7 +1199,6 @@ keine open source entsprechung?
 \printbibliography
 
 \newpage
-
 \addcontentsline{toc}{section}{Abbildungsverzeichnis}
 \listoffigures
 
