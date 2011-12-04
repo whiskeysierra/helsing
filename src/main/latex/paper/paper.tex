@@ -1,6 +1,5 @@
 \documentclass[a4paper]{article}
 \usepackage[utf8]{inputenc}
-%\usepackage{fullpage}
 \usepackage{csquotes}
 \usepackage[ngerman]{babel}
 \usepackage{biblatex}
@@ -1094,7 +1093,7 @@ Tenzing besteht aus vier Kern-Komponenten \cite{TENZING}:
 
 \begin{figure}[H]
 \centering
-\digraph[height=0.5\textwidth]{architecture} {
+\digraph[height=0.7\textwidth]{architecture} {
     node [shape="box"]
     edge [dir="both"]
     client [label="Client Interfaces"]
@@ -1241,6 +1240,104 @@ Aufgrund der Tatsache, dass der Artikel über Tenzing erst im September 2011 ers
 
 \newpage
 \section{Eigener Ansatz}
+In diesem Kapitel wird ein eigener Ansatz sowie die Idee und Architektur für einen Prototypen vorgestellt. Der Prototyp besteht aus einem eigenen SQL-Dialekt sowie einer Engine die Abfragen in diesem Dialekt in einen MapReduce-Job für das Hadoop-Framework übersetzt.
+
+\subsection{SQL-}
+Der SQL-Dialekt \textit{SQL-} (in Worten \textit{SQL Minus}), ist eine extrem kleine Teilmenge von SQL. Es werden ausschließlich Projektion und eine einfache Gruppierung mit einer Aggregation pro Abfrage. Als Aggregatfunktionen werden \texttt{SUM} und \texttt{AVG} unterstützt. Die Listings \ref{lst:sqlm-select}, \ref{lst:sqlm-group-by-avg}, \ref{lst:sqlm-group-by-sum} \ref{lst:sqlm-group-by} zeigen mögliche Queries. 
+
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT year, population
+FROM hdfs://countries.csv
+\end{minted}
+\caption{SQL- Select-Syntax}
+\label{lst:sqlm-select}
+\end{listing}
+
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT country, AVG(population)
+FROM hdfs://countries.csv
+GROUP BY country
+\end{minted}
+\caption{SQL- Group-by-Syntax}
+\label{lst:sqlm-group-by-avg}
+\end{listing}
+
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT year, SUM(population)
+FROM hdfs://countries.csv
+GROUP BY year
+\end{minted}
+\caption{SQL- Group-by-Syntax}
+\label{lst:sqlm-group-by-sum}
+\end{listing}
+
+\begin{listing}[H]
+\begin{minted}{sql}
+SELECT year
+FROM hdfs://countries.csv
+GROUP BY year
+\end{minted}
+\caption{SQL- Group-by-Syntax}
+\label{lst:sqlm-group-by}
+\end{listing}
+
+Abbildung \ref{fig:sampledata} zeigt die Beispieldaten auf die sich die oben vorgestellten Abfragen beziehen können. Konkrete Daten sind beispielsweise auf Geohive.com \cite{GeoHive} verfügbar, was für den Test des Prototypens interessant wird.
+
+\begin{figure}[H]
+\centering
+\begin{tabular}{l l l}
+	\toprule
+	country & year & population \\
+	\midrule
+	DE & 1900 & 56,400,000 \\
+	UK & 1900 & 41,600,000 \\
+	IT & 1900 & 32,400,000 \\
+	... \\
+	DE & 1950 & 50,800,000 \\
+	UK & 1950 & 50,200,000 \\
+	IT & 1950 & 46,800,000\\	
+	... \\
+	\bottomrule
+\end{tabular}
+\caption{Beispieldaten}
+\label{fig:sampledata}
+\end{figure}
+
+\subsection{Schema}
+Es gibt zwei Gründe warum die Definition eines Schema der Eingabedatei sinnvoll ist. Einerseits müssen die Spaltennamen, die im Query verwendet werden, auf konkrete Spalten in der Eingabe abgebildet werden, andererseits sind die beiden Aggregatfunktionen nur für numerische Werte definiert. Das erste Problem würde sich durch eine kleine CSV-Datei lösen lassen die nur die Namen der Spalten enthalten. Spaltennamen werden in derselben Reihenfolge angegeben wie die Spalten in der konkreten Eingabedatei. Da die Aggregatfunktionen die einzige Stelle sind an der Datentypen eine Rolle spielen reicht es aus wenn die Umwandlung von Strings in Longs an dieser Stelle passiert.
+
+
+\subsection{Command Line Interface}
+Bedient werden soll der Prototyp über die Kommandozeile in Form eines Command Line Interface. Benutzer der MySQL-Shell werden sofort gewollte Ähnlichkeiten feststellen.
+
+\begin{listing}[H]
+\begin{minted}{sh}
+java -jar de.bht.pat.tenzing.Main
+> SELECT year FROM hdfs://countries.csv
++---------------+
+| year          |
++---------------+
+| 1950          |
+| 1950          |
+| 1950          |
+| 1951          |
+| 1951          |
+| 1951          |
++---------------+
+6 rows in set (1 min 12 sec)
+>
+\end{minted}
+\caption{Command Line Interface}
+\label{lst:cli}
+\end{listing}
+
+\subsection{Architekturelle Herausforderungen}
+Zwei Teilaspekte des Prototypen erfordern ein genaues Planen, Einschätzen des Aufwandes sowie Abwägen von Alternativen. Der erste Aspekt betrifft das Parsen des SQL-Dialekts in eine verwertbare Struktur. Formal korrekt wäre die Definition einer Grammatik, vorzugsweise in Backus-Naur-Form, und das Erstellen eines Parsers mithilfe eines Parser Generators wie zum Beispiel ANTLR. Aufgrund mangelnden Vorwissens wird von dieser Strategie Abstand genommen. Eine Alternative für das Parsen wären Regulären Ausdrücke. Obwohl Reguläre Ausdrücke ein sehr mächtiges Werkzeug sind erscheinen sie für die Aufgabe doch zu fehleranfällig und nicht ausdrucksstark genug. Um den zeitlichen Aufwand in Grenzen zu halten wird versucht einen bestehenden Open-Source SQL-Parser \cite{SQLParser} für Java zu verwenden.
+
+Der zweite Aspekt der das Potential hat kompliziert zu werden ist die Tatsache, dass die Hadoop-API die Map- und Reduce-Funktionen in Form von Klassen und nicht als Instanzen akzeptiert. Konkret heißt das, dass die übergebenen Mapper und Reducer bereits zur Compiletime existieren müssen, da sie serialisiert und über das Netzwerk im Cluster verteilt werden müssen. Wie die Verwendung eines Parser Generators für den SQL-Dialekt gibt es auch hier eine Lösung die vermutlich die \textit{formal} korrekt wäre aber zu aufwändig ist: die Verwendung eines Bytecode-Generators \cite{Bytecode}. Stattdessen lässt sich die Simplizität des SQL-Dialekts ausnutzen. Es gibt nur zwei Varianten einer Projektion, mit und ohne Gruppierung. Falls in der Selektklausel keine Aggregatfunktion vorkommt reichen ein Mapper und ein Reducer: \texttt{SelectMapper} und \texttt{NoopReducer}. Der SelectMapper liefert nur die gewünschten Spalten, der NoopReducer gruppiert nach Schlüssel, wendet aber keine Aggregatfunktion an. Für den Fall dass in der Projektion eine Aggregatfunktion auftaucht wird wird ein spezieller Mapper, der \texttt{GroupByMapper}, und zwei spezielle Reducer, \texttt{SumReducer} und \texttt{AvgReducer}, benötigt. Da die entsprechenden Klassen bereits zur Compiletime existieren müssen ist es nötig Laufzeitinformationen wie die konkrete Liste der Spaltennamen etc. dynamisch im Cluster zu verteilen. Dazu lässt sich die Hadoop-Klasse \texttt{Configuration} verwendet die es erlaubt beliebige Konfigurationsparameter beim Start festzulegen, die dann für alle Knoten im Cluster verfügbar sind.
 
 \newpage
 \nocite{GOOGLE-TENZING}
