@@ -11,6 +11,7 @@
 \usepackage{graphvizzz}
 \usepackage{array}
 \usepackage[table]{xcolor}
+\usepackage{booktabs}
 \usepackage{multirow}
 \usepackage[format=plain,labelfont=bf,up,justification=centering]{caption}
 \setcounter{secnumdepth}{-1} 
@@ -38,6 +39,18 @@
 \includegraphics[width=0.5\textwidth]{beuth.eps}
 \maketitle
 \end{figure}
+
+\newpage
+\section{Dokument-Historie}
+
+\begin{tabular}{ r  l  l }
+	\toprule
+	\textbf{Version} & \textbf{Datum} & \textbf{Inhalt} \\
+	\midrule
+	0.1 & \date{30. Oktober 2011} & Kapitel SQL, MapReduce und Tenzing \\ 
+	0.2 & \date{4. Dezember 2011} & Kapitel Tenzing im Vergleich und Eigener Ansatz \\
+	\bottomrule
+\end{tabular}
 
 \newpage
 \tableofcontents
@@ -1160,15 +1173,11 @@ Im Rahmen des Apache Pig Projektes wurde \textit{PigLatin} entwickelt, eine proz
 Pig und Tenzing teilen die Motivation das Analysieren von großen Datenmengen mithilfe von MapReduce zu vereinfachen. SQL und PigLatin sind beides extrem spezialisierte Hochsprachen die es erlauben sehr ausdrucksstark Abfragen zu schreiben. Der Ansatz bei Tenzing, den SQL92-Standard so strikt wie möglich einzuhalten, hat seine Berechntigung wenn man bedenkt wieviele Programmierer und Analysten SQL beherrschen. Nichtsdestotrotz wäre Pig, wie auch HBase, ein wichtiger Bestandteil einer Open-Source-Variante von Tenzing da es MapReduce-Spezifika gegebenenfalls besser unterstützt als SQL.
 
 \subsection{Apache Hive}
-Hive beschreibt sich selbst als \textit{data warehouse software [that] facilitates querying and managing large datasets residing in distributed storage} \cite{HiveWiki}. Als Abfragesprache bietet als Hive einen SQL-Dialekt an: HIve-QL oder oft einfach nur QL. Als Data Warehouse System aggregiert Hive Daten aus HDFS-Dateien oder HBase. Eine Eigenschaft die Tenzing und Hive teilen. Ob Hive dabei spezifische Eigenschaften und Optimierungsmöglichkeiten der jeweiligen Datenquellen ausnutzt um die Ausführzeit von Abfragen zu reduzieren war leider nicht zu ermitteln. Generell haben Hive-Queries eine Laufzeit im Minuten-Bereich; Hive ist also nicht für Echtzeit-Abfragen geeignite. Allerdings bietet Hive, ähnlich wie Tenzing, auch die Möglichkeit über sogenannte \textit{User-Defined Functions} die Sprache um Funktionen und Features zu erweitern. Von den bisher untersuchten System hat Hive, im Vergleich zu Tenzing, die meisten vergleichbaren und ähnlichen Ansätze und Eigenschaften. 
-
-TODO: worker pool von tenzing?!
+Hive beschreibt sich selbst als \textit{data warehouse software [that] facilitates querying and managing large datasets residing in distributed storage} \cite{HiveWiki}. Als Abfragesprache bietet als Hive einen SQL-Dialekt an: HIve-QL oder oft einfach nur QL. Als Data Warehouse System aggregiert Hive Daten aus HDFS-Dateien oder HBase. Eine Eigenschaft die Tenzing und Hive teilen. Ob Hive dabei spezifische Eigenschaften und Optimierungsmöglichkeiten der jeweiligen Datenquellen ausnutzt um die Ausführzeit von Abfragen zu reduzieren war leider nicht zu ermitteln. Generell haben Hive-Queries eine Laufzeit im Minuten-Bereich; Hive ist also nicht für Echtzeit-Abfragen geeignet. Hier spielt Tenzings Worker Pool seine volle Stärke aus da Anfragen Prozesse wiederverwenden und dadurch die Zeit reduzieren. Zusätzlich bietet, ähnlich wie Tenzing, auch die Möglichkeit über sogenannte \textit{User-Defined Functions} die Sprache um Funktionen und Features zu erweitern. Von den bisher untersuchten System hat Hive, im Vergleich zu Tenzing, die meisten vergleichbaren und ähnlichen Ansätze und Eigenschaften. 
 
 \subsection{HadoopDB}
 \cite{HadoopDB2009}
-benutzt Hive
-MySQL + Postgres Support, gleichzeitig?
-Scheint Datenquellen-spezifische Eigenschaften nicht zu berücksichtigen. nur RDBMS (Column Stores in Planung)
+Im Paper \textit{HadoopDB: An Architectural Hybrid of MapReduce and DBMS Technologies for Analytic Workloads} \cite{HadoopDB2009}, veröffentlicht im August 2009 von Forschern der Yale sowie der Brown University, wird ein System vorgestellt das Eigenschaften von parallelen Datenbanken und MapReduce-Frameworks kombiniert. HadoopDB verspricht die Ausfallsicherheit und Skalierbarkeit eines MapReduce-Systems mit der Performance von parallelen Datenbank zu verbinden. Technisch realisiert wurde das System durch diverse Erweiterungen für Hadoop und Hive. Abbildung \ref{fig:hadoopdb} zeigt die Architectur des System. Die blauen Bereiche stellen die HadoopDB-spezifischen Erweiterungen dar. Die Architektur basiert darauf dass jeder Knoten im Cluster eine lokale Datenbank besitzt und MapReduce als Vermittlungsschicht zwischen den Knoten verwendet wird. Offiziell unterstützt HadoopDB MySQL und PostgreSQL. Leider war weder zu ermitteln ob beide Datenbank transparent im gleichen Cluster verwendet werden können noch ob HadoopDB spezifische Eigenschaften dieser Datenbank ausnutzen kann. Die Anbindung von Column Stores, wie beispielsweise HBase, ist in Planung aber noch nicht verfügbar. Auch hier wäre es interessant zu wissen ob HadoopDB ein heterogenes Setup aus Column Stores und relationalen Datenbanken unterstützt. Leider wurden keine schlüssigen Informationen diesbezüglich gefunden.
 
 \begin{figure}[H]
 \centering
@@ -1177,11 +1186,58 @@ Scheint Datenquellen-spezifische Eigenschaften nicht zu berücksichtigen. nur RD
 \label{fig:hadoopdb}
 \end{figure}
 
-\subsection{PACT}
-Paper \textit{MapReduce and PACT - Comparing Data Parallel Programming Models} \cite{PACT}
+HadoopDB scheint viele der Eigenschaften von Hive zu übernehmen, setzt aber gezielt auf eine höhere Performance. Durch das Zusammenspiel von MapReduce und traditionellen Datenbanken entsteht ein hybrides System das an vielen Stellen an Tenzing erinnert. Falls die Unterstützung unterschiedlicher DBMS und gegebenenfalls sogar die Integration von Column Stores innerhalb eines Clusters unterstützt wird hätte HadoopDB ähnliche Eigenschaften bezüglich heterogener Datenquellen.
+
+\newpage
+\subsection{Nephele und PACT}
+Die Technische Universität Berlin hat 2011 einen wissenschaftlichen Forschungs-Artikel mit dem Titel \textit{MapReduce and PACT - Comparing Data Parallel Programming Models} \cite{PACT} veröffentlich. Darin wird die Nephele Execution Engine sowie das PACT Programmiermodell vorgestellt. Nephele basiert auf Hadoop und PACT sieht sich selbst als Erweiterung des MapReduce-Paradigmas. Tenzing und PACT haben einige Gemeinsamkeiten was die Motivation betrifft, verfolgen jedoch grundverschiedene Ansätze bei der Umsetzung. Die Autoren des PACT-Papers stimmen mit der Meinung der Autoren des Tenzing-Papers überein, dass das Schreiben von MapReduce-Jobs aufwändig ist und viele Anwendungsfälle nicht ohne weiteres in MapReduce ausgedrückt werden können. Während Tenzing mit kompletter Unterstützung des SQL-Standards versucht den Zugang zur Analyse von großen Datenmengen zu ermöglichen verfolgt PACT klar den programmatischen Ansatz. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{pact.png}
+	\caption{Ausführung eines PACT-Programms}
+	\label{fig:pact}
+\end{figure}
+
+PACT erweitert das MapReduce-Konzept an zwei Stellen. Neben \texttt{Map} und \texttt{Reduce} wurden drei weitere grundlegende Funktionen identifiziert die für die Analyse von Daten wichtig sind: \texttt{Match}, \texttt{Cross} und \texttt{CoGroup}. 
+
+\begin{enumerate}
+    \item \paragraph{Match}
+	Die Match-Funktion arbeitet auf Paaren von Schlüssel-Werte-Paaren und kombiniert Paare mit dem gleichen Schlüssel.
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.5\textwidth]{match.png}
+		\caption{Match-Funktion}
+	\end{figure}
+    \item \paragraph{Cross}
+	Die Cross-Funktion bildet Paare von Schlüssel-Werte-Paaren in Form eines kartesischen Produkts. Eigenschaften der Schlüssel, wie beispielsweise die Gleichheit werden nicht beachtet.
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.5\textwidth]{cross.png}
+		\caption{Cross-Funktion}
+	\end{figure}
+    \item \paragraph{CoGroup}
+	Die CoGroup-Funktion arbeitet ähnlich wie Match-Funktion, allerdings bildet sie nicht nur Paare, sondern Gruppen von Schlüssel-Werte-Paaren mit dem gleichen Schlüssel.
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.5\textwidth]{cogroup.png}
+		\caption{CoGroup-Funktion}
+	\end{figure}
+\end{enumerate}
+
+Im Gegensatz zu Map und Reduce arbeiten die drei zusätzlichen Funktionen immer mit zwei Eingabemengen. Dadurch lassen sich Joins wesentlich einfacher formulieren als mit klassischen MapReduce-Programmen. Zusammen mit Map und Reduce lassen sich diese fünf Funktionen in beliebiger Konstellation zusammenstellen. Während man bei MapReduce auf die starre Abfolge von Map und Reduce angewiesen war, erlaubt es PACT komplexe Analsysen in kleinere und dadurch wiederverwendbarere Bausteine aufzuteilen. Dadurch entsteht in gerichteter Graph der dann von der Execution Engine analysiert und gegebenenfalls optimiert wird. Abbildung \ref{fig:pact} zeigt das Übersetzen eines PACT-Programms in einen ausführbaren Plan.
+
+Nephele/PACT und Tenzing verfolgen extrem unterschiedliche Ansätze für die Lösung des gleichen Problems. Nephele/PACT ist kein Open-Source-Ersatz für Tenzing aber eine vielversprechende Basis für einen Open-Source-SQL-Engine auf Basis von Hadoop. Durch den bereits vorhandenen Compiler und Optimizer fehlt dem Nephele/PACT-System effektiv nur noch eine entsprechende SQL-Schnittstelle. Also eine Komponente die SQL-Queries parsen und in PACT-Programme übersetzen kann. Den aufwändigen Teil des Optimierens und Verteilens bietet das System bereits. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{compilation.png}
+\caption{Lebenszyklus eines PACT-Programms}
+\label{fig:pact}
+\end{figure}
 
 \subsection{Fazit}
-keine open source entsprechung?
+Aufgrund der Tatsache, dass der Artikel über Tenzing erst im September 2011 erschienen ist, ist es nicht weiter überraschend, dass es zum aktuellen Zeitpunkt nicht weiter verwunderlich dass es keine vergleichbaren Open-Source-System gibt. Nichtsdestotrotz bieten sowohl Hive als auch HadoopDB bereits ausgesprochen ausgereifte Varianten von SQL-Engines auf Basis des Hadoop-Ökosystems an. Zusätzlich wurde im vorherigen Kapitel eine alternative Route aufgezeigt womit eine Open-Source-SQL-Engine auf Basis von Hadoop entwickelt werden könnte.
 
 \newpage
 \section{Eigener Ansatz}
