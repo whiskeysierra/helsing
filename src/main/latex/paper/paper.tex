@@ -56,7 +56,7 @@
 
 \newpage
 \section{Einleitung}
-Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzepte} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein wissenschaftliches Paper ausgewählt, untersucht und bewertet werden. Das Ziel dieses Dokumentes ist es die Ergebnisse dieser Semesterarbeit zusammenzufassen. Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong. Tenzing ist eine SQL/92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}. Die beiden zugrundeliegenden Technologien werden in den Kapiteln \nameref{sql} und \nameref{mapreduce}, im Kontext des Hauptthemas, näher erläutert.
+Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzepte} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein wissenschaftlicher Artikel ausgewählt, untersucht und bewertet werden. Das Ziel dieses Dokumentes ist es die Ergebnisse dieser Semesterarbeit zusammenzufassen. Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong. Tenzing ist eine SQL/92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}. Die beiden zugrundeliegenden Technologien werden in den Kapiteln \nameref{sql} und \nameref{mapreduce}, im Kontext des Hauptthemas, näher erläutert.
 
 \newpage
 \section{SQL}
@@ -368,7 +368,7 @@ FROM City city, Country country
 WHERE city.country_id = country.id;
 \end{minted}
 \caption{Impliziter Inner Join}
-\label{lst:inplicit-inner-join}
+\label{lst:implicit-inner-join}
 \end{listing}
 
 \begin{minipage}{\textwidth}
@@ -1169,13 +1169,12 @@ HBase wäre ein wichtiger Bestandteil einer Open-Source-Variante von Tenzing abe
 \subsection{Apache Pig}
 Im Rahmen des Apache Pig Projektes wurde \textit{PigLatin} entwickelt, eine prozedurale Hochsprache für Abfragen die in MapReduce-Jobs kompiliert wird. PigLatin hat einige Ähnlichkeiten zu Sawzall \cite{Sawzall} das ebenfalls von Google entwickelt wurde. Beide Sprachen sind imperativ wobei ein Sawzall-Programm genau einem MapReduce-Job entspricht währen Pig-Programme in mehrere solcher Jobs kompiliert werden können \cite{PigWiki}. Die Motivation von Pig ist es, MapReduce-Jobs mit weniger Quellcode und dadurch mit weniger Aufwand in kürzerer Zeit zu schreiben \cite{pdfcast}. PigLatin übernimmt eine Sprachkonstrukte und Schlüsselwörter aus dem SQL-Standard was den Einstieg für SQL-Kenner erleichtert.
 
-Pig und Tenzing teilen die Motivation das Analysieren von großen Datenmengen mithilfe von MapReduce zu vereinfachen. SQL und PigLatin sind beides extrem spezialisierte Hochsprachen die es erlauben sehr ausdrucksstark Abfragen zu schreiben. Der Ansatz bei Tenzing, den SQL92-Standard so strikt wie möglich einzuhalten, hat seine Berechntigung wenn man bedenkt wieviele Programmierer und Analysten SQL beherrschen. Nichtsdestotrotz wäre Pig, wie auch HBase, ein wichtiger Bestandteil einer Open-Source-Variante von Tenzing da es MapReduce-Spezifika gegebenenfalls besser unterstützt als SQL.
+Pig und Tenzing teilen die Motivation das Analysieren von großen Datenmengen mithilfe von MapReduce zu vereinfachen. SQL und PigLatin sind beides extrem spezialisierte Hochsprachen die es erlauben sehr ausdrucksstark Abfragen zu schreiben. Der Ansatz bei Tenzing, den SQL92-Standard so strikt wie möglich einzuhalten, hat seine Berechtigung wenn man bedenkt wieviele Programmierer und Analysten SQL beherrschen. Nichtsdestotrotz wäre Pig, wie auch HBase, ein wichtiger Bestandteil einer Open-Source-Variante von Tenzing da es MapReduce-Spezifika gegebenenfalls besser unterstützt als SQL.
 
 \subsection{Apache Hive}
-Hive beschreibt sich selbst als \textit{data warehouse software [that] facilitates querying and managing large datasets residing in distributed storage} \cite{HiveWiki}. Als Abfragesprache bietet als Hive einen SQL-Dialekt an: HIve-QL oder oft einfach nur QL. Als Data Warehouse System aggregiert Hive Daten aus HDFS-Dateien oder HBase. Eine Eigenschaft die Tenzing und Hive teilen. Ob Hive dabei spezifische Eigenschaften und Optimierungsmöglichkeiten der jeweiligen Datenquellen ausnutzt um die Ausführzeit von Abfragen zu reduzieren war leider nicht zu ermitteln. Generell haben Hive-Queries eine Laufzeit im Minuten-Bereich; Hive ist also nicht für Echtzeit-Abfragen geeignet. Hier spielt Tenzings Worker Pool seine volle Stärke aus da Anfragen Prozesse wiederverwenden und dadurch die Zeit reduzieren. Zusätzlich bietet, ähnlich wie Tenzing, auch die Möglichkeit über sogenannte \textit{User-Defined Functions} die Sprache um Funktionen und Features zu erweitern. Von den bisher untersuchten System hat Hive, im Vergleich zu Tenzing, die meisten vergleichbaren und ähnlichen Ansätze und Eigenschaften. 
+Hive beschreibt sich selbst als \textit{data warehouse software [that] facilitates querying and managing large datasets residing in distributed storage} \cite{HiveWiki}. Als Abfragesprache bietet als Hive einen SQL-Dialekt an: Hive-QL oder oft einfach nur QL. Als Data Warehouse System aggregiert Hive Daten aus HDFS-Dateien oder HBase. Eine Eigenschaft die Tenzing und Hive teilen. Ob Hive dabei spezifische Eigenschaften und Optimierungsmöglichkeiten der jeweiligen Datenquellen ausnutzt um die Ausführzeit von Abfragen zu reduzieren war leider nicht zu ermitteln. Generell haben Hive-Queries eine Laufzeit im Minuten-Bereich; Hive ist also nicht für Echtzeit-Abfragen geeignet. Hier spielt Tenzings Worker Pool seine volle Stärke aus da Anfragen Prozesse wiederverwenden und dadurch die benötigte Zeit reduzieren. Zusätzlich bietet Hive, ähnlich wie Tenzing, auch die Möglichkeit über sogenannte \textit{User-Defined Functions} die Sprache um Funktionen und Features zu erweitern. Von den bisher untersuchten System hat Hive, im Vergleich zu Tenzing, die meisten vergleichbaren Ansätze und Eigenschaften. 
 
 \subsection{HadoopDB}
-\cite{HadoopDB2009}
 Im Paper \textit{HadoopDB: An Architectural Hybrid of MapReduce and DBMS Technologies for Analytic Workloads} \cite{HadoopDB2009}, veröffentlicht im August 2009 von Forschern der Yale sowie der Brown University, wird ein System vorgestellt das Eigenschaften von parallelen Datenbanken und MapReduce-Frameworks kombiniert. HadoopDB verspricht die Ausfallsicherheit und Skalierbarkeit eines MapReduce-Systems mit der Performance von parallelen Datenbank zu verbinden. Technisch realisiert wurde das System durch diverse Erweiterungen für Hadoop und Hive. Abbildung \ref{fig:hadoopdb} zeigt die Architectur des System. Die blauen Bereiche stellen die HadoopDB-spezifischen Erweiterungen dar. Die Architektur basiert darauf dass jeder Knoten im Cluster eine lokale Datenbank besitzt und MapReduce als Vermittlungsschicht zwischen den Knoten verwendet wird. Offiziell unterstützt HadoopDB MySQL und PostgreSQL. Leider war weder zu ermitteln ob beide Datenbank transparent im gleichen Cluster verwendet werden können noch ob HadoopDB spezifische Eigenschaften dieser Datenbank ausnutzen kann. Die Anbindung von Column Stores, wie beispielsweise HBase, ist in Planung aber noch nicht verfügbar. Auch hier wäre es interessant zu wissen ob HadoopDB ein heterogenes Setup aus Column Stores und relationalen Datenbanken unterstützt. Leider wurden keine schlüssigen Informationen diesbezüglich gefunden.
 
 \begin{figure}[H]
@@ -1185,7 +1184,7 @@ Im Paper \textit{HadoopDB: An Architectural Hybrid of MapReduce and DBMS Technol
 \label{fig:hadoopdb}
 \end{figure}
 
-HadoopDB scheint viele der Eigenschaften von Hive zu übernehmen, setzt aber gezielt auf eine höhere Performance. Durch das Zusammenspiel von MapReduce und traditionellen Datenbanken entsteht ein hybrides System das an vielen Stellen an Tenzing erinnert. Falls die Unterstützung unterschiedlicher DBMS und gegebenenfalls sogar die Integration von Column Stores innerhalb eines Clusters unterstützt wird hätte HadoopDB ähnliche Eigenschaften bezüglich heterogener Datenquellen.
+HadoopDB scheint viele der Eigenschaften von Hive zu übernehmen, setzt aber gezielt auf eine höhere Performance. Durch das Zusammenspiel von MapReduce und traditionellen Datenbanken entsteht ein hybrides System das an vielen Stellen an Tenzing erinnert. Falls die Unterstützung unterschiedlicher DBMS und gegebenenfalls sogar die Integration von Column Stores innerhalb eines Clusters geplant ist hätte HadoopDB bezüglich heterogener Datenquellen große Ähnlichkeiten mit Tenzing.
 
 \newpage
 \subsection{Nephele und PACT}
@@ -1236,14 +1235,14 @@ Nephele/PACT und Tenzing verfolgen extrem unterschiedliche Ansätze für die Lö
 \end{figure}
 
 \subsection{Fazit}
-Aufgrund der Tatsache, dass der Artikel über Tenzing erst im September 2011 erschienen ist, ist es nicht weiter überraschend, dass es zum aktuellen Zeitpunkt nicht weiter verwunderlich dass es keine vergleichbaren Open-Source-System gibt. Nichtsdestotrotz bieten sowohl Hive als auch HadoopDB bereits ausgesprochen ausgereifte Varianten von SQL-Engines auf Basis des Hadoop-Ökosystems an. Zusätzlich wurde im vorherigen Kapitel eine alternative Route aufgezeigt womit eine Open-Source-SQL-Engine auf Basis von Hadoop entwickelt werden könnte.
+Aufgrund der Tatsache, dass der Artikel über Tenzing erst im September 2011 erschienen ist, ist es nicht weiter überraschend, dass es zum aktuellen Zeitpunkt keine Open-Source-Varianten von Tenzing gibt. Nichtsdestotrotz bieten sowohl Hive als auch HadoopDB bereits ausgesprochen ausgereifte Varianten von SQL-Engines auf Basis des Hadoop-Ökosystems an. Zusätzlich wurde im vorherigen Kapitel eine erfolgsversprechende, alternative Route aufgezeigt wie eine Open-Source-SQL-Engine auf Basis von Hadoop entwickelt werden könnte.
 
 \newpage
 \section{Eigener Ansatz}
 In diesem Kapitel wird ein eigener Ansatz sowie die Idee und Architektur für einen Prototypen vorgestellt. Der Prototyp besteht aus einem eigenen SQL-Dialekt sowie einer Engine die Abfragen in diesem Dialekt in einen MapReduce-Job für das Hadoop-Framework übersetzt.
 
 \subsection{SQL-}
-Der SQL-Dialekt \textit{SQL-} (in Worten \textit{SQL Minus}), ist eine extrem kleine Teilmenge von SQL. Es werden ausschließlich Projektion und eine einfache Gruppierung mit einer Aggregation pro Abfrage. Als Aggregatfunktionen werden \texttt{SUM} und \texttt{AVG} unterstützt. Die Listings \ref{lst:sqlm-select}, \ref{lst:sqlm-group-by-avg}, \ref{lst:sqlm-group-by-sum} \ref{lst:sqlm-group-by} zeigen mögliche Queries. 
+Der SQL-Dialekt \textit{SQL-} (in Worten \textit{SQL Minus}), ist eine extrem kleine Teilmenge von SQL. Es werden ausschließlich Projektion und eine einfache Gruppierung mit einer Aggregation pro Abfrage. Als Aggregatfunktionen werden \texttt{SUM} und \texttt{AVG} unterstützt. Die folgenden Listings zeigen kompatible Queries. 
 
 \begin{listing}[H]
 \begin{minted}{sql}
@@ -1251,7 +1250,6 @@ SELECT year, population
 FROM hdfs://countries.csv
 \end{minted}
 \caption{SQL- Select-Syntax}
-\label{lst:sqlm-select}
 \end{listing}
 
 \begin{listing}[H]
@@ -1261,7 +1259,6 @@ FROM hdfs://countries.csv
 GROUP BY country
 \end{minted}
 \caption{SQL- Group-by-Syntax}
-\label{lst:sqlm-group-by-avg}
 \end{listing}
 
 \begin{listing}[H]
@@ -1271,7 +1268,6 @@ FROM hdfs://countries.csv
 GROUP BY year
 \end{minted}
 \caption{SQL- Group-by-Syntax}
-\label{lst:sqlm-group-by-sum}
 \end{listing}
 
 \begin{listing}[H]
@@ -1281,7 +1277,6 @@ FROM hdfs://countries.csv
 GROUP BY year
 \end{minted}
 \caption{SQL- Group-by-Syntax}
-\label{lst:sqlm-group-by}
 \end{listing}
 
 Abbildung \ref{fig:sampledata} zeigt die Beispieldaten auf die sich die oben vorgestellten Abfragen beziehen können. Konkrete Daten sind beispielsweise auf Geohive.com \cite{GeoHive} verfügbar, was für den Test des Prototypens interessant wird.
