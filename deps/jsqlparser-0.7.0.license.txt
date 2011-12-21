@@ -1,0 +1,1 @@
+Beware that starting from version 0.7.0 PlainSelect.getGroupByColumnReferences returns a list of Expression object, and that OrderByElement holds an Expression, not a ColumnReference

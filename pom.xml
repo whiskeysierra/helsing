@@ -4,6 +4,9 @@
     <groupId>org.whiskeysierra.beuth.pat</groupId>
     <artifactId>tenzing</artifactId>
     <version>0.1</version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -11,6 +14,62 @@
                 <artifactId>latex-maven-plugin</artifactId>
                 <version>1.1</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>de.bht.pat.tenzing.Main</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>dependency</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeScope>provided</excludeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>0.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-core</artifactId>
+            <version>0.20.205.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.inamik.utils.</groupId>
+            <artifactId>tableformatter</artifactId>
+            <version>0.96.2</version>
+        </dependency>
+    </dependencies>
 </project>
