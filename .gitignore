@@ -54,3 +54,5 @@ pom.xml.releaseBackup
 /src/main/latex/*/*.synctex.gz
 /src/main/latex/*/*.toc
 
+/hadoop
+
