@@ -29,6 +29,9 @@ final class SqlValidator {
             final CCJSqlParserManager manager = new CCJSqlParserManager();
             final String sql = event.getSql();
             manager.parse(new StringReader(sql));
+
+            // TODO check statement for unsupported features
+
             bus.post(new QueryEvent(sql));
         } catch (JSQLParserException e) {
             bus.post(new SyntaxError(e));

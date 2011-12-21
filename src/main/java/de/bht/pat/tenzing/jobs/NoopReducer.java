@@ -4,11 +4,13 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
-public final class NoopReducer extends Reducer<String, Void, String, Void> {
+public final class NoopReducer extends Reducer<String, String, String, String> {
 
     @Override
-    protected void reduce(String key, Iterable<Void> values, Context context) throws IOException, InterruptedException {
-        context.write(key, null);
+    protected void reduce(String key, Iterable<String> values, Context context) throws IOException, InterruptedException {
+        for (String value : values) {
+            context.write(key, value);
+        }
     }
 
 }
