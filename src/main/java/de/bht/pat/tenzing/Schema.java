@@ -1,4 +1,4 @@
-package de.bht.pat.tenzing.cli;
+package de.bht.pat.tenzing;
 
 import com.google.inject.BindingAnnotation;
 
@@ -7,5 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @BindingAnnotation
-public @interface Console {
+public @interface Schema {
 }

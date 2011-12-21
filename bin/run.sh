@@ -1,3 +1,3 @@
 #!/bin/sh
 
-java -jar target/tenzing-*.jar $*
+$JAVA_HOME/bin/java -jar target/tenzing-*.jar $*

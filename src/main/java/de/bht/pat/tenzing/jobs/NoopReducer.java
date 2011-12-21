@@ -1,6 +1,5 @@
-package de.bht.pat.tenzing.mapreduce;
+package de.bht.pat.tenzing.jobs;
 
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;

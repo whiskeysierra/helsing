@@ -1,14 +1,14 @@
-package de.bht.pat.tenzing.mapreduce;
+package de.bht.pat.tenzing.jobs;
 
 import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
 
-public final class GroupByMapper extends Mapper<String, String, String, String> {
+public final class SelectMapper extends Mapper<String, String, String, String> {
 
     @Override
     protected void map(String key, String value, Context context) throws IOException, InterruptedException {
-        // TODO use group by key
+        // TODO use key, but select only requested columns
     }
 
 }

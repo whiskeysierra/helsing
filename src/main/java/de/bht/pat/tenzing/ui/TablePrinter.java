@@ -1,28 +1,29 @@
-package de.bht.pat.tenzing.cli;
+package de.bht.pat.tenzing.ui;
 
 import au.com.bytecode.opencsv.CSVReader;
-import com.google.common.collect.Table;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.inamik.utils.SimpleTableFormatter;
 import com.inamik.utils.TableFormatter;
+import de.bht.pat.tenzing.events.ResultEvent;
+import jline.ConsoleReader;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Writer;
-import java.util.Map;
 
-final class DefaultTablePrinter implements TablePrinter {
+final class TablePrinter {
 
-    private final Writer writer;
+    private final ConsoleReader console;
 
     @Inject
-    public DefaultTablePrinter(@Console Writer writer) {
-        this.writer = writer;
+    public TablePrinter(ConsoleReader console) {
+        this.console = console;
     }
 
-    @Override
-    public void print(File file) throws IOException {
+    @Subscribe
+    public void onResult(ResultEvent event) throws IOException {
+        final File file = event.getFile();
         // TODO print stream-like, without pushing everything in memory
         final CSVReader reader = new CSVReader(new FileReader(file), ' ');
 
@@ -41,9 +42,10 @@ final class DefaultTablePrinter implements TablePrinter {
         final String[] lines = formatter.getFormattedTable();
 
         for (String line : lines) {
-            writer.write(line);
-            writer.write("\n");
+            console.printString(line);
+            console.printNewline();
         }
+        console.flushConsole();
     }
 
 }

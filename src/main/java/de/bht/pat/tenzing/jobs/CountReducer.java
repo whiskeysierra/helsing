@@ -1,4 +1,4 @@
-package de.bht.pat.tenzing.mapreduce;
+package de.bht.pat.tenzing.jobs;
 
 import com.google.common.collect.Iterables;
 import org.apache.hadoop.mapreduce.Reducer;
