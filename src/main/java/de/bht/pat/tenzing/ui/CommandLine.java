@@ -1,5 +1,6 @@
 package de.bht.pat.tenzing.ui;
 
+import com.google.common.base.Throwables;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -75,13 +76,16 @@ final class CommandLine {
 
     @Subscribe
     public void onSyntaxError(SyntaxError error) throws IOException {
-        println("You have an error in your SQL syntax.");
+        print("You have an error in your SQL syntax. ");
+        final Throwable exception = Throwables.getRootCause(error.getException());
+        final String message = StringUtils.trimToEmpty(exception.getMessage());
+        println(message.replace(" ...", ",").replace("\n    ", " "));
         bus.post(new PromptEvent());
     }
 
     @Subscribe
     public void onUnsupportedFeature(UnsupportedFeatureEvent event) throws IOException {
-        println("%s is not supported", event.getFeature());
+        println("%s not supported", event.getFeature());
         bus.post(new PromptEvent());
     }
 
@@ -100,8 +104,13 @@ final class CommandLine {
         println(String.format(s, arguments));
     }
 
-    private void println(String str) throws IOException {
-        console.printString(str);
+    private void print(String s) throws IOException {
+        console.printString(s);
+        console.flushConsole();
+    }
+
+    private void println(String s) throws IOException {
+        console.printString(s);
         console.printNewline();
         console.flushConsole();
     }

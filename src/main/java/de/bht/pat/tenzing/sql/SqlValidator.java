@@ -144,13 +144,18 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
             item.accept(this);
         }
 
-        // TODO support
+        // TODO support single table
         select.getFromItem().accept(this);
 
-        // TODO support only one (or maybe more later: composite key)
-        for (Column column : getGroupByColumns(select)) {
-            // TODO accept only columns
-            column.accept(this);
+        final List<Column> columns = getGroupByColumns(select);
+        switch (columns.size()) {
+            case 0:
+                break;
+            case 1:
+                columns.get(0).accept(this);
+                break;
+            default:
+                throw new UnsupportedOperationException("Multiple GROUP BY columns");
         }
     }
 
@@ -179,7 +184,10 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
                 return;
             case "AVG":
                 return;
-            // TODO support MIN, MAX
+            case "MIN":
+                return;
+            case "MAX":
+                return;
             default: {
                 throw new UnsupportedOperationException(name);
             }
