@@ -11,6 +11,7 @@ import de.bht.pat.tenzing.events.QueryEvent;
 import de.bht.pat.tenzing.events.QuitEvent;
 import de.bht.pat.tenzing.events.SqlEvent;
 import de.bht.pat.tenzing.events.SyntaxError;
+import de.bht.pat.tenzing.events.UnsupportedFeatureEvent;
 import jline.ConsoleReader;
 import org.apache.commons.lang.StringUtils;
 
@@ -75,6 +76,12 @@ final class CommandLine {
     @Subscribe
     public void onSyntaxError(SyntaxError error) throws IOException {
         println("You have an error in your SQL syntax.");
+        bus.post(new PromptEvent());
+    }
+
+    @Subscribe
+    public void onUnsupportedFeature(UnsupportedFeatureEvent event) throws IOException {
+        println("%s is not supported", event.getFeature());
         bus.post(new PromptEvent());
     }
 
