@@ -94,18 +94,18 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
         try {
             final CCJSqlParserManager manager = new CCJSqlParserManager();
             final String sql = event.getSql();
+
+            // syntactical checks
             final Statement statement = manager.parse(new StringReader(sql));
 
-            // TODO check statement for unsupported features
-
+            // semantical checks
             statement.accept(this);
 
             bus.post(new QueryEvent(sql));
-
-        } catch (UnsupportedOperationException e) {
-            bus.post(new UnsupportedFeatureEvent(e.getMessage()));
         } catch (JSQLParserException e) {
             bus.post(new SyntaxError(e));
+        } catch (UnsupportedOperationException e) {
+            bus.post(new UnsupportedFeatureEvent(e.getMessage()));
         }
     }
 
@@ -138,13 +138,10 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
         assertNull(select.getTop(), "TOP");
         assertNull(select.getWhere(), "WHERE");
 
-        // TODO support
         for (SelectItem item : getSelectItems(select)) {
-            // TODO accept aggregate functions
             item.accept(this);
         }
 
-        // TODO support single table
         select.getFromItem().accept(this);
 
         final List<Column> columns = getGroupByColumns(select);
