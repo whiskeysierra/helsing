@@ -5,14 +5,14 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class QueryEvent {
 
-    private final String sql;
+    private final String query;
 
-    public QueryEvent(String sql) {
-        this.sql = sql;
+    public QueryEvent(String query) {
+        this.query = query;
     }
 
-    public String getSql() {
-        return sql;
+    public String getQuery() {
+        return query;
     }
 
 }
