@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import de.bht.pat.tenzing.mapreduce.MapReduceModule;
 import de.bht.pat.tenzing.ui.UiModule;
 import de.bht.pat.tenzing.sql.SqlModule;
+import de.bht.pat.tenzing.util.concurrent.ProcessModule;
 
 final class MainModule extends AbstractModule {
 
@@ -17,6 +18,7 @@ final class MainModule extends AbstractModule {
         install(new MapReduceModule());
         install(new SqlModule());
         install(new UiModule());
+        install(new ProcessModule());
     }
 
 }

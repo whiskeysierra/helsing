@@ -1,5 +1,6 @@
 package de.bht.pat.tenzing.ui;
 
+import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -78,9 +79,18 @@ final class CommandLine {
     }
 
     @Subscribe
+    public void onUndeliverable(DeadEvent event) throws IOException {
+        println("Unhandled event: %s", event.getEvent());
+        quit();
+    }
+
+    @Subscribe
     public void onQuit(QuitEvent event) throws IOException {
-        console.printString("Bye");
-        console.flushConsole();
+        println("Bye");
+    }
+
+    private void println(String s, Object... arguments) throws IOException {
+        println(String.format(s, arguments));
     }
 
     private void println(String str) throws IOException {
