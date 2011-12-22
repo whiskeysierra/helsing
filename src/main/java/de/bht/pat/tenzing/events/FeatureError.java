@@ -1,10 +1,10 @@
 package de.bht.pat.tenzing.events;
 
-public final class UnsupportedFeatureEvent {
+public final class FeatureError {
 
     private final String feature;
 
-    public UnsupportedFeatureEvent(String feature) {
+    public FeatureError(String feature) {
         this.feature = feature;
     }
 

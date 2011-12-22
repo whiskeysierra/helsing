@@ -56,3 +56,5 @@ pom.xml.releaseBackup
 
 /hadoop
 
+.history
+/output

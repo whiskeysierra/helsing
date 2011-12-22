@@ -1,15 +1,18 @@
 package de.bht.pat.tenzing.jobs;
 
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
-public final class NoopReducer extends Reducer<String, String, String, String> {
+public final class NoopReducer extends Reducer<LongWritable, Text, NullWritable, Text> {
 
     @Override
-    protected void reduce(String key, Iterable<String> values, Context context) throws IOException, InterruptedException {
-        for (String value : values) {
-            context.write(key, value);
+    protected void reduce(LongWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+        for (Text value : values) {
+            context.write(NullWritable.get(), value);
         }
     }
 

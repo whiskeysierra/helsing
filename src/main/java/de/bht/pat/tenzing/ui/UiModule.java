@@ -7,8 +7,10 @@ import com.google.inject.Singleton;
 import jline.ArgumentCompletor;
 import jline.Completor;
 import jline.ConsoleReader;
+import jline.History;
 import jline.SimpleCompletor;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,13 +19,14 @@ public final class UiModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(CommandLine.class).asEagerSingleton();
-        bind(TablePrinter.class).asEagerSingleton();
     }
 
     @Provides
     @Singleton
     public ConsoleReader provideConsole(SchemaCompletor schema, DataCompletor data) throws IOException {
         final ConsoleReader console = new ConsoleReader();
+
+        console.setHistory(new History(new File(".history")));
 
         final List<Completor> completors = Lists.newLinkedList();
         completors.add(new SimpleCompletor("SELECT"));

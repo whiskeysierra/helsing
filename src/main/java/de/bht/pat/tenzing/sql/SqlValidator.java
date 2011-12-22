@@ -6,7 +6,7 @@ import com.google.common.eventbus.Subscribe;
 import de.bht.pat.tenzing.events.QueryEvent;
 import de.bht.pat.tenzing.events.SqlEvent;
 import de.bht.pat.tenzing.events.SyntaxError;
-import de.bht.pat.tenzing.events.UnsupportedFeatureEvent;
+import de.bht.pat.tenzing.events.FeatureError;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
@@ -105,7 +105,7 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
         } catch (JSQLParserException e) {
             bus.post(new SyntaxError(e));
         } catch (UnsupportedOperationException e) {
-            bus.post(new UnsupportedFeatureEvent(e.getMessage()));
+            bus.post(new FeatureError(e.getMessage()));
         }
     }
 
