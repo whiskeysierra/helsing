@@ -1,6 +1,5 @@
 package de.bht.pat.tenzing.ui;
 
-import au.com.bytecode.opencsv.CSVReader;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -18,12 +17,14 @@ import de.bht.pat.tenzing.events.QuitEvent;
 import de.bht.pat.tenzing.events.ResultEvent;
 import de.bht.pat.tenzing.events.SqlEvent;
 import de.bht.pat.tenzing.events.SyntaxError;
+import de.bht.pat.tenzing.util.Formatting;
+import de.bht.pat.tenzing.util.io.StatelessLineProcessor;
 import jline.ConsoleReader;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 final class CommandLine {
@@ -91,18 +92,9 @@ final class CommandLine {
         bus.post(new PromptEvent());
     }
 
-    private int sum(Iterable<Integer> values) {
-        int sum = 0;
-        for (Integer value : values) {
-            sum += value;
-        }
-        return sum;
-    }
-
     @Subscribe
     public void onResult(ResultEvent event) throws IOException {
         final File file = event.getFile();
-        final CSVReader reader = new CSVReader(new FileReader(file), '\t');
 
         final WidthCalculator calculator = new WidthCalculator();
         Files.readLines(file, Charsets.UTF_8, calculator);
@@ -112,14 +104,20 @@ final class CommandLine {
 
         printTableSeparator(widths);
         // TODO make dynamic
+        // TODO consider width of header in Width calculator
+        // e.g. calculator.processLine(Formatting.JOINER.join(header))
         printTableLine(widths, "year", "population");
         printTableSeparator(widths);
 
-        while (true) {
-            final String[] line = reader.readNext();
-            if (line == null) break;
-            printTableLine(widths, line);
-        }
+        Files.readLines(file, Charsets.UTF_8, new StatelessLineProcessor() {
+
+            @Override
+            public boolean processLine(String line) throws IOException {
+                printTableLine(widths, Formatting.SPLITTER.split(line));
+                return true;
+            }
+
+        });
 
         printTableSeparator(widths);
 
@@ -127,12 +125,20 @@ final class CommandLine {
     }
 
     private void printTableLine(Map<Integer, Integer> widths, String... line) throws IOException {
+        printTableLine(widths, Arrays.asList(line));
+    }
+
+    private void printTableLine(Map<Integer, Integer> widths, Iterable<String> line) throws IOException {
         console.printString("|");
-        for (int i = 0; i < line.length; i++) {
+
+        int i = 0;
+        for (String cell : line) {
             console.printString(" ");
-            console.printString(Strings.padStart(line[i], widths.get(i), ' '));
+            console.printString(Strings.padStart(cell, widths.get(i), ' '));
             console.printString(" |");
+            i++;
         }
+
         console.printNewline();
         console.flushConsole();
     }
