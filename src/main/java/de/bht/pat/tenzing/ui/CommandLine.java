@@ -1,31 +1,25 @@
 package de.bht.pat.tenzing.ui;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.io.Files;
 import com.google.inject.Inject;
 import de.bht.pat.tenzing.events.BootEvent;
 import de.bht.pat.tenzing.events.ExecutionError;
 import de.bht.pat.tenzing.events.FeatureError;
 import de.bht.pat.tenzing.events.InputEvent;
+import de.bht.pat.tenzing.events.PrintEvent;
+import de.bht.pat.tenzing.events.PrintLineEvent;
 import de.bht.pat.tenzing.events.PromptEvent;
 import de.bht.pat.tenzing.events.QuitEvent;
-import de.bht.pat.tenzing.events.ResultEvent;
+import de.bht.pat.tenzing.events.ResultPrintedEvent;
 import de.bht.pat.tenzing.events.SqlEvent;
 import de.bht.pat.tenzing.events.SyntaxError;
-import de.bht.pat.tenzing.util.Formatting;
-import de.bht.pat.tenzing.util.io.StatelessLineProcessor;
 import jline.ConsoleReader;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
 
 final class CommandLine {
 
@@ -78,6 +72,16 @@ final class CommandLine {
     }
 
     @Subscribe
+    public void onPrintEvent(PrintEvent event) throws IOException {
+        print(event.getLine());
+    }
+
+    @Subscribe
+    public void onPrintLineEvent(PrintLineEvent event) throws IOException {
+        println(event.getLine());
+    }
+
+    @Subscribe
     public void onSyntaxError(SyntaxError error) throws IOException {
         print("You have an error in your SQL syntax. ");
         final Throwable exception = Throwables.getRootCause(error.getException());
@@ -93,64 +97,8 @@ final class CommandLine {
     }
 
     @Subscribe
-    public void onResult(ResultEvent event) throws IOException {
-        final File file = event.getFile();
-
-        final WidthCalculator calculator = new WidthCalculator();
-        Files.readLines(file, Charsets.UTF_8, calculator);
-        final Map<Integer, Integer> widths = calculator.getResult();
-
-        // TODO add select clause to result event
-
-        printTableSeparator(widths);
-        // TODO make dynamic
-        // TODO consider width of header in Width calculator
-        // e.g. calculator.processLine(Formatting.JOINER.join(header))
-        printTableLine(widths, "year", "population");
-        printTableSeparator(widths);
-
-        Files.readLines(file, Charsets.UTF_8, new StatelessLineProcessor() {
-
-            @Override
-            public boolean processLine(String line) throws IOException {
-                printTableLine(widths, Formatting.SPLITTER.split(line));
-                return true;
-            }
-
-        });
-
-        printTableSeparator(widths);
-
+    public void onResultPrinted(ResultPrintedEvent event) {
         bus.post(new PromptEvent());
-    }
-
-    private void printTableLine(Map<Integer, Integer> widths, String... line) throws IOException {
-        printTableLine(widths, Arrays.asList(line));
-    }
-
-    private void printTableLine(Map<Integer, Integer> widths, Iterable<String> line) throws IOException {
-        console.printString("|");
-
-        int i = 0;
-        for (String cell : line) {
-            console.printString(" ");
-            console.printString(Strings.padStart(cell, widths.get(i), ' '));
-            console.printString(" |");
-            i++;
-        }
-
-        console.printNewline();
-        console.flushConsole();
-    }
-
-    private void printTableSeparator(Map<Integer, Integer> widths) throws IOException {
-        console.printString("+");
-        for (int width : widths.values()) {
-            console.printString(Strings.repeat("-", width + 2));
-            console.printString("+");
-        }
-        console.printNewline();
-        console.flushConsole();
     }
 
     @Subscribe

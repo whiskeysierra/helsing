@@ -19,6 +19,7 @@ public final class UiModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(CommandLine.class).asEagerSingleton();
+        bind(ResultPrinter.class).asEagerSingleton();
     }
 
     @Provides
