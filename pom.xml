@@ -50,7 +50,7 @@
                     </descriptors>
                     <archive>
                         <manifest>
-                            <mainClass>de.bht.pat.tenzing.jobs.Tenzing</mainClass>
+                            <mainClass>de.bht.pat.tenzing.hadoop.Hadoop</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

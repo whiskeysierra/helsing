@@ -139,6 +139,7 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
         assertNull(select.getTop(), "TOP");
         assertNull(select.getWhere(), "WHERE");
 
+        // TODO only allow single aggregate function
         for (SelectItem item : getSelectItems(select)) {
             item.accept(this);
         }

@@ -1,6 +1,6 @@
-package de.bht.pat.tenzing.jobs;
+package de.bht.pat.tenzing.hadoop;
 
-final class SideData {
+public final class SideData {
 
     public static final String PROJECTION = "tenzing.projection";
 

@@ -1,4 +1,4 @@
-package de.bht.pat.tenzing.jobs;
+package de.bht.pat.tenzing.hadoop;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -6,15 +6,20 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import de.bht.pat.tenzing.hadoop.jobs.GroupByMapper;
+import de.bht.pat.tenzing.hadoop.jobs.NoopReducer;
+import de.bht.pat.tenzing.hadoop.jobs.SelectMapper;
 import de.bht.pat.tenzing.sql.SelectStatement;
 import de.bht.pat.tenzing.sql.SqlColumn;
 import de.bht.pat.tenzing.sql.SqlExpression;
 import de.bht.pat.tenzing.sql.SqlFunction;
+import de.bht.pat.tenzing.sql.SqlGroupBy;
 import de.bht.pat.tenzing.sql.SqlParser;
 import de.bht.pat.tenzing.sql.SqlProjection;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -29,10 +34,9 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
-public final class Tenzing extends Configured implements Tool {
+public final class Hadoop extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
@@ -80,19 +84,35 @@ public final class Tenzing extends Configured implements Tool {
         // http://hadoop-common.472056.n3.nabble.com/Configuration-set-Configuration-get-now-working-td103806.html
         conf.set(SideData.PROJECTION, Joiner.on(',').join(indices));
 
+        final SqlGroupBy groupBy = statement.groupBy();
+        if (groupBy != null) {
+            final int index = columns.indexOf(groupBy.column().name());
+            conf.set(SideData.GROUP_INDEX, Integer.toString(index));
+        }
+
         final Job job = new Job(conf, "Tenzing");
 
-        job.setJarByClass(Tenzing.class);
+        job.setJarByClass(Hadoop.class);
 
-        job.setMapOutputKeyClass(NullWritable.class);
-        job.setMapOutputValueClass(Text.class);
-        job.setOutputKeyClass(NullWritable.class);
-        job.setOutputValueClass(Text.class);
+        if (groupBy == null) {
+            job.setMapOutputKeyClass(NullWritable.class);
+            job.setMapOutputValueClass(Text.class);
+            job.setOutputKeyClass(NullWritable.class);
+            job.setOutputValueClass(Text.class);
 
-        job.setMapperClass(SelectMapper.class);
+            job.setMapperClass(SelectMapper.class);
+            job.setReducerClass(Reducer.class);
+        } else {
+            job.setMapOutputKeyClass(Text.class);
+            job.setMapOutputValueClass(Text.class);
+            job.setOutputKeyClass(NullWritable.class);
+            job.setOutputValueClass(Text.class);
 
-        // Reducer performs identity operation by default
-        job.setReducerClass(Reducer.class);
+            job.setMapperClass(GroupByMapper.class);
+            job.setReducerClass(NoopReducer.class);
+        }
+
+        // TODO set reducer according to aggregate function, regardless of group by
 
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
@@ -105,7 +125,7 @@ public final class Tenzing extends Configured implements Tool {
 
     public static void main(String[] args) throws Exception {
         final Configuration config = new Configuration();
-        int code = ToolRunner.run(config, new Tenzing(), args);
+        int code = ToolRunner.run(config, new Hadoop(), args);
         System.exit(code);
     }
 

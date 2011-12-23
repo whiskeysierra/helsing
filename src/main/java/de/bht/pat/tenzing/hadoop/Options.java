@@ -1,4 +1,4 @@
-package de.bht.pat.tenzing.jobs;
+package de.bht.pat.tenzing.hadoop;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;

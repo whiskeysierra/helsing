@@ -1,16 +1,12 @@
-package de.bht.pat.tenzing.jobs;
+package de.bht.pat.tenzing.hadoop.jobs;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
+import de.bht.pat.tenzing.hadoop.SideData;
 import de.bht.pat.tenzing.util.Formatting;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.DefaultStringifier;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Stringifier;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
@@ -34,7 +30,7 @@ public final class SelectMapper extends Mapper<LongWritable, Text, NullWritable,
 
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        final List<String> cells = split(value);
+        final List<String> cells = Input.split(value);
         final List<String> output = Lists.newLinkedList();
 
         for (int index : indices) {
@@ -42,10 +38,6 @@ public final class SelectMapper extends Mapper<LongWritable, Text, NullWritable,
         }
 
         context.write(NullWritable.get(), new Text(Formatting.JOINER.join(output)));
-    }
-
-    private List<String> split(Text value) {
-        return Lists.newLinkedList(Formatting.SPLITTER.split(value.toString()));
     }
 
 }
