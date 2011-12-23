@@ -9,7 +9,7 @@
 - Maven 3
 
 ### Maven Dependencies
-- Run `bin/install.sh` to install special dependencies to local maven repository and hadoop distribution to the `hadoop` directory
+- Run `bin/install.sh` to install hadoop to the `hadoop` directory
 
 ### Compilation
 - `mvn clean package`

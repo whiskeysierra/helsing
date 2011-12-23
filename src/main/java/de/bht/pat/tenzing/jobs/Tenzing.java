@@ -3,8 +3,10 @@ package de.bht.pat.tenzing.jobs;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.DefaultStringifier;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Stringifier;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -38,15 +40,26 @@ public final class Tenzing extends Configured implements Tool {
         final File input = options.getInput();
         final File output = options.getOutput();
 
-        // IMPORTANT set parameters before passing the config to the job
-        // http://hadoop-common.472056.n3.nabble.com/Configuration-set-Configuration-get-now-working-td103806.html
-        conf.setStrings(SideData.SELECT_INDICES, "1", "2");
+        final Stringifier<Projection> stringifier = new DefaultStringifier<>(conf, Projection.class);
+
+        try {
+            final Projection projection = new Projection();
+            // TODO make dynamic
+            projection.put("year", 1);
+            projection.put("population", 2);
+
+            // IMPORTANT set parameters before passing the config to the job
+            // http://hadoop-common.472056.n3.nabble.com/Configuration-set-Configuration-get-now-working-td103806.html
+            conf.set(SideData.PROJECTION, stringifier.toString(projection));
+        } finally {
+            stringifier.close();
+        }
 
         final Job job = new Job(conf, "Tenzing");
 
         job.setJarByClass(Tenzing.class);
 
-        job.setMapOutputKeyClass(LongWritable.class);
+        job.setMapOutputKeyClass(NullWritable.class);
         job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);

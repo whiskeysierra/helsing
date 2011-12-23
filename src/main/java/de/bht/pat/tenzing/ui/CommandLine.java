@@ -1,33 +1,30 @@
 package de.bht.pat.tenzing.ui;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.io.Files;
 import com.google.inject.Inject;
-import com.inamik.utils.SimpleTableFormatter;
-import com.inamik.utils.TableFormatter;
 import de.bht.pat.tenzing.events.BootEvent;
 import de.bht.pat.tenzing.events.ExecutionError;
+import de.bht.pat.tenzing.events.FeatureError;
 import de.bht.pat.tenzing.events.InputEvent;
 import de.bht.pat.tenzing.events.PromptEvent;
-import de.bht.pat.tenzing.events.QueryEvent;
 import de.bht.pat.tenzing.events.QuitEvent;
 import de.bht.pat.tenzing.events.ResultEvent;
 import de.bht.pat.tenzing.events.SqlEvent;
 import de.bht.pat.tenzing.events.SyntaxError;
-import de.bht.pat.tenzing.events.FeatureError;
 import jline.ConsoleReader;
-import jline.ConsoleReaderInputStream;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.util.Map;
 
 final class CommandLine {
 
@@ -94,36 +91,60 @@ final class CommandLine {
         bus.post(new PromptEvent());
     }
 
+    private int sum(Iterable<Integer> values) {
+        int sum = 0;
+        for (Integer value : values) {
+            sum += value;
+        }
+        return sum;
+    }
+
     @Subscribe
     public void onResult(ResultEvent event) throws IOException {
         final File file = event.getFile();
-        // TODO print stream-like, without pushing everything in memory
         final CSVReader reader = new CSVReader(new FileReader(file), '\t');
 
-        final TableFormatter formatter = new SimpleTableFormatter(true);
+        final WidthCalculator calculator = new WidthCalculator();
+        Files.readLines(file, Charsets.UTF_8, calculator);
+        final Map<Integer, Integer> widths = calculator.getResult();
 
         // TODO add select clause to result event
+
+        printTableSeparator(widths);
+        // TODO make dynamic
+        printTableLine(widths, "year", "population");
+        printTableSeparator(widths);
 
         while (true) {
             final String[] line = reader.readNext();
             if (line == null) break;
-
-            formatter.nextRow();
-            for (String cell : line) {
-                formatter.nextCell(TableFormatter.ALIGN_RIGHT, TableFormatter.VALIGN_CENTER);
-                formatter.addLine(" " + cell + " ");
-            }
+            printTableLine(widths, line);
         }
 
-        final String[] lines = formatter.getFormattedTable();
-
-        for (String line : lines) {
-            console.printString(line);
-            console.printNewline();
-        }
-        console.flushConsole();
+        printTableSeparator(widths);
 
         bus.post(new PromptEvent());
+    }
+
+    private void printTableLine(Map<Integer, Integer> widths, String... line) throws IOException {
+        console.printString("|");
+        for (int i = 0; i < line.length; i++) {
+            console.printString(" ");
+            console.printString(Strings.padStart(line[i], widths.get(i), ' '));
+            console.printString(" |");
+        }
+        console.printNewline();
+        console.flushConsole();
+    }
+
+    private void printTableSeparator(Map<Integer, Integer> widths) throws IOException {
+        console.printString("+");
+        for (int width : widths.values()) {
+            console.printString(Strings.repeat("-", width + 2));
+            console.printString("+");
+        }
+        console.printNewline();
+        console.flushConsole();
     }
 
     @Subscribe

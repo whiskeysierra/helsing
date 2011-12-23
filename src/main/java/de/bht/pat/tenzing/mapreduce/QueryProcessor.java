@@ -42,11 +42,11 @@ final class QueryProcessor {
         // TODO fill from query
         final String table = "countries.csv";
         final File input = new File(data, table);
+
+        // TODO make configurable
         final File output = new File("output");
 
         // TODO call hadoop, wait for response, fire either success/result or error
-
-
         try {
             FileUtils.deleteDirectory(output);
 
@@ -56,6 +56,8 @@ final class QueryProcessor {
                 "--output", output.getAbsolutePath(),
                 query
             )).call().await();
+
+            // TODO make dynamic, use all part-* files in output directory
             bus.post(new ResultEvent(new File(output, "part-r-00000")));
         } catch (IOException e) {
             bus.post(new ExecutionError(e));
