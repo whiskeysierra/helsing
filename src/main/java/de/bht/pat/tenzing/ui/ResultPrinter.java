@@ -7,6 +7,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
 import com.google.inject.Inject;
+import de.bht.pat.tenzing.bean.Duration;
 import de.bht.pat.tenzing.events.PrintEvent;
 import de.bht.pat.tenzing.events.PrintLineEvent;
 import de.bht.pat.tenzing.events.ResultEvent;
@@ -23,20 +24,25 @@ import java.util.concurrent.TimeUnit;
 final class ResultPrinter {
 
     private final EventBus bus;
+    private final TimeFormatter formatter;
 
     @Inject
-    public ResultPrinter(EventBus bus) {
+    public ResultPrinter(EventBus bus, TimeFormatter formatter) {
         this.bus = bus;
+        this.formatter = formatter;
 
         bus.register(this);
     }
 
     @Subscribe
     public void onResult(ResultEvent event) throws IOException {
-        final File file = event.getFile();
 
         final WidthCalculator calculator = new WidthCalculator();
-        Files.readLines(file, Charsets.UTF_8, calculator);
+
+        for (File file : event.getFiles()) {
+            Files.readLines(file, Charsets.UTF_8, calculator);
+        }
+
         final Map<Integer, Integer> widths = calculator.getResult();
 
         // TODO add select clause to result event
@@ -48,30 +54,32 @@ final class ResultPrinter {
         printTableLine(widths, "year", "population");
         printTableSeparator(widths);
 
-        final long count = Files.readLines(file, Charsets.UTF_8, new LineProcessor<Long>() {
+        long count = 0;
 
-            private long count;
+        for (File file : event.getFiles()) {
+            count += Files.readLines(file, Charsets.UTF_8, new LineProcessor<Long>() {
 
-            @Override
-            public boolean processLine(String line) throws IOException {
-                printTableLine(widths, Formatting.SPLITTER.split(line));
-                count++;
-                return true;
-            }
+                private long count;
 
-            @Override
-            public Long getResult() {
-                return count;
-            }
+                @Override
+                public boolean processLine(String line) throws IOException {
+                    printTableLine(widths, Formatting.SPLITTER.split(line));
+                    count++;
+                    return true;
+                }
 
-        });
+                @Override
+                public Long getResult() {
+                    return count;
+                }
+
+            });
+        }
 
         printTableSeparator(widths);
 
-        final TimeFormatter formatter = new TimeFormatter();
-        final long duration = event.getDuration();
-        final TimeUnit durationUnit = event.getDurationUnit();
-        println(count + " rows in set (" + formatter.format(duration, durationUnit) + ")");
+        final Duration duration = event.getDuration();
+        println(count + " rows in set (" + formatter.format(duration) + ")");
 
         bus.post(new ResultPrintedEvent());
     }

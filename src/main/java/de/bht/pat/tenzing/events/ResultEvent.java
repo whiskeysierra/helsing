@@ -1,30 +1,26 @@
 package de.bht.pat.tenzing.events;
 
+import de.bht.pat.tenzing.bean.Duration;
+
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 public final class ResultEvent {
 
-    private final File file;
-    private final long duration;
-    private final TimeUnit durationUnit;
+    private final Iterable<File> files;
+    private final Duration duration;
 
-    public ResultEvent(File file, long duration, TimeUnit durationUnit) {
-        this.file = file;
+    public ResultEvent(Iterable<File> files, Duration duration) {
+        this.files = files;
         this.duration = duration;
-        this.durationUnit = durationUnit;
     }
 
-    public File getFile() {
-        return file;
+    public Iterable<File> getFiles() {
+        return files;
     }
 
-    public long getDuration() {
+    public Duration getDuration() {
         return duration;
-    }
-
-    public TimeUnit getDurationUnit() {
-        return durationUnit;
     }
 
 }

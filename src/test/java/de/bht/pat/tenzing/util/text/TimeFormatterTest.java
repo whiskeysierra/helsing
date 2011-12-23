@@ -1,5 +1,6 @@
 package de.bht.pat.tenzing.util.text;
 
+import com.google.inject.Guice;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -7,11 +8,16 @@ import java.util.concurrent.TimeUnit;
 
 public final class TimeFormatterTest {
 
-    private final TimeFormatter unit = new TimeFormatter();
+    private final TimeFormatter unit = Guice.createInjector(new TextModule()).getInstance(TimeFormatter.class);
+
+    @Test
+    public void zero() {
+        Assert.assertEquals("0 ns", unit.format(0, TimeUnit.DAYS));
+    }
 
     @Test
     public void lessThanOneSecond() {
-         Assert.assertEquals("0.00 sec", unit.format(100, TimeUnit.MILLISECONDS));
+         Assert.assertEquals("100 ms", unit.format(100, TimeUnit.MILLISECONDS));
     }
 
     @Test
