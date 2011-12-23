@@ -8,6 +8,8 @@ import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
 import com.google.inject.Inject;
 import de.bht.pat.tenzing.bean.Duration;
+import de.bht.pat.tenzing.sql.SqlProjection;
+import de.bht.pat.tenzing.sql.SelectStatement;
 import de.bht.pat.tenzing.events.PrintEvent;
 import de.bht.pat.tenzing.events.PrintLineEvent;
 import de.bht.pat.tenzing.events.ResultEvent;
@@ -19,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 final class ResultPrinter {
 
@@ -36,8 +37,14 @@ final class ResultPrinter {
 
     @Subscribe
     public void onResult(ResultEvent event) throws IOException {
+        final SelectStatement statement = event.getStatement();
+        final SqlProjection projection = statement.projection();
+        final Iterable<String> header = projection.toStrings();
 
         final WidthCalculator calculator = new WidthCalculator();
+
+        // treat header as any other line
+        calculator.processLine(Formatting.JOINER.join(header));
 
         for (File file : event.getFiles()) {
             Files.readLines(file, Charsets.UTF_8, calculator);
@@ -45,13 +52,8 @@ final class ResultPrinter {
 
         final Map<Integer, Integer> widths = calculator.getResult();
 
-        // TODO add select clause to result event
-
         printTableSeparator(widths);
-        // TODO make dynamic
-        // TODO consider width of header in Width calculator
-        // e.g. calculator.processLine(Formatting.JOINER.join(header))
-        printTableLine(widths, "year", "population");
+        printTableLine(widths, header);
         printTableSeparator(widths);
 
         long count = 0;

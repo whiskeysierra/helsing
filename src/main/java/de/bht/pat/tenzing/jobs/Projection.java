@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Set;
 
-public final class Projection extends ForwardingMap<String, Integer> implements
+final class Projection extends ForwardingMap<String, Integer> implements
     BiMap<String, Integer>, Serializable, Writable {
 
     private final BiMap<String, Integer> delegate = HashBiMap.create();

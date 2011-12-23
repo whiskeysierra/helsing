@@ -44,8 +44,7 @@ final class QueryProcessor {
         // TODO set to real values
         final File jar = new File("target/tenzing-0.1-job.jar");
 
-        // TODO fill from query
-        final String table = "countries.csv";
+        final String table = event.getStatement().from().name();
         final File input = new File(data, table);
 
         // TODO make configurable
@@ -68,7 +67,7 @@ final class QueryProcessor {
             final List<File> files = Arrays.asList(output.listFiles(filter));
             final Duration duration = new Duration(end - start, TimeUnit.MILLISECONDS);
 
-            bus.post(new ResultEvent(files, duration));
+            bus.post(new ResultEvent(files, event.getStatement(), duration));
         } catch (IOException e) {
             bus.post(new ExecutionError(e));
         }

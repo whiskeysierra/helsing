@@ -49,7 +49,6 @@ import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.StatementVisitor;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.delete.Delete;
@@ -81,10 +80,12 @@ import java.util.List;
 final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemVisitor, FromItemVisitor, ExpressionVisitor {
 
     private final EventBus bus;
+    private final SqlParser parser;
 
     @Inject
-    public SqlValidator(EventBus bus) {
+    public SqlValidator(EventBus bus, SqlParser parser) {
         this.bus = bus;
+        this.parser = parser;
 
         bus.register(this);
     }
@@ -92,21 +93,21 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
     @Subscribe
     public void onInput(SqlEvent event) throws SQLException {
         try {
-            final CCJSqlParserManager manager = new CCJSqlParserManager();
             final String sql = event.getSql();
 
-            // syntactical checks
-            final Statement statement = manager.parse(new StringReader(sql));
+            validate(sql);
 
-            // semantical checks
-            statement.accept(this);
-
-            bus.post(new QueryEvent(sql));
+            bus.post(new QueryEvent(sql, parser.parse(sql)));
         } catch (JSQLParserException e) {
             bus.post(new SyntaxError(e));
         } catch (UnsupportedOperationException e) {
             bus.post(new FeatureError(e.getMessage()));
         }
+    }
+
+    private void validate(String sql) throws JSQLParserException {
+        final CCJSqlParserManager manager = new CCJSqlParserManager();
+        manager.parse(new StringReader(sql)).accept(this);
     }
 
     private void assertNull(Object element, String feature) {
