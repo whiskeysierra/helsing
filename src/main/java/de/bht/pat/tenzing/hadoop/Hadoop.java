@@ -3,12 +3,11 @@ package de.bht.pat.tenzing.hadoop;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import de.bht.pat.tenzing.hadoop.jobs.Functions;
+import de.bht.pat.tenzing.hadoop.functions.AggregatorReducer;
 import de.bht.pat.tenzing.hadoop.jobs.GroupByMapper;
 import de.bht.pat.tenzing.hadoop.jobs.GroupOnlyReducer;
 import de.bht.pat.tenzing.hadoop.jobs.IdentityReducer;
@@ -26,7 +25,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -57,8 +55,6 @@ public final class Hadoop extends Configured implements Tool {
 
         final Injector injector = Guice.createInjector(new HadoopModule());
         final SqlParser sqlParser = injector.getInstance(SqlParser.class);
-        final Map<String, Class<? extends Reducer>> functions = injector.getInstance(
-            Key.get(new TypeLiteral<Map<String, Class<? extends Reducer>>>() {}, Functions.class));
 
         final Configuration conf = getConf();
 
@@ -73,9 +69,7 @@ public final class Hadoop extends Configured implements Tool {
 
         final SqlProjection projection = statement.projection();
         final List<Integer> indices = Lists.newLinkedList();
-
-        int functionIndex = -1;
-        String functionName = null;
+        final Map<Integer, String> functionIndices = Maps.newHashMap();
 
         for (SqlExpression expression : projection) {
             if (expression.is(SqlColumn.class)) {
@@ -87,8 +81,7 @@ public final class Hadoop extends Configured implements Tool {
                 final String name = function.column().name();
                 final int index = columns.indexOf(name);
                 indices.add(index);
-                functionIndex = projection.indexOf(function);
-                functionName = function.name();
+                functionIndices.put(projection.indexOf(function), function.name());
             }
         }
 
@@ -101,9 +94,8 @@ public final class Hadoop extends Configured implements Tool {
             conf.set(SideData.GROUP_INDEX, Integer.toString(index));
         }
 
-        if (functionIndex != -1) {
-            conf.set(SideData.FUNCTION_INDEX, Integer.toString(functionIndex));
-        }
+        // TODO move "serialization" to own class
+        conf.set(SideData.FUNCTION_INDICES, Joiner.on(",").withKeyValueSeparator("=").join(functionIndices));
 
         final Job job = new Job(conf, "Tenzing");
 
@@ -117,19 +109,19 @@ public final class Hadoop extends Configured implements Tool {
         if (groupBy == null) {
             job.setMapperClass(SelectMapper.class);
 
-            if (functionName == null) {
+            if (functionIndices.isEmpty()) {
                 job.setReducerClass(IdentityReducer.class);
             } else {
-                setAggregator(functionName, job, functions);
+                job.setReducerClass(AggregatorReducer.class);
             }
         } else {
             job.setMapperClass(GroupByMapper.class);
 
-            if (functionName == null) {
+            if (functionIndices.isEmpty()) {
                 // identity
                 job.setReducerClass(GroupOnlyReducer.class);
             } else {
-                setAggregator(functionName, job, functions);
+                job.setReducerClass(AggregatorReducer.class);
             }
         }
 
@@ -140,15 +132,6 @@ public final class Hadoop extends Configured implements Tool {
         FileOutputFormat.setOutputPath(job, new Path(output.getAbsolutePath()));
 
         return job.waitForCompletion(true) ? 0 : 1;
-    }
-
-    private void setAggregator(String functionName, Job job, Map<String, Class<? extends Reducer>> functions) {
-        final Class<? extends Reducer> reducer = functions.get(functionName);
-        if (reducer == null) {
-            throw new AssertionError();
-        } else {
-            job.setReducerClass(reducer);
-        }
     }
 
     public static void main(String[] args) throws Exception {

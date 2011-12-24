@@ -16,7 +16,10 @@ public final class SideData {
     /**
      * The index of the aggregate function in the projection.
      */
+    @Deprecated
     public static final String FUNCTION_INDEX = "tenzing.function_index";
+
+    public static final String FUNCTION_INDICES = "tenzing.function_indices";
 
     private SideData() {
 
