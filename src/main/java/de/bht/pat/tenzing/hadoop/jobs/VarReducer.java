@@ -7,22 +7,31 @@ import org.apache.hadoop.io.Text;
 import java.io.IOException;
 import java.util.List;
 
-@AggregateFunction("COUNT")
-public final class CountReducer extends AbstractReducer {
+@AggregateFunction("VAR")
+public final class VarReducer extends AbstractReducer {
 
     @Override
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+        long sum = 0;
         long count = 0;
+        long squared = 0;
 
         Text last = key;
 
         for (Text line : values) {
             last = line;
+            final List<String> cells = Input.split(line);
+            final long value = Long.parseLong(cells.get(index()));
+            sum += value;
+            squared += value * value;
             count++;
         }
 
+        final long avg = sum / count;
+        final long var = Math.abs(squared - avg * sum) / count;
+
         final List<String> cells = Input.split(last);
-        cells.set(index(), Long.toString(count));
+        cells.set(index(), Long.toString(var));
 
         context.write(NullWritable.get(), new Text(Formatting.JOINER.join(cells)));
     }

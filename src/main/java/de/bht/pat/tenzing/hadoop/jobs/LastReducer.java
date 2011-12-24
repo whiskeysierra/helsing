@@ -7,6 +7,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
+@AggregateFunction("LAST")
 public final class LastReducer extends Reducer<Text, Text, NullWritable, Text> {
 
     @Override

@@ -7,6 +7,7 @@ import org.apache.hadoop.io.Text;
 import java.io.IOException;
 import java.util.List;
 
+@AggregateFunction("MAX")
 public final class MaxReducer extends AbstractReducer {
 
     @Override

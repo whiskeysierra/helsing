@@ -7,6 +7,7 @@ import org.apache.hadoop.io.Text;
 import java.io.IOException;
 import java.util.List;
 
+@AggregateFunction("MIN")
 public final class MinReducer extends AbstractReducer {
 
     @Override

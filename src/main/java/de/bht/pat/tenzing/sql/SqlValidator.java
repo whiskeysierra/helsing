@@ -3,10 +3,12 @@ package de.bht.pat.tenzing.sql;
 import com.google.common.base.Objects;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import de.bht.pat.tenzing.events.FeatureError;
 import de.bht.pat.tenzing.events.QueryEvent;
 import de.bht.pat.tenzing.events.SqlEvent;
 import de.bht.pat.tenzing.events.SyntaxError;
+import de.bht.pat.tenzing.hadoop.jobs.Functions;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
@@ -71,21 +73,23 @@ import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.Update;
 import org.apache.commons.lang.StringUtils;
 
-import javax.inject.Inject;
 import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemVisitor, FromItemVisitor, ExpressionVisitor {
 
     private final EventBus bus;
     private final SqlParser parser;
+    private final Set<String> functions;
 
     @Inject
-    public SqlValidator(EventBus bus, SqlParser parser) {
+    public SqlValidator(EventBus bus, SqlParser parser, @Functions Set<String> functions) {
         this.bus = bus;
         this.parser = parser;
+        this.functions = functions;
 
         bus.register(this);
     }
@@ -176,25 +180,8 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
     @Override
     public void visit(Function function) {
         final String name = StringUtils.upperCase(function.getName());
-        switch (name) {
-            case "AVG":
-                return;
-            case "COUNT":
-                return;
-            case "FIRST":
-                return;
-            case "LAST":
-                return;
-            case "MAX":
-                return;
-            case "MIN":
-                return;
-            case "SUM":
-                return;
-            default: {
-                throw new UnsupportedOperationException(name);
-            }
-        }
+        if (functions.contains(name)) return;
+        throw new UnsupportedOperationException(name);
     }
 
     @Override

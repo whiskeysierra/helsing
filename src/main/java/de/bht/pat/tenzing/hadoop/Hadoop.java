@@ -6,17 +6,13 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import de.bht.pat.tenzing.hadoop.jobs.AvgReducer;
-import de.bht.pat.tenzing.hadoop.jobs.CountReducer;
-import de.bht.pat.tenzing.hadoop.jobs.FirstReducer;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import de.bht.pat.tenzing.hadoop.jobs.Functions;
 import de.bht.pat.tenzing.hadoop.jobs.GroupByMapper;
-import de.bht.pat.tenzing.hadoop.jobs.IdentityReducer;
-import de.bht.pat.tenzing.hadoop.jobs.LastReducer;
-import de.bht.pat.tenzing.hadoop.jobs.MaxReducer;
-import de.bht.pat.tenzing.hadoop.jobs.MinReducer;
 import de.bht.pat.tenzing.hadoop.jobs.GroupOnlyReducer;
+import de.bht.pat.tenzing.hadoop.jobs.IdentityReducer;
 import de.bht.pat.tenzing.hadoop.jobs.SelectMapper;
-import de.bht.pat.tenzing.hadoop.jobs.SumReducer;
 import de.bht.pat.tenzing.sql.SelectStatement;
 import de.bht.pat.tenzing.sql.SqlColumn;
 import de.bht.pat.tenzing.sql.SqlExpression;
@@ -42,6 +38,7 @@ import org.kohsuke.args4j.CmdLineParser;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public final class Hadoop extends Configured implements Tool {
 
@@ -60,6 +57,8 @@ public final class Hadoop extends Configured implements Tool {
 
         final Injector injector = Guice.createInjector(new HadoopModule());
         final SqlParser sqlParser = injector.getInstance(SqlParser.class);
+        final Map<String, Class<? extends Reducer>> functions = injector.getInstance(
+            Key.get(new TypeLiteral<Map<String, Class<? extends Reducer>>>() {}, Functions.class));
 
         final Configuration conf = getConf();
 
@@ -121,7 +120,7 @@ public final class Hadoop extends Configured implements Tool {
             if (functionName == null) {
                 job.setReducerClass(IdentityReducer.class);
             } else {
-                setAggregator(functionName, job);
+                setAggregator(functionName, job, functions);
             }
         } else {
             job.setMapperClass(GroupByMapper.class);
@@ -130,7 +129,7 @@ public final class Hadoop extends Configured implements Tool {
                 // identity
                 job.setReducerClass(GroupOnlyReducer.class);
             } else {
-                setAggregator(functionName, job);
+                setAggregator(functionName, job, functions);
             }
         }
 
@@ -143,39 +142,12 @@ public final class Hadoop extends Configured implements Tool {
         return job.waitForCompletion(true) ? 0 : 1;
     }
 
-    private void setAggregator(String functionName, Job job) {
-        switch (functionName) {
-            case "AVG": {
-                job.setReducerClass(AvgReducer.class);
-                break;
-            }
-            case "COUNT": {
-                job.setReducerClass(CountReducer.class);
-                break;
-            }
-            case "FIRST": {
-                job.setReducerClass(FirstReducer.class);
-                break;
-            }
-            case "LAST": {
-                job.setReducerClass(LastReducer.class);
-                break;
-            }
-            case "MAX": {
-                job.setReducerClass(MaxReducer.class);
-                break;
-            }
-            case "MIN": {
-                job.setReducerClass(MinReducer.class);
-                break;
-            }
-            case "SUM": {
-                job.setReducerClass(SumReducer.class);
-                break;
-            }
-            default: {
-                throw new AssertionError();
-            }
+    private void setAggregator(String functionName, Job job, Map<String, Class<? extends Reducer>> functions) {
+        final Class<? extends Reducer> reducer = functions.get(functionName);
+        if (reducer == null) {
+            throw new AssertionError();
+        } else {
+            job.setReducerClass(reducer);
         }
     }
 

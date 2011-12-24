@@ -9,6 +9,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import java.io.IOException;
 import java.util.List;
 
+@AggregateFunction("FIRST")
 public final class FirstReducer extends Reducer<Text, Text, NullWritable, Text> {
 
     @Override
