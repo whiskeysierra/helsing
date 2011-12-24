@@ -3,9 +3,9 @@ package de.bht.pat.tenzing.hadoop.functions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
+import com.google.inject.Provider;
 import de.bht.pat.tenzing.hadoop.SideData;
 import de.bht.pat.tenzing.hadoop.jobs.Functions;
 import de.bht.pat.tenzing.hadoop.jobs.Input;
@@ -20,33 +20,46 @@ import java.util.Map;
 
 public final class AggregatorReducer extends Reducer<Text, Text, NullWritable, Text> {
 
-    // column index to aggregator
-    private final Map<Integer, Aggregator> aggregators = Maps.newHashMap();
+    private final Map<Integer, String> indices = Maps.newHashMap();
+    private final Map<String, Provider<Aggregator>> functions = Maps.newHashMap();
+
+    @Inject
+    public void setFunctions(@Functions Map<String, Provider<Aggregator>> functions) {
+        this.functions.putAll(functions);
+    }
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
         final Injector injector = Guice.createInjector(new FunctionsModule());
-
-        // function name to aggregator
-        final Map<String, Aggregator> map = injector.getInstance(
-            Key.get(new TypeLiteral<Map<String, Aggregator>>() {}, Functions.class));
+        injector.getMembersInjector(AggregatorReducer.class).injectMembers(this);
 
         final Configuration config = context.getConfiguration();
         final String string = config.get(SideData.FUNCTION_INDICES, "");
 
         final Splitter.MapSplitter splitter = Splitter.on(",").withKeyValueSeparator("=");
 
-        // column index to function name
         for (Map.Entry<String, String> entry : splitter.split(string).entrySet()) {
             final int index = Integer.parseInt(entry.getKey());
             final String functionName = entry.getValue();
-
-            aggregators.put(index, map.get(functionName));
+            indices.put(index, functionName);
         }
     }
 
+    private Map<Integer, Aggregator> getAggregators() {
+        final Map<Integer, Aggregator> aggregators = Maps.newHashMap();
+
+        for (Map.Entry<Integer, String> entry : indices.entrySet()) {
+            aggregators.put(entry.getKey(), functions.get(entry.getValue()).get());
+        }
+
+        return aggregators;
+    }
+
+
     @Override
     protected void reduce(Text ignored, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+        final Map<Integer, Aggregator> aggregators = getAggregators();
+
         Text last = null;
 
         for (Text value : values) {
