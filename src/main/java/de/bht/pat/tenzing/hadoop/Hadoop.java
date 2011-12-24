@@ -86,6 +86,7 @@ public final class Hadoop extends Configured implements Tool {
         }
 
         // IMPORTANT set parameters before passing the config to the job
+        // TODO use setStrings(..)
         conf.set(SideData.PROJECTION, Joiner.on(',').join(indices));
 
         final SqlGroupBy groupBy = statement.groupBy();
