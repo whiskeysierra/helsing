@@ -35,9 +35,8 @@ public final class GroupByMapper extends Mapper<LongWritable, Text, Text, Text> 
 
     private void setupGroupIndex(Context context) {
         final Configuration config = context.getConfiguration();
-        final String string = config.get(SideData.GROUP_INDEX);
-        if (string == null) return;
-        this.groupIndex = Integer.parseInt(string);
+        final int index = config.getInt(SideData.GROUP_INDEX, -1);
+        this.groupIndex = index == -1 ? null : index;
     }
 
     @Override

@@ -1,6 +1,8 @@
 package de.bht.pat.tenzing;
 
 import com.google.inject.AbstractModule;
+import de.bht.pat.tenzing.inject.Data;
+import de.bht.pat.tenzing.inject.Schema;
 
 import java.io.File;
 import java.util.regex.Pattern;

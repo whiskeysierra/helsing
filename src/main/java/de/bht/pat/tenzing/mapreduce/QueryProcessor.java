@@ -4,7 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.PatternFilenameFilter;
 import com.google.inject.Inject;
-import de.bht.pat.tenzing.Data;
+import de.bht.pat.tenzing.inject.Data;
 import de.bht.pat.tenzing.bean.Duration;
 import de.bht.pat.tenzing.events.ExecutionError;
 import de.bht.pat.tenzing.events.QueryEvent;

@@ -91,7 +91,7 @@ public final class Hadoop extends Configured implements Tool {
         final SqlGroupBy groupBy = statement.groupBy();
         if (groupBy != null) {
             final int index = columns.indexOf(groupBy.column().name());
-            conf.set(SideData.GROUP_INDEX, Integer.toString(index));
+            conf.setInt(SideData.GROUP_INDEX, index);
         }
 
         // TODO move "serialization" to own class

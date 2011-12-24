@@ -32,8 +32,7 @@ public final class AggregatorReducer extends Reducer<Text, Text, NullWritable, T
             Key.get(new TypeLiteral<Map<String, Aggregator>>() {}, Functions.class));
 
         final Configuration config = context.getConfiguration();
-        final String string = config.get(SideData.FUNCTION_INDICES);
-        if (string == null) return;
+        final String string = config.get(SideData.FUNCTION_INDICES, "");
 
         final Splitter.MapSplitter splitter = Splitter.on(",").withKeyValueSeparator("=");
 

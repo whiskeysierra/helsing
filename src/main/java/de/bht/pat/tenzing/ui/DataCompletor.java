@@ -3,8 +3,8 @@ package de.bht.pat.tenzing.ui;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
-import de.bht.pat.tenzing.Data;
-import de.bht.pat.tenzing.Schema;
+import de.bht.pat.tenzing.inject.Data;
+import de.bht.pat.tenzing.inject.Schema;
 import jline.Completor;
 import jline.SimpleCompletor;
 import org.apache.commons.io.filefilter.AndFileFilter;
@@ -16,7 +16,7 @@ import java.io.FilenameFilter;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public final class DataCompletor implements Completor {
+final class DataCompletor implements Completor {
 
     private final Completor completor;
 
