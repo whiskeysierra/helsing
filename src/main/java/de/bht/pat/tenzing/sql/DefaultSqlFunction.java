@@ -18,7 +18,7 @@ class DefaultSqlFunction extends AbstractSqlExpression implements SqlFunction {
 
     @Override
     public String name() {
-        return function.getName();
+        return function.getName().toUpperCase(Locale.ENGLISH);
     }
 
     @Override
@@ -32,7 +32,7 @@ class DefaultSqlFunction extends AbstractSqlExpression implements SqlFunction {
 
     @Override
     public String toString() {
-        return name().toUpperCase(Locale.ENGLISH) + "(" + column() + ")";
+        return name() + "(" + column() + ")";
     }
 
 }

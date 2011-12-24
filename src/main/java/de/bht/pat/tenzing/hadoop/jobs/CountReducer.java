@@ -1,22 +1,29 @@
 package de.bht.pat.tenzing.hadoop.jobs;
 
-import org.apache.hadoop.io.LongWritable;
+import de.bht.pat.tenzing.util.Formatting;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
+import java.util.List;
 
-public final class CountReducer extends Reducer<Text, LongWritable, Text, LongWritable> {
+public final class CountReducer extends AbstractReducer {
 
     @Override
-    protected void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
+    protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
         long count = 0;
 
-        for (LongWritable value : values) {
+        Text last = key;
+
+        for (Text line : values) {
+            last = line;
             count++;
         }
 
-        context.write(key, new LongWritable(count));
+        final List<String> cells = Input.split(last);
+        cells.set(index(), Long.toString(count));
+
+        context.write(NullWritable.get(), new Text(Formatting.JOINER.join(cells)));
     }
 
 }

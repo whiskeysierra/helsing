@@ -27,6 +27,7 @@ public final class UiModule extends AbstractModule {
     public ConsoleReader provideConsole(SchemaCompletor schema, DataCompletor data) throws IOException {
         final ConsoleReader console = new ConsoleReader();
 
+        console.setBellEnabled(false);
         console.setHistory(new History(new File(".history")));
 
         final List<Completor> completors = Lists.newLinkedList();

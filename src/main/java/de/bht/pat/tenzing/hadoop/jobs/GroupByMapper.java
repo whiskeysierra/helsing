@@ -41,7 +41,7 @@ public final class GroupByMapper extends Mapper<LongWritable, Text, Text, Text> 
     }
 
     @Override
-    protected void map(LongWritable number, Text line, Context context) throws IOException, InterruptedException {
+    protected void map(LongWritable ignored, Text line, Context context) throws IOException, InterruptedException {
         final List<String> cells = Input.split(line);
         final List<String> output = Lists.newLinkedList();
 

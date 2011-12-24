@@ -13,8 +13,9 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.util.List;
 
-public final class SelectMapper extends Mapper<LongWritable, Text, NullWritable, Text> {
+public final class SelectMapper<K> extends Mapper<LongWritable, Text, Text, Text> {
 
+    private final Text same = new Text("");
     private List<Integer> indices = Lists.newLinkedList();
 
     @Override
@@ -29,7 +30,7 @@ public final class SelectMapper extends Mapper<LongWritable, Text, NullWritable,
     }
 
     @Override
-    protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+    protected void map(LongWritable ignored, Text value, Context context) throws IOException, InterruptedException {
         final List<String> cells = Input.split(value);
         final List<String> output = Lists.newLinkedList();
 
@@ -37,7 +38,7 @@ public final class SelectMapper extends Mapper<LongWritable, Text, NullWritable,
             output.add(cells.get(index));
         }
 
-        context.write(NullWritable.get(), new Text(Formatting.JOINER.join(output)));
+        context.write(same, new Text(Formatting.JOINER.join(output)));
     }
 
 }

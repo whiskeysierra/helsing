@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import java.io.IOException;
 import java.util.List;
 
-public final class NoopReducer extends Reducer<Text, Text, NullWritable, Text> {
+public final class GroupOnlyReducer extends Reducer<Text, Text, NullWritable, Text> {
 
     private List<Integer> indices = Lists.newLinkedList();
 

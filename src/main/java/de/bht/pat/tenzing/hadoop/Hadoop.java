@@ -6,9 +6,15 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import de.bht.pat.tenzing.hadoop.jobs.AvgReducer;
+import de.bht.pat.tenzing.hadoop.jobs.CountReducer;
 import de.bht.pat.tenzing.hadoop.jobs.GroupByMapper;
-import de.bht.pat.tenzing.hadoop.jobs.NoopReducer;
+import de.bht.pat.tenzing.hadoop.jobs.IdentityReducer;
+import de.bht.pat.tenzing.hadoop.jobs.MaxReducer;
+import de.bht.pat.tenzing.hadoop.jobs.MinReducer;
+import de.bht.pat.tenzing.hadoop.jobs.GroupOnlyReducer;
 import de.bht.pat.tenzing.hadoop.jobs.SelectMapper;
+import de.bht.pat.tenzing.hadoop.jobs.SumReducer;
 import de.bht.pat.tenzing.sql.SelectStatement;
 import de.bht.pat.tenzing.sql.SqlColumn;
 import de.bht.pat.tenzing.sql.SqlExpression;
@@ -19,7 +25,6 @@ import de.bht.pat.tenzing.sql.SqlProjection;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -68,6 +73,9 @@ public final class Hadoop extends Configured implements Tool {
         final SqlProjection projection = statement.projection();
         final List<Integer> indices = Lists.newLinkedList();
 
+        int functionIndex = -1;
+        String functionName = null;
+
         for (SqlExpression expression : projection) {
             if (expression.is(SqlColumn.class)) {
                 final SqlColumn column = expression.as(SqlColumn.class);
@@ -76,12 +84,14 @@ public final class Hadoop extends Configured implements Tool {
             } else if (expression.is(SqlFunction.class)) {
                 final SqlFunction function = expression.as(SqlFunction.class);
                 final String name = function.column().name();
-                indices.add(columns.indexOf(name));
+                final int index = columns.indexOf(name);
+                indices.add(index);
+                functionIndex = projection.indexOf(function);
+                functionName = function.name();
             }
         }
 
         // IMPORTANT set parameters before passing the config to the job
-        // http://hadoop-common.472056.n3.nabble.com/Configuration-set-Configuration-get-now-working-td103806.html
         conf.set(SideData.PROJECTION, Joiner.on(',').join(indices));
 
         final SqlGroupBy groupBy = statement.groupBy();
@@ -90,29 +100,37 @@ public final class Hadoop extends Configured implements Tool {
             conf.set(SideData.GROUP_INDEX, Integer.toString(index));
         }
 
+        if (functionIndex != -1) {
+            conf.set(SideData.FUNCTION_INDEX, Integer.toString(functionIndex));
+        }
+
         final Job job = new Job(conf, "Tenzing");
 
         job.setJarByClass(Hadoop.class);
 
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
+        job.setOutputKeyClass(NullWritable.class);
+        job.setOutputValueClass(Text.class);
+
         if (groupBy == null) {
-            job.setMapOutputKeyClass(NullWritable.class);
-            job.setMapOutputValueClass(Text.class);
-            job.setOutputKeyClass(NullWritable.class);
-            job.setOutputValueClass(Text.class);
-
             job.setMapperClass(SelectMapper.class);
-            job.setReducerClass(Reducer.class);
+
+            if (functionName == null) {
+                job.setReducerClass(IdentityReducer.class);
+            } else {
+                setAggregator(functionName, job);
+            }
         } else {
-            job.setMapOutputKeyClass(Text.class);
-            job.setMapOutputValueClass(Text.class);
-            job.setOutputKeyClass(NullWritable.class);
-            job.setOutputValueClass(Text.class);
-
             job.setMapperClass(GroupByMapper.class);
-            job.setReducerClass(NoopReducer.class);
-        }
 
-        // TODO set reducer according to aggregate function, regardless of group by
+            if (functionName == null) {
+                // identity
+                job.setReducerClass(GroupOnlyReducer.class);
+            } else {
+                setAggregator(functionName, job);
+            }
+        }
 
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
@@ -121,6 +139,34 @@ public final class Hadoop extends Configured implements Tool {
         FileOutputFormat.setOutputPath(job, new Path(output.getAbsolutePath()));
 
         return job.waitForCompletion(true) ? 0 : 1;
+    }
+
+    private void setAggregator(String functionName, Job job) {
+        switch (functionName) {
+            case "AVG": {
+                job.setReducerClass(AvgReducer.class);
+                break;
+            }
+            case "COUNT": {
+                job.setReducerClass(CountReducer.class);
+                break;
+            }
+            case "MAX": {
+                job.setReducerClass(MaxReducer.class);
+                break;
+            }
+            case "MIN": {
+                job.setReducerClass(MinReducer.class);
+                break;
+            }
+            case "SUM": {
+                job.setReducerClass(SumReducer.class);
+                break;
+            }
+            default: {
+                throw new AssertionError();
+            }
+        }
     }
 
     public static void main(String[] args) throws Exception {
