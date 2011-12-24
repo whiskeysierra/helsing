@@ -24,9 +24,7 @@ public final class GroupByMapper extends Mapper<LongWritable, Text, Text, Text> 
     }
 
     private void setupIndices(Context context) {
-        final Configuration config = context.getConfiguration();
-        final String string = config.get(SideData.PROJECTION);
-        if (string == null) return;
+        final String string = context.getConfiguration().get(SideData.PROJECTION, "");
 
         for (String index : Splitter.on(',').split(string)) {
             indices.add(Integer.valueOf(index));
@@ -34,9 +32,7 @@ public final class GroupByMapper extends Mapper<LongWritable, Text, Text, Text> 
     }
 
     private void setupGroupIndex(Context context) {
-        final Configuration config = context.getConfiguration();
-        final int index = config.getInt(SideData.GROUP_INDEX, -1);
-        this.groupIndex = index == -1 ? null : index;
+        this.groupIndex = context.getConfiguration().getInt(SideData.GROUP_INDEX, -1);
     }
 
     @Override
@@ -44,7 +40,7 @@ public final class GroupByMapper extends Mapper<LongWritable, Text, Text, Text> 
         final List<String> cells = Input.split(line);
         final List<String> output = Lists.newLinkedList();
 
-        for (int index : indices) {
+        for (Integer index : indices) {
             output.add(cells.get(index));
         }
 

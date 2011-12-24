@@ -118,7 +118,6 @@ public final class Hadoop extends Configured implements Tool {
             job.setMapperClass(GroupByMapper.class);
 
             if (functionIndices.isEmpty()) {
-                // identity
                 job.setReducerClass(GroupOnlyReducer.class);
             } else {
                 job.setReducerClass(AggregatorReducer.class);

@@ -46,19 +46,18 @@ public final class AggregatorReducer extends Reducer<Text, Text, NullWritable, T
     }
 
     @Override
-    protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+    protected void reduce(Text ignored, Iterable<Text> values, Context context) throws IOException, InterruptedException {
         Text last = null;
 
-        for (Text text : values) {
-            final List<String> cells = Input.split(text);
+        for (Text value : values) {
+            final List<String> cells = Input.split(value);
             for (Map.Entry<Integer, Aggregator> entry : aggregators.entrySet()) {
                 final int index = entry.getKey();
                 final Aggregator aggregator = entry.getValue();
-                final String value = cells.get(index);
-                aggregator.update(value);
+                aggregator.update(cells.get(index));
             }
 
-            last = text;
+            last = value;
         }
 
         final List<String> cells = Input.split(last);
