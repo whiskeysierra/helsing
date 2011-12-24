@@ -177,15 +177,19 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
     public void visit(Function function) {
         final String name = StringUtils.upperCase(function.getName());
         switch (name) {
-            case "SUM":
+            case "AVG":
                 return;
             case "COUNT":
                 return;
-            case "AVG":
+            case "FIRST":
+                return;
+            case "LAST":
+                return;
+            case "MAX":
                 return;
             case "MIN":
                 return;
-            case "MAX":
+            case "SUM":
                 return;
             default: {
                 throw new UnsupportedOperationException(name);

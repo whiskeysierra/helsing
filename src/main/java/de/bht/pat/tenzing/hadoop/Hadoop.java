@@ -8,8 +8,10 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import de.bht.pat.tenzing.hadoop.jobs.AvgReducer;
 import de.bht.pat.tenzing.hadoop.jobs.CountReducer;
+import de.bht.pat.tenzing.hadoop.jobs.FirstReducer;
 import de.bht.pat.tenzing.hadoop.jobs.GroupByMapper;
 import de.bht.pat.tenzing.hadoop.jobs.IdentityReducer;
+import de.bht.pat.tenzing.hadoop.jobs.LastReducer;
 import de.bht.pat.tenzing.hadoop.jobs.MaxReducer;
 import de.bht.pat.tenzing.hadoop.jobs.MinReducer;
 import de.bht.pat.tenzing.hadoop.jobs.GroupOnlyReducer;
@@ -149,6 +151,14 @@ public final class Hadoop extends Configured implements Tool {
             }
             case "COUNT": {
                 job.setReducerClass(CountReducer.class);
+                break;
+            }
+            case "FIRST": {
+                job.setReducerClass(FirstReducer.class);
+                break;
+            }
+            case "LAST": {
+                job.setReducerClass(LastReducer.class);
                 break;
             }
             case "MAX": {
