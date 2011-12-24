@@ -1,10 +1,8 @@
-package de.bht.pat.tenzing.hadoop.jobs;
+package de.bht.pat.tenzing.hadoop;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import de.bht.pat.tenzing.hadoop.SideData;
 import de.bht.pat.tenzing.util.Formatting;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -12,7 +10,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.util.List;
 
-public final class GroupByMapper extends Mapper<LongWritable, Text, Text, Text> {
+final class GroupByMapper extends Mapper<LongWritable, Text, Text, Text> {
 
     private List<Integer> indices = Lists.newLinkedList();
     private Integer groupIndex;
@@ -32,7 +30,7 @@ public final class GroupByMapper extends Mapper<LongWritable, Text, Text, Text> 
     }
 
     private void setupGroupIndex(Context context) {
-        this.groupIndex = context.getConfiguration().getInt(SideData.GROUP_INDEX, -1);
+        this.groupIndex = context.getConfiguration().getInt(SideData.GROUP, -1);
     }
 
     @Override

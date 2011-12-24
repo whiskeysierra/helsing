@@ -8,7 +8,7 @@ import net.sf.jsqlparser.schema.Column;
 import java.util.List;
 import java.util.Locale;
 
-class DefaultSqlFunction extends AbstractSqlExpression implements SqlFunction {
+final class DefaultSqlFunction extends AbstractSqlExpression implements SqlFunction {
 
     private final Function function;
 

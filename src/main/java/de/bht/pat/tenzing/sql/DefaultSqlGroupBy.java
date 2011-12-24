@@ -2,7 +2,7 @@ package de.bht.pat.tenzing.sql;
 
 import net.sf.jsqlparser.schema.Column;
 
-class DefaultSqlGroupBy implements SqlGroupBy {
+final class DefaultSqlGroupBy implements SqlGroupBy {
 
     private final Column column;
 

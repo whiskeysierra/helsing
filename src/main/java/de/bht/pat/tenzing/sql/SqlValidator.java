@@ -8,7 +8,7 @@ import de.bht.pat.tenzing.events.FeatureError;
 import de.bht.pat.tenzing.events.QueryEvent;
 import de.bht.pat.tenzing.events.SqlEvent;
 import de.bht.pat.tenzing.events.SyntaxError;
-import de.bht.pat.tenzing.hadoop.jobs.Functions;
+import de.bht.pat.tenzing.inject.Functions;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;

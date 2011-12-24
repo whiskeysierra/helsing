@@ -1,8 +1,7 @@
-package de.bht.pat.tenzing.hadoop.jobs;
+package de.bht.pat.tenzing.hadoop;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import de.bht.pat.tenzing.hadoop.SideData;
 import de.bht.pat.tenzing.util.Formatting;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -11,7 +10,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.util.List;
 
-public final class SelectMapper extends Mapper<LongWritable, Text, Text, Text> {
+final class SelectMapper extends Mapper<LongWritable, Text, Text, Text> {
 
     private final Text same = new Text("");
     private List<Integer> indices = Lists.newLinkedList();

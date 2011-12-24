@@ -1,7 +1,5 @@
 package de.bht.pat.tenzing.hadoop.functions;
 
-import de.bht.pat.tenzing.hadoop.jobs.AggregateFunction;
-
 @AggregateFunction("AVG")
 final class Average extends LongAggregator {
 

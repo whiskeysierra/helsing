@@ -1,6 +1,6 @@
 package de.bht.pat.tenzing.hadoop.functions;
 
-interface Aggregator {
+public interface Aggregator {
 
     void update(String value);
 

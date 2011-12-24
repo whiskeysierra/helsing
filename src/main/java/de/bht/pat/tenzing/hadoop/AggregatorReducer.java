@@ -1,4 +1,4 @@
-package de.bht.pat.tenzing.hadoop.functions;
+package de.bht.pat.tenzing.hadoop;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
@@ -6,9 +6,9 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
-import de.bht.pat.tenzing.hadoop.SideData;
-import de.bht.pat.tenzing.hadoop.jobs.Functions;
-import de.bht.pat.tenzing.hadoop.jobs.Input;
+import de.bht.pat.tenzing.hadoop.functions.Aggregator;
+import de.bht.pat.tenzing.hadoop.functions.FunctionsModule;
+import de.bht.pat.tenzing.inject.Functions;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public final class AggregatorReducer extends Reducer<Text, Text, NullWritable, Text> {
+final class AggregatorReducer extends Reducer<Text, Text, NullWritable, Text> {
 
     private final Map<Integer, String> indices = Maps.newHashMap();
     private final Map<String, Provider<Aggregator>> functions = Maps.newHashMap();
@@ -34,7 +34,7 @@ public final class AggregatorReducer extends Reducer<Text, Text, NullWritable, T
         injector.getMembersInjector(AggregatorReducer.class).injectMembers(this);
 
         final Configuration config = context.getConfiguration();
-        final String string = config.get(SideData.FUNCTION_INDICES, "");
+        final String string = config.get(SideData.FUNCTIONS, "");
 
         final Splitter.MapSplitter splitter = Splitter.on(",").withKeyValueSeparator("=");
 
@@ -54,7 +54,6 @@ public final class AggregatorReducer extends Reducer<Text, Text, NullWritable, T
 
         return aggregators;
     }
-
 
     @Override
     protected void reduce(Text ignored, Iterable<Text> values, Context context) throws IOException, InterruptedException {

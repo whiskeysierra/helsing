@@ -7,11 +7,6 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import de.bht.pat.tenzing.hadoop.functions.AggregatorReducer;
-import de.bht.pat.tenzing.hadoop.jobs.GroupByMapper;
-import de.bht.pat.tenzing.hadoop.jobs.GroupOnlyReducer;
-import de.bht.pat.tenzing.hadoop.jobs.IdentityReducer;
-import de.bht.pat.tenzing.hadoop.jobs.SelectMapper;
 import de.bht.pat.tenzing.sql.SelectStatement;
 import de.bht.pat.tenzing.sql.SqlColumn;
 import de.bht.pat.tenzing.sql.SqlExpression;
@@ -92,11 +87,11 @@ public final class Hadoop extends Configured implements Tool {
         final SqlGroupBy groupBy = statement.groupBy();
         if (groupBy != null) {
             final int index = columns.indexOf(groupBy.column().name());
-            conf.setInt(SideData.GROUP_INDEX, index);
+            conf.setInt(SideData.GROUP, index);
         }
 
         // TODO move "serialization" to own class
-        conf.set(SideData.FUNCTION_INDICES, Joiner.on(",").withKeyValueSeparator("=").join(functionIndices));
+        conf.set(SideData.FUNCTIONS, Joiner.on(",").withKeyValueSeparator("=").join(functionIndices));
 
         final Job job = new Job(conf, "Tenzing");
 

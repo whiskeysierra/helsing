@@ -1,6 +1,6 @@
 package de.bht.pat.tenzing.hadoop;
 
-public final class SideData {
+final class SideData {
 
     /**
      * Ordered list of indices where the value represents the index in the schema and the value
@@ -11,15 +11,9 @@ public final class SideData {
     /**
      * The index of the grouping key in the schema.
      */
-    public static final String GROUP_INDEX = "tenzing.group_index";
+    public static final String GROUP = "tenzing.group_index";
 
-    /**
-     * The index of the aggregate function in the projection.
-     */
-    @Deprecated
-    public static final String FUNCTION_INDEX = "tenzing.function_index";
-
-    public static final String FUNCTION_INDICES = "tenzing.function_indices";
+    public static final String FUNCTIONS = "tenzing.function_indices";
 
     private SideData() {
 

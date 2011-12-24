@@ -2,7 +2,7 @@ package de.bht.pat.tenzing.sql;
 
 import net.sf.jsqlparser.schema.Column;
 
-class DefaultSqlColumn extends AbstractSqlExpression implements SqlColumn {
+final class DefaultSqlColumn extends AbstractSqlExpression implements SqlColumn {
 
     private final String name;
 

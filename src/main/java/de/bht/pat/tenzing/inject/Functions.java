@@ -1,4 +1,4 @@
-package de.bht.pat.tenzing.hadoop.jobs;
+package de.bht.pat.tenzing.inject;
 
 import com.google.inject.BindingAnnotation;
 

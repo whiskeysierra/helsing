@@ -3,8 +3,7 @@ package de.bht.pat.tenzing.hadoop.functions;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.multibindings.MapBinder;
-import de.bht.pat.tenzing.hadoop.jobs.AggregateFunction;
-import de.bht.pat.tenzing.hadoop.jobs.Functions;
+import de.bht.pat.tenzing.inject.Functions;
 import org.reflections.Reflections;
 
 import java.util.Map;
