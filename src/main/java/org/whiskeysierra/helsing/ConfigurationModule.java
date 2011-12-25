@@ -4,6 +4,8 @@ import com.google.common.io.Closeables;
 import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
+import org.nnsoft.guice.rocoto.converters.FileConverter;
+import org.nnsoft.guice.rocoto.converters.PatternConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,9 @@ final class ConfigurationModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        install(new FileConverter());
+        install(new PatternConverter());
+
         final Properties properties = new Properties();
         final URL url = Resources.getResource("application.properties");
 

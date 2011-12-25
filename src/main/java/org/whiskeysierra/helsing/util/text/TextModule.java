@@ -13,7 +13,6 @@ public final class TextModule extends AbstractModule {
     protected void configure() {
         final ResourceBundle bundle = ResourceBundle.getBundle("unit", Locale.ENGLISH);
         bind(ResourceBundle.class).annotatedWith(Names.named("unit")).toInstance(bundle);
-
         bind(TimeFormatter.class).in(Singleton.class);
     }
 

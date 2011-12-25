@@ -1,6 +1,6 @@
 package org.whiskeysierra.helsing.events;
 
-import org.whiskeysierra.helsing.sql.SelectStatement;
+import org.whiskeysierra.helsing.api.sql.SelectStatement;
 
 import javax.annotation.concurrent.Immutable;
 

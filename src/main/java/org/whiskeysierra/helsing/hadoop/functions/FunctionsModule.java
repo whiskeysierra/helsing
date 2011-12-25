@@ -3,7 +3,7 @@ package org.whiskeysierra.helsing.hadoop.functions;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.multibindings.MapBinder;
-import org.whiskeysierra.helsing.inject.Functions;
+import org.whiskeysierra.helsing.api.Functions;
 import org.reflections.Reflections;
 
 import java.util.Map;

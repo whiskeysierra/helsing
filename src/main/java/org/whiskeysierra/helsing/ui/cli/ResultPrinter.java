@@ -7,14 +7,14 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
 import com.google.inject.Inject;
-import org.whiskeysierra.helsing.bean.Duration;
+import org.whiskeysierra.helsing.api.sql.SelectStatement;
+import org.whiskeysierra.helsing.api.sql.SqlProjection;
+import org.whiskeysierra.helsing.events.ResultEvent.Duration;
 import org.whiskeysierra.helsing.events.PrintEvent;
 import org.whiskeysierra.helsing.events.PrintLineEvent;
 import org.whiskeysierra.helsing.events.ResultEvent;
 import org.whiskeysierra.helsing.events.ResultPrintedEvent;
-import org.whiskeysierra.helsing.sql.SelectStatement;
-import org.whiskeysierra.helsing.sql.SqlProjection;
-import org.whiskeysierra.helsing.util.Formatting;
+import org.whiskeysierra.helsing.util.io.Formatting;
 import org.whiskeysierra.helsing.util.text.TimeFormatter;
 
 import java.io.File;

@@ -4,11 +4,12 @@ import com.google.common.base.Objects;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import org.whiskeysierra.helsing.api.Functions;
+import org.whiskeysierra.helsing.api.sql.SqlParser;
 import org.whiskeysierra.helsing.events.FeatureError;
 import org.whiskeysierra.helsing.events.QueryEvent;
 import org.whiskeysierra.helsing.events.SqlEvent;
 import org.whiskeysierra.helsing.events.SyntaxError;
-import org.whiskeysierra.helsing.inject.Functions;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
@@ -143,7 +144,6 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
         assertNull(select.getTop(), "TOP");
         assertNull(select.getWhere(), "WHERE");
 
-        // TODO only allow single aggregate function
         for (SelectItem item : getSelectItems(select)) {
             item.accept(this);
         }

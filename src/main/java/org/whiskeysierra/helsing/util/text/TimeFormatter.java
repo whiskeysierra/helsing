@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.whiskeysierra.helsing.bean.Duration;
+import org.whiskeysierra.helsing.events.ResultEvent.Duration;
 
 import java.util.Arrays;
 import java.util.List;

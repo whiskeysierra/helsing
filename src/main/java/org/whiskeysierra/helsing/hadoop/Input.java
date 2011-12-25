@@ -1,7 +1,7 @@
 package org.whiskeysierra.helsing.hadoop;
 
 import com.google.common.collect.Lists;
-import org.whiskeysierra.helsing.util.Formatting;
+import org.whiskeysierra.helsing.util.io.Formatting;
 import org.apache.hadoop.io.Text;
 
 import java.util.List;

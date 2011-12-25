@@ -1,9 +1,9 @@
 package org.whiskeysierra.helsing.events;
 
-import org.whiskeysierra.helsing.bean.Duration;
-import org.whiskeysierra.helsing.sql.SelectStatement;
+import org.whiskeysierra.helsing.api.sql.SelectStatement;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 public final class ResultEvent {
 
@@ -27,6 +27,25 @@ public final class ResultEvent {
 
     public Duration getDuration() {
         return duration;
+    }
+
+    public static final class Duration {
+
+        private final long value;
+        private final TimeUnit unit;
+
+        public Duration(long value, TimeUnit unit) {
+            this.value = value;
+            this.unit = unit;
+        }
+
+        public long getValue() {
+            return value;
+        }
+
+        public TimeUnit getUnit() {
+            return unit;
+        }
     }
 
 }

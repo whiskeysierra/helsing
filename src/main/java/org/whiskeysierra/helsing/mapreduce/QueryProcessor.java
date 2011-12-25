@@ -6,12 +6,13 @@ import com.google.common.io.PatternFilenameFilter;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.apache.commons.io.FileUtils;
-import org.whiskeysierra.helsing.bean.Duration;
 import org.whiskeysierra.helsing.events.ExecutionError;
 import org.whiskeysierra.helsing.events.QueryEvent;
 import org.whiskeysierra.helsing.events.ResultEvent;
-import org.whiskeysierra.helsing.util.concurrent.ProcessService;
-import org.whiskeysierra.helsing.util.concurrent.RunningProcess;
+import org.whiskeysierra.helsing.events.ResultEvent.Duration;
+import org.whiskeysierra.helsing.events.ResultPrintedEvent;
+import org.whiskeysierra.helsing.util.concurrent.process.ProcessService;
+import org.whiskeysierra.helsing.util.concurrent.process.RunningProcess;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,15 +25,19 @@ final class QueryProcessor {
     private final EventBus bus;
     private final ProcessService service;
     private final File data;
+    private final File output;
 
     private final File hadoop = new File("hadoop/bin/hadoop");
     private final PatternFilenameFilter filter = new PatternFilenameFilter("^part-r-[0-9]{5}$");
 
     @Inject
-    public QueryProcessor(EventBus bus, ProcessService service, @Named("data.directory") File data) {
+    public QueryProcessor(EventBus bus, ProcessService service,
+        @Named("data.directory") File data, @Named("output.directory") File output) {
+
         this.bus = bus;
         this.service = service;
         this.data = data;
+        this.output = output;
 
         bus.register(this);
     }
@@ -41,24 +46,21 @@ final class QueryProcessor {
     public void onStatement(QueryEvent event) {
         final String query = event.getQuery();
 
-        // TODO set to real values
+        // TODO make dynamic
         final File jar = new File("target/helsing-0.1-job.jar");
 
         final String table = event.getStatement().from().name();
         final File input = new File(data, table);
 
-        // TODO make configurable
-        final File output = new File("output");
-
         try {
-            FileUtils.deleteDirectory(output);
+            deleteOutput();
 
-            final RunningProcess process = service.prepare(hadoop, Arrays.asList(
+            final RunningProcess process = service.prepare(hadoop,
                 "jar", jar.getAbsolutePath(),
                 "--input", input.getAbsolutePath(),
                 "--output", output.getAbsolutePath(),
                 query
-            )).call();
+            ).call();
 
             final long start = System.currentTimeMillis();
             process.await();
@@ -71,6 +73,15 @@ final class QueryProcessor {
         } catch (IOException e) {
             bus.post(new ExecutionError(e));
         }
+    }
+
+    @Subscribe
+    public void onResultPrinted(ResultPrintedEvent event) throws IOException {
+        deleteOutput();
+    }
+
+    private void deleteOutput() throws IOException {
+        FileUtils.deleteDirectory(output);
     }
 
 }
