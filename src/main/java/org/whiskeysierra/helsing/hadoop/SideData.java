@@ -13,8 +13,27 @@ import java.util.Map.Entry;
 
 public final class SideData {
 
+    /**
+     * A list of column indices.
+     *
+     * @deprecated switch to COLUMNS
+     */
+    @Deprecated
     public static final String PROJECTION = "helsing.projection";
+
+    /**
+     * A map from selected column indices to column names.
+     */
+    public static final String COLUMNS = "helsing.columns";
+
+    /**
+     * A list of selected group indices.
+     */
     public static final String GROUPS = "helsing.groups";
+
+    /**
+     * A map from selected column indices to function names.
+     */
     public static final String FUNCTIONS = "helsing.functions";
 
     private static final Joiner JOINER = Joiner.on(",");

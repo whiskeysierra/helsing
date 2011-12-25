@@ -59,7 +59,10 @@ public final class Hadoop extends Configured implements Tool {
         final File schema = new File(input.getParentFile(), input.getName().replace(".csv", ".schema.csv"));
         final List<String> columns = Files.readLines(schema, Charsets.UTF_8);
 
+        @Deprecated
         final List<Integer> projection = Lists.newLinkedList();
+
+        final Map<Integer, String> selections = Maps.newHashMap();
         final Map<Integer, String> functions = Maps.newHashMap();
 
         for (SqlExpression expression : statement.projection()) {
@@ -67,11 +70,12 @@ public final class Hadoop extends Configured implements Tool {
                 final SqlColumn column = expression.as(SqlColumn.class);
                 final String name = column.name();
                 projection.add(columns.indexOf(name));
+                selections.put(columns.indexOf(name), name);
             } else if (expression.is(SqlFunction.class)) {
                 final SqlFunction function = expression.as(SqlFunction.class);
                 final String name = function.column().name();
-                final int index = columns.indexOf(name);
-                projection.add(index);
+                projection.add(columns.indexOf(name));
+                selections.put(columns.indexOf(name), name);
                 functions.put(statement.projection().indexOf(function), function.name());
             }
         }
@@ -85,6 +89,7 @@ public final class Hadoop extends Configured implements Tool {
         // IMPORTANT set parameters before passing the config to the job
         // BEWARE on injection, config may not store empty strings
         config.set(SideData.PROJECTION, SideData.serialize(projection));
+        config.set(SideData.COLUMNS, SideData.serialize(selections));
         config.set(SideData.FUNCTIONS, SideData.serialize(functions));
         config.set(SideData.GROUPS, SideData.serialize(groups));
 
