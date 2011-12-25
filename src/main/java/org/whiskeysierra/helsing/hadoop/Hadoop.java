@@ -88,6 +88,7 @@ public final class Hadoop extends Configured implements Tool {
         if (groupBy != null) {
             final int index = columns.indexOf(groupBy.column().name());
             conf.setInt(SideData.GROUP, index);
+            conf.setInt(SideData.GROUPS, index);
         }
 
         // TODO move "serialization" to own class
@@ -97,7 +98,7 @@ public final class Hadoop extends Configured implements Tool {
 
         job.setJarByClass(Hadoop.class);
 
-        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputKeyClass(TextArray.class);
         job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);

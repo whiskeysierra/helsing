@@ -15,6 +15,7 @@ final class GroupByMapper extends DependencyInjectionMapper<LongWritable, Text, 
 
     private FileFormat format;
     private List<Integer> indices;
+    private List<Integer> groupIndices;
     private Integer groupIndex;
 
     @Inject
@@ -27,6 +28,11 @@ final class GroupByMapper extends DependencyInjectionMapper<LongWritable, Text, 
         this.indices = indices;
     }
 
+    @Inject
+    public void setGroupIndices(@Named(SideData.GROUPS) List<Integer> groupIndices) {
+        this.groupIndices = groupIndices;
+    }
+
     @Inject(optional = true)
     public void setGroupIndex(@Named(SideData.GROUP) Integer groupIndex) {
         this.groupIndex = groupIndex;
@@ -36,7 +42,16 @@ final class GroupByMapper extends DependencyInjectionMapper<LongWritable, Text, 
     protected void map(LongWritable ignored, Text value, Context context) throws IOException, InterruptedException {
         final Line line = format.lineOf(value);
 
-        final Text group = new Text(line.get(groupIndex));
+        //final Writable group = new Text(line.get(groupIndex));
+        //final Writable group = new Text(line.get(groupIndices.get(0)));
+
+        final Text[] groups = new Text[groupIndices.size()];
+
+        for (int i = 0; i < groupIndices.size(); i++) {
+            groups[i] = new Text(line.get(groupIndices.get(i)));
+        }
+
+        final Writable group = new TextArray(groups);
         final Text projection = line.keep(indices).toText();
 
         context.write(group, projection);

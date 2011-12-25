@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
 import org.whiskeysierra.helsing.hadoop.functions.Aggregator;
 import org.whiskeysierra.helsing.util.inject.MoreProviders;
 import org.whiskeysierra.helsing.util.io.FileFormat;
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
-final class AggregatorReducer extends DependencyInjectionReducer<Text, Text, NullWritable, Text> {
+final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text, NullWritable, Text> {
 
     private FileFormat format;
     private Map<Integer, Provider<Aggregator>> aggregators;
@@ -33,7 +34,7 @@ final class AggregatorReducer extends DependencyInjectionReducer<Text, Text, Nul
     }
 
     @Override
-    protected void reduce(Text ignored, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+    protected void reduce(Writable ignored, Iterable<Text> values, Context context) throws IOException, InterruptedException {
         final Map<Integer, Aggregator> aggregators = getAggregators();
 
         Line last = null;
