@@ -2,36 +2,48 @@ package org.whiskeysierra.helsing.hadoop;
 
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.name.Named;
+import com.google.inject.TypeLiteral;
 import org.whiskeysierra.helsing.api.Functions;
 import org.whiskeysierra.helsing.hadoop.functions.Aggregator;
 
+import javax.inject.Named;
+import java.util.Collections;
 import java.util.Map;
 
 final class SideDataModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
+        bind(new TypeLiteral<Map<Integer, Provider<Aggregator>>>() {
+        }).toProvider(AggregatorProvider.class);
     }
 
-    @Provides
-    public Map<Integer, Provider<Aggregator>> provideAggregators(
-        @Functions Map<String, Provider<Aggregator>> functions,
-        @Named(SideData.FUNCTIONS) Map<Integer, String> indices) {
+    private static final class AggregatorProvider implements Provider<Map<Integer, Provider<Aggregator>>> {
 
-        final Map<Integer, Provider<Aggregator>> aggregators = Maps.newHashMap();
+        @Inject
+        @Functions
+        private Map<String, Provider<Aggregator>> functions;
 
-        for (Map.Entry<Integer, String> entry : indices.entrySet()) {
-            final int index = entry.getKey();
-            final String functionName = entry.getValue();
+        @Inject(optional = true)
+        @Named(SideData.FUNCTIONS)
+        private Map<Integer, String> indices = Collections.emptyMap();
 
-            aggregators.put(index, functions.get(functionName));
+        @Override
+        public Map<Integer, Provider<Aggregator>> get() {
+            final Map<Integer, Provider<Aggregator>> aggregators = Maps.newHashMap();
+
+            for (Map.Entry<Integer, String> entry : indices.entrySet()) {
+                final int index = entry.getKey();
+                final String functionName = entry.getValue();
+
+                aggregators.put(index, functions.get(functionName));
+            }
+
+            return aggregators;
         }
 
-        return aggregators;
     }
 
 }
