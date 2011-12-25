@@ -1,11 +1,11 @@
 package org.whiskeysierra.helsing.hadoop;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
-abstract class DependencyInjectionMapper<KI, VI, KO, VO> extends Mapper<KI, VI, KO, VO> {
+abstract class DependencyInjectionReducer<KI, VI, KO, VO> extends Reducer<KI, VI, KO, VO> {
 
     @Override
     protected final void setup(Context context) throws IOException, InterruptedException {

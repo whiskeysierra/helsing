@@ -11,7 +11,7 @@ import org.whiskeysierra.helsing.util.io.Line;
 import java.io.IOException;
 import java.util.List;
 
-final class SelectMapper extends DependencyInjectionMapper<LongWritable, Text, Writable, Text> {
+final class ProjectionMapper extends DependencyInjectionMapper<LongWritable, Text, Writable, Text> {
 
     private FileFormat format;
     private List<Integer> indices;

@@ -1,17 +1,11 @@
 package org.whiskeysierra.helsing.hadoop;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapreduce.Mapper;
 import org.whiskeysierra.helsing.util.io.FileFormat;
-import org.whiskeysierra.helsing.util.io.Formatting;
 import org.whiskeysierra.helsing.util.io.Line;
 
 import java.io.IOException;

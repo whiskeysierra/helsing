@@ -6,6 +6,7 @@ import org.apache.hadoop.io.Text;
 
 import java.util.List;
 
+@Deprecated
 final class Input {
 
     public static List<String> split(Text value) {

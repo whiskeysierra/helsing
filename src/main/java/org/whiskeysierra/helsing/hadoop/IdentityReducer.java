@@ -6,6 +6,9 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
+/**
+ * This reducer just passes through all values using a nullwritable key.
+ */
 final class IdentityReducer extends Reducer<Text, Text, NullWritable, Text> {
 
     @Override

@@ -103,7 +103,7 @@ public final class Hadoop extends Configured implements Tool {
         job.setOutputValueClass(Text.class);
 
         if (groupBy == null) {
-            job.setMapperClass(SelectMapper.class);
+            job.setMapperClass(ProjectionMapper.class);
 
             if (functionIndices.isEmpty()) {
                 job.setReducerClass(IdentityReducer.class);
@@ -114,7 +114,7 @@ public final class Hadoop extends Configured implements Tool {
             job.setMapperClass(GroupByMapper.class);
 
             if (functionIndices.isEmpty()) {
-                job.setReducerClass(GroupOnlyReducer.class);
+                job.setReducerClass(GroupReducer.class);
             } else {
                 job.setReducerClass(AggregatorReducer.class);
             }

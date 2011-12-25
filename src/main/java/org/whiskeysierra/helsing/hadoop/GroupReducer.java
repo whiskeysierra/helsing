@@ -7,7 +7,10 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
-final class GroupOnlyReducer extends Reducer<Text, Text, NullWritable, Text> {
+/**
+ * This reducer performs grouping with applying any aggregate function.
+ */
+final class GroupReducer extends Reducer<Text, Text, NullWritable, Text> {
 
     @Override
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
