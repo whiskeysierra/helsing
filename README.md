@@ -20,7 +20,7 @@ The first steps included reading, describing, reflecting and rating the Google p
 - Run `mvn clean package`
 - Should produce two jar files
     - `target/helsing-&lt;version&gt;.jar`
-    - `target/helsing-&lt;version&gt;-job.jar
+    - `target/helsing-&lt;version&gt;-job.jar`
 
 ## Test drive
 - Run `bin/run.sh`
