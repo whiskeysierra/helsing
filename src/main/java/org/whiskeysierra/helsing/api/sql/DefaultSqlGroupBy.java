@@ -1,18 +1,24 @@
 package org.whiskeysierra.helsing.api.sql;
 
+import com.google.common.collect.Lists;
 import net.sf.jsqlparser.schema.Column;
+
+import java.util.Iterator;
+import java.util.List;
 
 final class DefaultSqlGroupBy implements SqlGroupBy {
 
-    private final Column column;
+    private final List<SqlColumn> columns = Lists.newArrayList();
 
-    public DefaultSqlGroupBy(Column column) {
-        this.column = column;
+    public DefaultSqlGroupBy(Iterable<Column> columns) {
+        for (Column column : columns) {
+            this.columns.add(new DefaultSqlColumn(column));
+        }
     }
 
     @Override
-    public SqlColumn column() {
-        return new DefaultSqlColumn(column);
+    public Iterator<SqlColumn> iterator() {
+        return columns.iterator();
     }
 
 }

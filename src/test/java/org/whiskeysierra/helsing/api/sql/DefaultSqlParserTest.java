@@ -1,5 +1,6 @@
 package org.whiskeysierra.helsing.api.sql;
 
+import com.google.common.collect.Iterables;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,7 +27,7 @@ public final class DefaultSqlParserTest {
         Assert.assertEquals("MAX", statement.projection().get(1).as(SqlFunction.class).name());
         Assert.assertEquals("year", statement.projection().get(1).as(SqlFunction.class).column().name());
         Assert.assertEquals("countries.csv", statement.from().name());
-        Assert.assertEquals("country", statement.groupBy().column().name());
+        Assert.assertEquals("country", Iterables.getOnlyElement(statement.groupBy()).name());
     }
 
 }

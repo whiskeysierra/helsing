@@ -86,9 +86,13 @@ public final class Hadoop extends Configured implements Tool {
 
         final SqlGroupBy groupBy = statement.groupBy();
         if (groupBy != null) {
-            final int index = columns.indexOf(groupBy.column().name());
-            conf.setInt(SideData.GROUP, index);
-            conf.setInt(SideData.GROUPS, index);
+            final List<Integer> groupIndices = Lists.newLinkedList();
+
+            for (SqlColumn column : groupBy) {
+                groupIndices.add(columns.indexOf(column.name()));
+            }
+
+            conf.set(SideData.GROUPS, Joiner.on(',').join(groupIndices));
         }
 
         // TODO move "serialization" to own class
@@ -98,7 +102,7 @@ public final class Hadoop extends Configured implements Tool {
 
         job.setJarByClass(Hadoop.class);
 
-        job.setMapOutputKeyClass(TextArray.class);
+        job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);

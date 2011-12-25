@@ -1,7 +1,5 @@
 package org.whiskeysierra.helsing.api.sql;
 
-public interface SqlGroupBy {
-
-    SqlColumn column();
+public interface SqlGroupBy extends Iterable<SqlColumn> {
 
 }

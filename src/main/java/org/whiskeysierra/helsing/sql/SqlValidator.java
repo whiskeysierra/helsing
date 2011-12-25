@@ -150,15 +150,8 @@ final class SqlValidator implements StatementVisitor, SelectVisitor, SelectItemV
 
         select.getFromItem().accept(this);
 
-        final List<Column> columns = getGroupByColumns(select);
-        switch (columns.size()) {
-            case 0:
-                break;
-            case 1:
-                columns.get(0).accept(this);
-                break;
-            default:
-                throw new UnsupportedOperationException("Multiple GROUP BY columns");
+        for (Column column : getGroupByColumns(select)) {
+            column.accept(this);
         }
     }
 

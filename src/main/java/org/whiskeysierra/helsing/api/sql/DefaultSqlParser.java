@@ -16,6 +16,7 @@ import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.List;
 
 final class DefaultSqlParser implements SqlParser {
@@ -50,18 +51,24 @@ final class DefaultSqlParser implements SqlParser {
             assert item instanceof Table;
             final Table table = Table.class.cast(item);
 
-            final List<?> references = select.getGroupByColumnReferences();
-            final Column groupColumn = references == null || references.isEmpty() ?
-                null : Column.class.cast(references.get(0));
+            final List<Column> groupColumns = getGroupByColumns(select);
 
             final SqlProjection projection = new DefaultSqlProjection(expressions);
             final SqlTable t = new DefaultSqlTable(table);
-            final SqlGroupBy groupBy = groupColumn == null ? null : new DefaultSqlGroupBy(groupColumn);
+
+            final SqlGroupBy groupBy = groupColumns.isEmpty() ? null : new DefaultSqlGroupBy(groupColumns);
 
             return new DefaultSelectStatement(projection, t, groupBy);
         } catch (JSQLParserException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Column> getGroupByColumns(PlainSelect select) {
+        final List<?> references = select.getGroupByColumnReferences();
+        return references == null ?
+            Collections.<Column>emptyList() : (List<Column>) references;
     }
 
 }
