@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public final class CommandLineInterfaceModule extends AbstractModule {
+final class CommandLineInterfaceModule extends AbstractModule {
 
     @Override
     protected void configure() {

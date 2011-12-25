@@ -33,7 +33,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.whiskeysierra.helsing.Main</mainClass>
+                            <mainClass>org.whiskeysierra.helsing.ui.cli.Main</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>dependency</classpathPrefix>
                         </manifest>
