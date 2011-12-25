@@ -23,32 +23,8 @@ public final class ApplicationModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bindProperties();
         bindEventBus();
         installModules();
-    }
-
-    private void bindProperties() {
-        final Properties properties = new Properties();
-        final URL url = Resources.getResource("application.properties");
-
-        final InputStream stream;
-
-        try {
-            stream = url.openStream();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-
-        try {
-            properties.load(stream);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            Closeables.closeQuietly(stream);
-        }
-
-        Names.bindProperties(binder(), properties);
     }
 
     private void bindEventBus() {
@@ -56,6 +32,7 @@ public final class ApplicationModule extends AbstractModule {
     }
 
     private void installModules() {
+        install(new PropertiesModule());
         install(new ApiModule());
         install(new FunctionsModule());
         install(new MapReduceModule());

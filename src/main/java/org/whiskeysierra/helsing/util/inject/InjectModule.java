@@ -9,6 +9,9 @@ import com.google.inject.spi.TypeConverter;
 import org.nnsoft.guice.rocoto.converters.FileConverter;
 import org.nnsoft.guice.rocoto.converters.PatternConverter;
 
+import java.util.List;
+import java.util.Map;
+
 public final class InjectModule extends AbstractModule {
 
     @Override
@@ -16,23 +19,18 @@ public final class InjectModule extends AbstractModule {
         install(new FileConverter());
         install(new PatternConverter());
 
-        convertToTypes(Matchers.only(TypeLiteral.get(Joiner.class)), new TypeConverter() {
+        bindConverter(Joiner.class, new JoinerConverter());
+        bindConverter(Splitter.class, new SplitterConverter());
+        bindConverter(new TypeLiteral<List<Integer>>() { }, new IntegerListConverter());
+        bindConverter(new TypeLiteral<Map<Integer, String>>() { }, new IntegerStringMapConverter());
+    }
 
-            @Override
-            public Joiner convert(String value, TypeLiteral<?> toType) {
-                return Joiner.on(value);
-            }
+    private void bindConverter(TypeLiteral<?> literal, TypeConverter converter) {
+        convertToTypes(Matchers.only(literal), converter);
+    }
 
-        });
-
-        convertToTypes(Matchers.only(TypeLiteral.get(Splitter.class)), new TypeConverter() {
-
-            @Override
-            public Splitter convert(String value, TypeLiteral<?> toType) {
-                return Splitter.on(value);
-            }
-
-        });
+    private void bindConverter(Class<?> type, TypeConverter converter) {
+        bindConverter(TypeLiteral.get(type), converter);
     }
 
 }

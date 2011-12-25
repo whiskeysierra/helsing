@@ -2,15 +2,16 @@ package org.whiskeysierra.helsing.hadoop;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import org.whiskeysierra.helsing.util.io.Formatting;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.whiskeysierra.helsing.util.io.Formatting;
 
 import java.io.IOException;
 import java.util.List;
 
-final class GroupByMapper extends Mapper<LongWritable, Text, Text, Text> {
+final class GroupByMapper extends Mapper<LongWritable, Text, Writable, Text> {
 
     private List<Integer> indices = Lists.newLinkedList();
     private Integer groupIndex;

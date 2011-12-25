@@ -2,6 +2,7 @@ package org.whiskeysierra.helsing.hadoop;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import org.apache.hadoop.io.Writable;
 import org.whiskeysierra.helsing.util.io.Formatting;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -10,9 +11,9 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.util.List;
 
-final class SelectMapper extends Mapper<LongWritable, Text, Text, Text> {
+final class SelectMapper extends Mapper<LongWritable, Text, Writable, Text> {
 
-    private final Text same = new Text("");
+    private final Text same = new Text();
     private List<Integer> indices = Lists.newLinkedList();
 
     @Override
