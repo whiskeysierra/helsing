@@ -27,29 +27,28 @@ The first steps included reading, describing, reflecting and rating the Google p
 - An interactive prompt should appear which allows sql statements to be entered
 - The sample file shiped with this project (`data/countries.csv`) has the following schema:
 
-
-    +---------------------------+------------------+------+------------+
-    |                   country |        continent | year | population |
-    +---------------------------+------------------+------+------------+
-    |               Afghanistan |             Asia | 1950 |    8150368 |
-    |               Afghanistan |             Asia | 1960 |    9829450 |
-    |               Afghanistan |             Asia | 1970 |   12430623 |
-    |               Afghanistan |             Asia | 1980 |   15112149 |
-    |               Afghanistan |             Asia | 1990 |   14669339 |
-    |               Afghanistan |             Asia | 2000 |   23898198 |
-    |               Afghanistan |             Asia | 2010 |   34504794 |
-    |               Afghanistan |             Asia | 2020 |   44546287 |
-    |               Afghanistan |             Asia | 2030 |   56322744 |
-    |               Afghanistan |             Asia | 2040 |   69094697 |
-    |               Afghanistan |             Asia | 2050 |   81933479 |
-    |                   Albania |           Europe | 1950 |    1227156 |
-    |                   Albania |           Europe | 1960 |    1623114 |
-    |                   Albania |           Europe | 1970 |    2156612 |
-    |                   Albania |           Europe | 1980 |    2671412 |
-    |                   Albania |           Europe | 1990 |    3250778 |
-    |                   Albania |           Europe | 2000 |    3473835 |
-    |                   Albania |           Europe | 2010 |    3659616 |
-    ...
+        +---------------------------+------------------+------+------------+
+        |                   country |        continent | year | population |
+        +---------------------------+------------------+------+------------+
+        |               Afghanistan |             Asia | 1950 |    8150368 |
+        |               Afghanistan |             Asia | 1960 |    9829450 |
+        |               Afghanistan |             Asia | 1970 |   12430623 |
+        |               Afghanistan |             Asia | 1980 |   15112149 |
+        |               Afghanistan |             Asia | 1990 |   14669339 |
+        |               Afghanistan |             Asia | 2000 |   23898198 |
+        |               Afghanistan |             Asia | 2010 |   34504794 |
+        |               Afghanistan |             Asia | 2020 |   44546287 |
+        |               Afghanistan |             Asia | 2030 |   56322744 |
+        |               Afghanistan |             Asia | 2040 |   69094697 |
+        |               Afghanistan |             Asia | 2050 |   81933479 |
+        |                   Albania |           Europe | 1950 |    1227156 |
+        |                   Albania |           Europe | 1960 |    1623114 |
+        |                   Albania |           Europe | 1970 |    2156612 |
+        |                   Albania |           Europe | 1980 |    2671412 |
+        |                   Albania |           Europe | 1990 |    3250778 |
+        |                   Albania |           Europe | 2000 |    3473835 |
+        |                   Albania |           Europe | 2010 |    3659616 |
+        ...
 
 - Currently the following features are supported:
     - Projection
