@@ -2,9 +2,6 @@ package org.whiskeysierra.helsing.events;
 
 import org.whiskeysierra.helsing.api.sql.SelectStatement;
 
-import javax.annotation.concurrent.Immutable;
-
-@Immutable
 public final class QueryEvent {
 
     private final String query;

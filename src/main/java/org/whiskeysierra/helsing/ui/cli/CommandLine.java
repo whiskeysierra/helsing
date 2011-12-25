@@ -5,6 +5,8 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import jline.ConsoleReader;
+import org.apache.commons.lang.StringUtils;
 import org.whiskeysierra.helsing.events.BootEvent;
 import org.whiskeysierra.helsing.events.ExecutionError;
 import org.whiskeysierra.helsing.events.FeatureError;
@@ -16,8 +18,6 @@ import org.whiskeysierra.helsing.events.QuitEvent;
 import org.whiskeysierra.helsing.events.ResultPrintedEvent;
 import org.whiskeysierra.helsing.events.SqlEvent;
 import org.whiskeysierra.helsing.events.SyntaxError;
-import jline.ConsoleReader;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 
