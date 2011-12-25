@@ -36,8 +36,8 @@ final class GroupByMapper extends DependencyInjectionMapper<LongWritable, Text, 
     protected void map(LongWritable ignored, Text value, Context context) throws IOException, InterruptedException {
         final Line line = format.lineOf(value);
 
-        final Writable group = line.keep(groupIndices).toText();
-        final Text projection = line.keep(indices).toText();
+        final Writable group = line.select(groupIndices).toText();
+        final Text projection = line.select(indices).toText();
 
         context.write(group, projection);
     }

@@ -30,7 +30,7 @@ final class ProjectionMapper extends DependencyInjectionMapper<LongWritable, Tex
     protected void map(LongWritable ignored, Text value, Context context) throws IOException, InterruptedException {
         final Line line = format.lineOf(value);
 
-        final Line projection = line.keep(indices);
+        final Line projection = line.select(indices);
 
         context.write(new Text(), projection.toText());
     }

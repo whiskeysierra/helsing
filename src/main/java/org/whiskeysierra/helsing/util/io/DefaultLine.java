@@ -27,7 +27,7 @@ final class DefaultLine extends ForwardingList<String> implements Line {
     }
 
     @Override
-    public Line keep(Iterable<Integer> indices) {
+    public Line select(Iterable<Integer> indices) {
         final Line line = format.lineOf();
 
         for (int index : indices) {

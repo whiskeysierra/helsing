@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface Line extends List<String> {
 
-    Line keep(Iterable<Integer> indices);
+    Line select(Iterable<Integer> indices);
 
     Text toText();
 
