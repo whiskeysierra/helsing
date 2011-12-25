@@ -25,7 +25,7 @@ The first steps included reading, describing, reflecting and rating the Google p
 ## Test drive
 - Run `bin/run.sh`
 - An interactive prompt should appear which allows sql statements to be entered
-- The sample file shiped with this project (`data/countries.csv`) has the following schema:
+- The sample file shiped with this project ([`data/countries.csv`](https://github.com/whiskeysierra/helsing/blob/master/data/countries.csv)) has the following schema:
 
         +---------------------------+------------------+------+------------+
         |                   country |        continent | year | population |
