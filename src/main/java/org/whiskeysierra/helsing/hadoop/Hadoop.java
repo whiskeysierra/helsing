@@ -1,7 +1,6 @@
 package org.whiskeysierra.helsing.hadoop;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -25,9 +24,7 @@ import org.whiskeysierra.helsing.api.sql.SelectStatement;
 import org.whiskeysierra.helsing.api.sql.SqlColumn;
 import org.whiskeysierra.helsing.api.sql.SqlExpression;
 import org.whiskeysierra.helsing.api.sql.SqlFunction;
-import org.whiskeysierra.helsing.api.sql.SqlGroupBy;
 import org.whiskeysierra.helsing.api.sql.SqlParser;
-import org.whiskeysierra.helsing.api.sql.SqlProjection;
 
 import java.io.File;
 import java.util.List;
@@ -51,7 +48,7 @@ public final class Hadoop extends Configured implements Tool {
         final Injector injector = Guice.createInjector(new HadoopModule());
         final SqlParser sqlParser = injector.getInstance(SqlParser.class);
 
-        final Configuration conf = getConf();
+        final Configuration config = getConf();
 
         final File input = options.getInput();
         final File output = options.getOutput();
@@ -62,40 +59,36 @@ public final class Hadoop extends Configured implements Tool {
         final File schema = new File(input.getParentFile(), input.getName().replace(".csv", ".schema.csv"));
         final List<String> columns = Files.readLines(schema, Charsets.UTF_8);
 
-        final SqlProjection projection = statement.projection();
-        final List<Integer> indices = Lists.newLinkedList();
-        final Map<Integer, String> functionIndices = Maps.newHashMap();
+        final List<Integer> projection = Lists.newLinkedList();
+        final Map<Integer, String> functions = Maps.newHashMap();
 
-        for (SqlExpression expression : projection) {
+        for (SqlExpression expression : statement.projection()) {
             if (expression.is(SqlColumn.class)) {
                 final SqlColumn column = expression.as(SqlColumn.class);
                 final String name = column.name();
-                indices.add(columns.indexOf(name));
+                projection.add(columns.indexOf(name));
             } else if (expression.is(SqlFunction.class)) {
                 final SqlFunction function = expression.as(SqlFunction.class);
                 final String name = function.column().name();
                 final int index = columns.indexOf(name);
-                indices.add(index);
-                functionIndices.put(projection.indexOf(function), function.name());
+                projection.add(index);
+                functions.put(statement.projection().indexOf(function), function.name());
             }
         }
 
-        // IMPORTANT set parameters before passing the config to the job
-        // TODO use setStrings(..)
-        conf.set(SideData.PROJECTION, Joiner.on(',').join(indices));
-
-        final List<Integer> groupIndices = Lists.newLinkedList();
+        final List<Integer> groups = Lists.newLinkedList();
 
         for (SqlColumn column : statement.groupBy()) {
-            groupIndices.add(columns.indexOf(column.name()));
+            groups.add(columns.indexOf(column.name()));
         }
 
-        conf.set(SideData.GROUPS, Joiner.on(',').join(groupIndices));
+        // IMPORTANT set parameters before passing the config to the job
+        // BEWARE on injection, config may not store empty strings
+        config.set(SideData.PROJECTION, SideData.serialize(projection));
+        config.set(SideData.FUNCTIONS, SideData.serialize(functions));
+        config.set(SideData.GROUPS, SideData.serialize(groups));
 
-        // TODO move "serialization" to own class
-        conf.set(SideData.FUNCTIONS, Joiner.on(",").withKeyValueSeparator("=").join(functionIndices));
-
-        final Job job = new Job(conf, "Helsing");
+        final Job job = new Job(config, "Helsing");
 
         job.setJarByClass(Hadoop.class);
 
@@ -104,23 +97,8 @@ public final class Hadoop extends Configured implements Tool {
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);
 
-        if (statement.groupBy().isEmpty()) {
-            job.setMapperClass(ProjectionMapper.class);
-
-            if (functionIndices.isEmpty()) {
-                job.setReducerClass(IdentityReducer.class);
-            } else {
-                job.setReducerClass(AggregatorReducer.class);
-            }
-        } else {
-            job.setMapperClass(GroupByMapper.class);
-
-            if (functionIndices.isEmpty()) {
-                job.setReducerClass(GroupReducer.class);
-            } else {
-                job.setReducerClass(AggregatorReducer.class);
-            }
-        }
+        job.setMapperClass(GroupByMapper.class);
+        job.setReducerClass(AggregatorReducer.class);
 
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);

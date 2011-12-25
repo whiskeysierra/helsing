@@ -1,7 +1,9 @@
 package org.whiskeysierra.helsing.hadoop;
 
+import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
@@ -11,6 +13,8 @@ import org.whiskeysierra.helsing.util.io.FileFormat;
 import org.whiskeysierra.helsing.util.io.Line;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -18,6 +22,7 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
 
     private FileFormat format;
     private Map<Integer, Provider<Aggregator>> aggregators;
+    private List<Integer> groups = Collections.emptyList();
 
     @Inject
     public void setFormat(FileFormat format) {
@@ -29,12 +34,31 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
         this.aggregators = aggregators;
     }
 
+    @Inject(optional = true)
+    public void setGroups(@Named(SideData.GROUPS) List<Integer> groups) {
+        this.groups = groups;
+    }
+
     private Map<Integer, Aggregator> getAggregators() {
         return MoreProviders.get(aggregators);
     }
 
     @Override
     protected void reduce(Writable ignored, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+        if (groups.isEmpty() && aggregators.isEmpty()) {
+            identity(values, context);
+        } else {
+            aggregate(values, context);
+        }
+    }
+
+    private void identity(Iterable<Text> values, Context context) throws IOException, InterruptedException {
+        for (Text value : values) {
+            context.write(NullWritable.get(), value);
+        }
+    }
+
+    private void aggregate(Iterable<Text> values, Context context) throws IOException, InterruptedException {
         final Map<Integer, Aggregator> aggregators = getAggregators();
 
         Line last = null;
@@ -47,8 +71,7 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
                 aggregator.update(line.get(index));
             }
 
-            // or last = Objects.firstNonNull(line, last);
-            last = line;
+            last = Objects.firstNonNull(last, line);
         }
 
         assert last != null;
