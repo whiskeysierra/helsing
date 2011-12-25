@@ -46,7 +46,7 @@ final class ResultPrinter {
         final Iterable<String> header = projection.toStrings();
 
         // treat header as any other line
-        calculator.processLine(format.toString(header));
+        calculator.processLine(format.lineOf(header).toString());
 
         for (File file : event.getFiles()) {
             Files.readLines(file, Charsets.UTF_8, calculator);

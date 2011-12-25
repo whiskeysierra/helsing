@@ -1,40 +1,38 @@
 package org.whiskeysierra.helsing.hadoop;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import org.apache.hadoop.io.Writable;
-import org.whiskeysierra.helsing.util.io.Formatting;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.io.Writable;
+import org.whiskeysierra.helsing.util.io.FileFormat;
+import org.whiskeysierra.helsing.util.io.Line;
 
 import java.io.IOException;
 import java.util.List;
 
-final class SelectMapper extends Mapper<LongWritable, Text, Writable, Text> {
+final class SelectMapper extends DependencyInjectionMapper<LongWritable, Text, Writable, Text> {
 
-    private final Text same = new Text();
-    private List<Integer> indices = Lists.newLinkedList();
+    private FileFormat format;
+    private List<Integer> indices;
 
-    @Override
-    public void setup(Context context) throws IOException, InterruptedException {
-        final String string = context.getConfiguration().get(SideData.PROJECTION, "");
+    @Inject
+    public void setFormat(FileFormat format) {
+        this.format = format;
+    }
 
-        for (String index : Splitter.on(',').split(string)) {
-            indices.add(Integer.valueOf(index));
-        }
+    @Inject
+    public void setIndices(@Named(SideData.PROJECTION) List<Integer> indices) {
+        this.indices = indices;
     }
 
     @Override
     protected void map(LongWritable ignored, Text value, Context context) throws IOException, InterruptedException {
-        final List<String> cells = Input.split(value);
-        final List<String> output = Lists.newLinkedList();
+        final Line line = format.lineOf(value);
 
-        for (Integer index : indices) {
-            output.add(cells.get(index));
-        }
+        final Line projection = line.keep(indices);
 
-        context.write(same, new Text(Formatting.JOINER.join(output)));
+        context.write(new Text(), projection.toText());
     }
 
 }

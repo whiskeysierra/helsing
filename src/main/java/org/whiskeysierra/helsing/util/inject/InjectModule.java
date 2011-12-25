@@ -25,12 +25,12 @@ public final class InjectModule extends AbstractModule {
         bindConverter(new TypeLiteral<Map<Integer, String>>() { }, new IntegerStringMapConverter());
     }
 
-    private void bindConverter(TypeLiteral<?> literal, TypeConverter converter) {
-        convertToTypes(Matchers.only(literal), converter);
-    }
-
     private void bindConverter(Class<?> type, TypeConverter converter) {
         bindConverter(TypeLiteral.get(type), converter);
+    }
+
+    private void bindConverter(TypeLiteral<?> literal, TypeConverter converter) {
+        convertToTypes(Matchers.only(literal), converter);
     }
 
 }

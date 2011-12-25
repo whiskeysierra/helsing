@@ -1,51 +1,50 @@
 package org.whiskeysierra.helsing.hadoop;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.whiskeysierra.helsing.util.io.FileFormat;
 import org.whiskeysierra.helsing.util.io.Formatting;
+import org.whiskeysierra.helsing.util.io.Line;
 
 import java.io.IOException;
 import java.util.List;
 
-final class GroupByMapper extends Mapper<LongWritable, Text, Writable, Text> {
+final class GroupByMapper extends DependencyInjectionMapper<LongWritable, Text, Writable, Text> {
 
-    private List<Integer> indices = Lists.newLinkedList();
+    private FileFormat format;
+    private List<Integer> indices;
     private Integer groupIndex;
 
-    @Override
-    protected void setup(Context context) throws IOException, InterruptedException {
-        setupIndices(context);
-        setupGroupIndex(context);
+    @Inject
+    public void setFormat(FileFormat format) {
+        this.format = format;
     }
 
-    private void setupIndices(Context context) {
-        final String string = context.getConfiguration().get(SideData.PROJECTION, "");
-
-        for (String index : Splitter.on(',').split(string)) {
-            indices.add(Integer.valueOf(index));
-        }
+    @Inject
+    public void setIndices(@Named(SideData.PROJECTION) List<Integer> indices) {
+        this.indices = indices;
     }
 
-    private void setupGroupIndex(Context context) {
-        this.groupIndex = context.getConfiguration().getInt(SideData.GROUP, -1);
+    @Inject(optional = true)
+    public void setGroupIndex(@Named(SideData.GROUP) Integer groupIndex) {
+        this.groupIndex = groupIndex;
     }
 
     @Override
-    protected void map(LongWritable ignored, Text line, Context context) throws IOException, InterruptedException {
-        final List<String> cells = Input.split(line);
-        final List<String> output = Lists.newLinkedList();
+    protected void map(LongWritable ignored, Text value, Context context) throws IOException, InterruptedException {
+        final Line line = format.lineOf(value);
 
-        for (Integer index : indices) {
-            output.add(cells.get(index));
-        }
+        final Text group = new Text(line.get(groupIndex));
+        final Text projection = line.keep(indices).toText();
 
-        final Text key = new Text(cells.get(groupIndex));
-        final Text value = new Text(Formatting.JOINER.join(output));
-        context.write(key, value);
+        context.write(group, projection);
     }
-
 }

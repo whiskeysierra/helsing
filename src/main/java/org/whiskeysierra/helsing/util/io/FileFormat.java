@@ -1,9 +1,14 @@
 package org.whiskeysierra.helsing.util.io;
 
+import org.apache.hadoop.io.Text;
+
 public interface FileFormat {
 
-    String toString(Iterable<String> line);
+    Line lineOf();
+
+    Line lineOf(Text value);
 
     Line lineOf(String value);
 
+    Line lineOf(Iterable<String> values);
 }
