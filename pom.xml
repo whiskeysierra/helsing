@@ -33,7 +33,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.bht.pat.tenzing.Main</mainClass>
+                            <mainClass>org.whiskeysierra.helsing.Main</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>dependency</classpathPrefix>
                         </manifest>
@@ -50,7 +50,7 @@
                     </descriptors>
                     <archive>
                         <manifest>
-                            <mainClass>de.bht.pat.tenzing.hadoop.Hadoop</mainClass>
+                            <mainClass>org.whiskeysierra.helsing.hadoop.Hadoop</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -105,6 +105,11 @@
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-multibindings</artifactId>
             <version>3.0-rc3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.99soft.guice</groupId>
+            <artifactId>rocoto</artifactId>
+            <version>5.0.1</version>
         </dependency>
         <dependency>
             <groupId>jline</groupId>
