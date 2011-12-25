@@ -42,7 +42,7 @@ final class QueryProcessor {
         final String query = event.getQuery();
 
         // TODO set to real values
-        final File jar = new File("target/tenzing-0.1-job.jar");
+        final File jar = new File("target/helsing-0.1-job.jar");
 
         final String table = event.getStatement().from().name();
         final File input = new File(data, table);
