@@ -18,6 +18,7 @@ import org.whiskeysierra.helsing.util.io.FileFormat;
 import org.whiskeysierra.helsing.util.io.Line;
 import org.whiskeysierra.helsing.util.text.TimeFormatter;
 
+import javax.inject.Provider;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -26,15 +27,15 @@ final class ResultPrinter {
 
     private final EventBus bus;
     private final FileFormat format;
-    private final WidthCalculator calculator;
+    private final Provider<WidthCalculator> newCalculator;
     private final TimeFormatter formatter;
 
     @Inject
-    public ResultPrinter(EventBus bus, FileFormat format, WidthCalculator calculator, TimeFormatter formatter) {
+    public ResultPrinter(EventBus bus, FileFormat format, Provider<WidthCalculator> newCalculator, TimeFormatter formatter) {
         this.bus = bus;
         this.format = format;
         this.formatter = formatter;
-        this.calculator = calculator;
+        this.newCalculator = newCalculator;
 
         bus.register(this);
     }
@@ -44,6 +45,8 @@ final class ResultPrinter {
         final SelectStatement statement = event.getStatement();
         final SqlProjection projection = statement.projection();
         final Iterable<String> header = projection.toStrings();
+
+        final WidthCalculator calculator = newCalculator.get();
 
         // treat header as any other line
         calculator.processLine(format.lineOf(header).toString());
