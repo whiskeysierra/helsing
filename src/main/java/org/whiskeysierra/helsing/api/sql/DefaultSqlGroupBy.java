@@ -21,4 +21,9 @@ final class DefaultSqlGroupBy implements SqlGroupBy {
         return columns.iterator();
     }
 
+    @Override
+    public boolean isEmpty() {
+        return columns.isEmpty();
+    }
+
 }

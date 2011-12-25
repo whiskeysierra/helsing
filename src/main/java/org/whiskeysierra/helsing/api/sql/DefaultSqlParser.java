@@ -56,7 +56,7 @@ final class DefaultSqlParser implements SqlParser {
             final SqlProjection projection = new DefaultSqlProjection(expressions);
             final SqlTable t = new DefaultSqlTable(table);
 
-            final SqlGroupBy groupBy = groupColumns.isEmpty() ? null : new DefaultSqlGroupBy(groupColumns);
+            final SqlGroupBy groupBy = new DefaultSqlGroupBy(groupColumns);
 
             return new DefaultSelectStatement(projection, t, groupBy);
         } catch (JSQLParserException e) {

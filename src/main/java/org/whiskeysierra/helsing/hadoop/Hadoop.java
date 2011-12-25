@@ -84,21 +84,18 @@ public final class Hadoop extends Configured implements Tool {
         // TODO use setStrings(..)
         conf.set(SideData.PROJECTION, Joiner.on(',').join(indices));
 
-        final SqlGroupBy groupBy = statement.groupBy();
-        if (groupBy != null) {
-            final List<Integer> groupIndices = Lists.newLinkedList();
+        final List<Integer> groupIndices = Lists.newLinkedList();
 
-            for (SqlColumn column : groupBy) {
-                groupIndices.add(columns.indexOf(column.name()));
-            }
-
-            conf.set(SideData.GROUPS, Joiner.on(',').join(groupIndices));
+        for (SqlColumn column : statement.groupBy()) {
+            groupIndices.add(columns.indexOf(column.name()));
         }
+
+        conf.set(SideData.GROUPS, Joiner.on(',').join(groupIndices));
 
         // TODO move "serialization" to own class
         conf.set(SideData.FUNCTIONS, Joiner.on(",").withKeyValueSeparator("=").join(functionIndices));
 
-        final Job job = new Job(conf, "Tenzing");
+        final Job job = new Job(conf, "Helsing");
 
         job.setJarByClass(Hadoop.class);
 
@@ -107,7 +104,7 @@ public final class Hadoop extends Configured implements Tool {
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);
 
-        if (groupBy == null) {
+        if (statement.groupBy().isEmpty()) {
             job.setMapperClass(ProjectionMapper.class);
 
             if (functionIndices.isEmpty()) {

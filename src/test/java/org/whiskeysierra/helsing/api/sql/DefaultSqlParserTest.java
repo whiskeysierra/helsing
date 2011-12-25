@@ -14,7 +14,7 @@ public final class DefaultSqlParserTest {
 
         Assert.assertEquals("country", statement.projection().get(0).as(SqlColumn.class).name());
         Assert.assertEquals("countries.csv", statement.from().name());
-        Assert.assertNull(statement.groupBy());
+        Assert.assertTrue(statement.groupBy().isEmpty());
     }
 
     @Test
