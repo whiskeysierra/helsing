@@ -1,15 +1,17 @@
 package de.bht.pat.tenzing.hadoop;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.Maps;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import de.bht.pat.tenzing.hadoop.functions.Aggregator;
 import de.bht.pat.tenzing.hadoop.functions.FunctionsModule;
 import de.bht.pat.tenzing.inject.Functions;
-import org.apache.hadoop.conf.Configuration;
+import de.bht.pat.tenzing.inject.MoreProviders;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -17,42 +19,35 @@ import org.apache.hadoop.mapreduce.Reducer;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 final class AggregatorReducer extends Reducer<Text, Text, NullWritable, Text> {
 
-    private final Map<Integer, String> indices = Maps.newHashMap();
-    private final Map<String, Provider<Aggregator>> functions = Maps.newHashMap();
-
-    @Inject
-    public void setFunctions(@Functions Map<String, Provider<Aggregator>> functions) {
-        this.functions.putAll(functions);
-    }
+    private final Map<Integer, Provider<Aggregator>> aggregators = Maps.newHashMap();
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
         final Injector injector = Guice.createInjector(new FunctionsModule());
-        injector.getMembersInjector(AggregatorReducer.class).injectMembers(this);
 
-        final Configuration config = context.getConfiguration();
-        final String string = config.get(SideData.FUNCTIONS, "");
+        final Map<String, Provider<Aggregator>> functions = injector.getInstance(
+            Key.get(new TypeLiteral<Map<String, Provider<Aggregator>>>() {
+            }, Functions.class)
+        );
 
-        final Splitter.MapSplitter splitter = Splitter.on(",").withKeyValueSeparator("=");
+        final String string = context.getConfiguration().get(SideData.FUNCTIONS, "");
+
+        final MapSplitter splitter = Splitter.on(",").withKeyValueSeparator("=");
 
         for (Map.Entry<String, String> entry : splitter.split(string).entrySet()) {
             final int index = Integer.parseInt(entry.getKey());
             final String functionName = entry.getValue();
-            indices.put(index, functionName);
+
+            aggregators.put(index, functions.get(functionName));
         }
     }
 
     private Map<Integer, Aggregator> getAggregators() {
-        final Map<Integer, Aggregator> aggregators = Maps.newHashMap();
-
-        for (Map.Entry<Integer, String> entry : indices.entrySet()) {
-            aggregators.put(entry.getKey(), functions.get(entry.getValue()).get());
-        }
-
-        return aggregators;
+        return MoreProviders.get(aggregators);
     }
 
     @Override
@@ -63,7 +58,7 @@ final class AggregatorReducer extends Reducer<Text, Text, NullWritable, Text> {
 
         for (Text value : values) {
             final List<String> cells = Input.split(value);
-            for (Map.Entry<Integer, Aggregator> entry : aggregators.entrySet()) {
+            for (Entry<Integer, Aggregator> entry : aggregators.entrySet()) {
                 final int index = entry.getKey();
                 final Aggregator aggregator = entry.getValue();
                 aggregator.update(cells.get(index));
@@ -74,7 +69,7 @@ final class AggregatorReducer extends Reducer<Text, Text, NullWritable, Text> {
 
         final List<String> cells = Input.split(last);
 
-        for (Map.Entry<Integer, Aggregator> entry : aggregators.entrySet()) {
+        for (Entry<Integer, Aggregator> entry : aggregators.entrySet()) {
             final int index = entry.getKey();
             final Aggregator aggregator = entry.getValue();
             cells.set(index, aggregator.getResult());
