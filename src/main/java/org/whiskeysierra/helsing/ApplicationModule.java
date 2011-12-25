@@ -23,15 +23,9 @@ public final class ApplicationModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bindConverters();
         bindProperties();
         bindEventBus();
         installModules();
-    }
-
-    private void bindConverters() {
-        install(new FileConverter());
-        install(new PatternConverter());
     }
 
     private void bindProperties() {

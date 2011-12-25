@@ -9,12 +9,13 @@ import com.google.common.io.LineProcessor;
 import com.google.inject.Inject;
 import org.whiskeysierra.helsing.api.sql.SelectStatement;
 import org.whiskeysierra.helsing.api.sql.SqlProjection;
-import org.whiskeysierra.helsing.events.ResultEvent.Duration;
 import org.whiskeysierra.helsing.events.PrintEvent;
 import org.whiskeysierra.helsing.events.PrintLineEvent;
 import org.whiskeysierra.helsing.events.ResultEvent;
+import org.whiskeysierra.helsing.events.ResultEvent.Duration;
 import org.whiskeysierra.helsing.events.ResultPrintedEvent;
-import org.whiskeysierra.helsing.util.io.Formatting;
+import org.whiskeysierra.helsing.util.io.FileFormat;
+import org.whiskeysierra.helsing.util.io.Line;
 import org.whiskeysierra.helsing.util.text.TimeFormatter;
 
 import java.io.File;
@@ -24,12 +25,16 @@ import java.util.Map;
 final class ResultPrinter {
 
     private final EventBus bus;
+    private final FileFormat format;
+    private final WidthCalculator calculator;
     private final TimeFormatter formatter;
 
     @Inject
-    public ResultPrinter(EventBus bus, TimeFormatter formatter) {
+    public ResultPrinter(EventBus bus, FileFormat format, WidthCalculator calculator, TimeFormatter formatter) {
         this.bus = bus;
+        this.format = format;
         this.formatter = formatter;
+        this.calculator = calculator;
 
         bus.register(this);
     }
@@ -40,10 +45,8 @@ final class ResultPrinter {
         final SqlProjection projection = statement.projection();
         final Iterable<String> header = projection.toStrings();
 
-        final WidthCalculator calculator = new WidthCalculator();
-
         // treat header as any other line
-        calculator.processLine(Formatting.JOINER.join(header));
+        calculator.processLine(format.toString(header));
 
         for (File file : event.getFiles()) {
             Files.readLines(file, Charsets.UTF_8, calculator);
@@ -63,8 +66,9 @@ final class ResultPrinter {
                 private long count;
 
                 @Override
-                public boolean processLine(String line) throws IOException {
-                    printTableLine(widths, Formatting.SPLITTER.split(line));
+                public boolean processLine(String value) throws IOException {
+                    final Line line = format.lineOf(value);
+                    printTableLine(widths, line);
                     count++;
                     return true;
                 }

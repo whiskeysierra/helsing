@@ -2,14 +2,21 @@ package org.whiskeysierra.helsing.ui.cli;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.LineProcessor;
-import org.whiskeysierra.helsing.util.io.Formatting;
+import com.google.inject.Inject;
+import org.whiskeysierra.helsing.util.io.FileFormat;
 
 import java.io.IOException;
 import java.util.Map;
 
 final class WidthCalculator implements LineProcessor<Map<Integer, Integer>> {
 
+    private final FileFormat format;
     private final Map<Integer, Integer> widths = Maps.newLinkedHashMap();
+
+    @Inject
+    public WidthCalculator(FileFormat format) {
+        this.format = format;
+    }
 
     private int getWidth(int column) {
         final Integer width = widths.get(column);
@@ -20,7 +27,7 @@ final class WidthCalculator implements LineProcessor<Map<Integer, Integer>> {
     public boolean processLine(String line) throws IOException {
         int i = 0;
 
-        for (String cell : Formatting.SPLITTER.split(line)) {
+        for (String cell : format.lineOf(line)) {
             final int width = getWidth(i);
             widths.put(i, Math.max(width, cell.length()));
             i++;
