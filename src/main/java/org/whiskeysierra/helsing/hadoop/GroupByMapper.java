@@ -1,35 +1,29 @@
 package org.whiskeysierra.helsing.hadoop;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.whiskeysierra.helsing.util.io.FileFormat;
 import org.whiskeysierra.helsing.util.io.Line;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 final class GroupByMapper extends DependencyInjectionMapper<LongWritable, Text, Text, Text> {
 
     private FileFormat format;
     private List<Integer> indices;
-    private List<Integer> groups = Collections.emptyList();
+    private List<Integer> groups;
 
     @Inject
     public void setFormat(FileFormat format) {
         this.format = format;
     }
 
-    @Inject
-    public void setIndices(@Named(SideData.PROJECTION) List<Integer> indices) {
-        this.indices = indices;
-    }
-
-    @Inject(optional = true)
-    public void setGroups(@Named(SideData.GROUPS) List<Integer> groups) {
-        this.groups = groups;
+    @Override
+    protected void configure(Context context) throws IOException, InterruptedException {
+        this.indices = SideData.deserializeList(context.getConfiguration().get(SideData.PROJECTION, ""));
+        this.groups = SideData.deserializeList(context.getConfiguration().get(SideData.GROUPS, ""));
     }
 
     @Override

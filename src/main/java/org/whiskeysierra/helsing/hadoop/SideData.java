@@ -15,10 +15,7 @@ public final class SideData {
 
     /**
      * A list of column indices.
-     *
-     * @deprecated switch to COLUMNS
      */
-    @Deprecated
     public static final String PROJECTION = "helsing.projection";
 
     /**

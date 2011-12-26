@@ -3,7 +3,6 @@ package org.whiskeysierra.helsing.hadoop;
 import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
@@ -13,7 +12,6 @@ import org.whiskeysierra.helsing.util.io.FileFormat;
 import org.whiskeysierra.helsing.util.io.Line;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,7 +20,7 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
 
     private FileFormat format;
     private Map<Integer, Provider<Aggregator>> aggregators;
-    private List<Integer> groups = Collections.emptyList();
+    private List<Integer> groups;
 
     @Inject
     public void setFormat(FileFormat format) {
@@ -34,9 +32,9 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
         this.aggregators = aggregators;
     }
 
-    @Inject(optional = true)
-    public void setGroups(@Named(SideData.GROUPS) List<Integer> groups) {
-        this.groups = groups;
+    @Override
+    protected void configure(Context context) throws IOException, InterruptedException {
+        this.groups = SideData.deserializeList(context.getConfiguration().get(SideData.GROUPS, ""));
     }
 
     private Map<Integer, Aggregator> getAggregators() {
