@@ -11,17 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public final class SideData {
+final class SideData {
 
     /**
      * A list of column indices.
      */
     public static final String PROJECTION = "helsing.projection";
-
-    /**
-     * A map from selected column indices to column names.
-     */
-    public static final String COLUMNS = "helsing.columns";
 
     /**
      * A list of selected group indices.
