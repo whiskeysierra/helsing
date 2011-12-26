@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Stringifier;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.whiskeysierra.helsing.api.Functions;
@@ -22,6 +23,8 @@ import java.util.Map.Entry;
 final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text, NullWritable, Text> {
 
     private FileFormat format;
+    private Stringifier<List<Integer>> listStringifier;
+    private Stringifier<Map<Integer, String>> mapStringifier;
     private Map<String, Provider<Aggregator>> functions;
 
     private final Map<Integer, Provider<Aggregator>> aggregators = Maps.newHashMap();
@@ -33,6 +36,16 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
     }
 
     @Inject
+    public void setListStringifier(Stringifier<List<Integer>> listStringifier) {
+        this.listStringifier = listStringifier;
+    }
+
+    @Inject
+    public void setMapStringifier(Stringifier<Map<Integer, String>> mapStringifier) {
+        this.mapStringifier = mapStringifier;
+    }
+
+    @Inject
     public void setFunctions(@Functions Map<String, Provider<Aggregator>> functions) {
         this.functions = functions;
     }
@@ -40,9 +53,9 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
     @Override
     protected void configure(Context context) throws IOException, InterruptedException {
         final Configuration config = context.getConfiguration();
-        this.groups = SideData.deserializeList(config.get(SideData.GROUPS));
+        this.groups = listStringifier.fromString(config.get(SideData.GROUPS));
 
-        final Map<Integer, String> indices = SideData.deserializeMap(config.get(SideData.FUNCTIONS));
+        final Map<Integer, String> indices = mapStringifier.fromString(config.get(SideData.FUNCTIONS));
 
         for (Map.Entry<Integer, String> entry : indices.entrySet()) {
             final int index = entry.getKey();
@@ -97,5 +110,4 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
 
         context.write(NullWritable.get(), last.toText());
     }
-
 }

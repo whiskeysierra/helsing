@@ -2,6 +2,7 @@ package org.whiskeysierra.helsing.hadoop;
 
 import com.google.inject.Inject;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Stringifier;
 import org.apache.hadoop.io.Text;
 import org.whiskeysierra.helsing.util.io.FileFormat;
 import org.whiskeysierra.helsing.util.io.Line;
@@ -12,6 +13,8 @@ import java.util.List;
 final class GroupByMapper extends DependencyInjectionMapper<LongWritable, Text, Text, Text> {
 
     private FileFormat format;
+    private Stringifier<List<Integer>> stringifier;
+
     private List<Integer> indices;
     private List<Integer> groups;
 
@@ -20,10 +23,15 @@ final class GroupByMapper extends DependencyInjectionMapper<LongWritable, Text, 
         this.format = format;
     }
 
+    @Inject
+    public void setStringifier(Stringifier<List<Integer>> stringifier) {
+        this.stringifier = stringifier;
+    }
+
     @Override
     protected void configure(Context context) throws IOException, InterruptedException {
-        this.indices = SideData.deserializeList(context.getConfiguration().get(SideData.PROJECTION));
-        this.groups = SideData.deserializeList(context.getConfiguration().get(SideData.GROUPS));
+        this.indices = stringifier.fromString(context.getConfiguration().get(SideData.PROJECTION));
+        this.groups = stringifier.fromString(context.getConfiguration().get(SideData.GROUPS));
     }
 
     @Override
@@ -35,5 +43,4 @@ final class GroupByMapper extends DependencyInjectionMapper<LongWritable, Text, 
 
         context.write(group, projection);
     }
-
 }
