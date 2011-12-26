@@ -72,7 +72,6 @@ final class JobAssembler {
         }
 
         // IMPORTANT set parameters before passing the config to the job
-        // BEWARE on injection, config may not store empty strings
         config.set(SideData.PROJECTION, listStringifier.toString(projection));
         config.set(SideData.FUNCTIONS, mapStringifier.toString(functions));
         config.set(SideData.GROUPS, listStringifier.toString(groups));
