@@ -7,6 +7,7 @@ import com.google.common.io.Files;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Stringifier;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -29,12 +30,16 @@ final class JobAssembler {
     private final Configuration config;
     private final Options options;
     private final SelectStatement statement;
+    private final Stringifier<List<Integer>> listStringifier;
+    private final Stringifier<Map<Integer, String>> mapStringifier;
 
     @Inject
-    public JobAssembler(Configuration config, Options options, SelectStatement statement) {
+    public JobAssembler(Configuration config, Options options, SelectStatement statement, Stringifier<List<Integer>> listStringifier, Stringifier<Map<Integer, String>> mapStringifier) {
         this.config = config;
         this.options = options;
         this.statement = statement;
+        this.listStringifier = listStringifier;
+        this.mapStringifier = mapStringifier;
     }
 
     public Job assemble() throws IOException {
@@ -68,9 +73,9 @@ final class JobAssembler {
 
         // IMPORTANT set parameters before passing the config to the job
         // BEWARE on injection, config may not store empty strings
-        config.set(SideData.PROJECTION, SideData.serialize(projection));
-        config.set(SideData.FUNCTIONS, SideData.serialize(functions));
-        config.set(SideData.GROUPS, SideData.serialize(groups));
+        config.set(SideData.PROJECTION, listStringifier.toString(projection));
+        config.set(SideData.FUNCTIONS, mapStringifier.toString(functions));
+        config.set(SideData.GROUPS, listStringifier.toString(groups));
 
         final Job job = new Job(config, "Helsing");
 

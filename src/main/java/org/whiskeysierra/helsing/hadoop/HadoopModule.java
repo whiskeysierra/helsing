@@ -1,5 +1,7 @@
 package org.whiskeysierra.helsing.hadoop;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import org.apache.hadoop.io.Stringifier;
@@ -12,6 +14,7 @@ import org.whiskeysierra.helsing.util.io.InputOutputModule;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 final class HadoopModule extends AbstractModule {
 
@@ -30,12 +33,22 @@ final class HadoopModule extends AbstractModule {
 
             @Override
             public String toString(List<Integer> integers) throws IOException {
-                return SideData.serialize(integers);
+                return SideData.JOINER.join(integers);
             }
 
             @Override
             public List<Integer> fromString(String s) throws IOException {
-                return SideData.deserializeList(s);
+                if (s == null) {
+                    return ImmutableList.of();
+                } else {
+                    final ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+
+                    for (String index : SideData.SPLITTER.split(s)) {
+                        builder.add(Integer.valueOf(index));
+                    }
+
+                    return builder.build();
+                }
             }
 
             @Override
@@ -52,12 +65,22 @@ final class HadoopModule extends AbstractModule {
 
             @Override
             public String toString(Map<Integer, String> integerStringMap) throws IOException {
-                return SideData.serialize(integerStringMap);
+                return SideData.MAP_JOINER.join(integerStringMap);
             }
 
             @Override
             public Map<Integer, String> fromString(String s) throws IOException {
-                return SideData.deserializeMap(s);
+                if (s == null) {
+                    return ImmutableMap.of();
+                } else {
+                    final ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
+
+                    for (Entry<String, String> entry : SideData.MAP_SPLITTER.split(s).entrySet()) {
+                        builder.put(Integer.valueOf(entry.getKey()), entry.getValue());
+                    }
+
+                    return builder.build();
+                }
             }
 
             @Override
