@@ -1,18 +1,21 @@
 package org.whiskeysierra.helsing.hadoop.functions;
 
+import com.google.common.collect.Iterables;
+import org.whiskeysierra.helsing.util.io.Line;
+
 @AggregateFunction("LAST")
 final class Last implements Aggregator {
 
-    private String last;
+    private Line last;
 
     @Override
-    public void update(String value) {
-        last = value;
+    public void update(Line line) {
+        last = line;
     }
 
     @Override
     public String getResult() {
-        return last;
+        return Iterables.getOnlyElement(last);
     }
 
 }

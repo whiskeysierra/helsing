@@ -68,7 +68,7 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
             for (Entry<Integer, Aggregator> entry : aggregators.entrySet()) {
                 final int index = entry.getKey();
                 final Aggregator aggregator = entry.getValue();
-                aggregator.update(line.get(index));
+                aggregator.update(line.select(index));
             }
 
             last = Objects.firstNonNull(last, line);

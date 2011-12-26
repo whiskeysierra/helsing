@@ -1,12 +1,14 @@
 package org.whiskeysierra.helsing.hadoop.functions;
 
+import org.whiskeysierra.helsing.util.io.Line;
+
 @AggregateFunction("COUNT")
 final class Count implements Aggregator {
 
     private long count;
 
     @Override
-    public void update(String value) {
+    public void update(Line line) {
         count++;
     }
 

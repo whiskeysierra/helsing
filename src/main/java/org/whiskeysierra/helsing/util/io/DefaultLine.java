@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.apache.hadoop.io.Text;
 
+import java.util.Arrays;
 import java.util.List;
 
 final class DefaultLine extends ForwardingList<String> implements Line {
@@ -24,6 +25,11 @@ final class DefaultLine extends ForwardingList<String> implements Line {
     @Override
     protected List<String> delegate() {
         return values;
+    }
+
+    @Override
+    public Line select(Integer... indices) {
+        return select(Arrays.asList(indices));
     }
 
     @Override
