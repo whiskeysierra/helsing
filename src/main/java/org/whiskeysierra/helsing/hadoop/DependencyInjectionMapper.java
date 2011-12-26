@@ -1,6 +1,6 @@
 package org.whiskeysierra.helsing.hadoop;
 
-import org.apache.hadoop.conf.Configuration;
+import com.google.inject.Guice;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
@@ -9,13 +9,10 @@ abstract class DependencyInjectionMapper<KI, VI, KO, VO> extends Mapper<KI, VI, 
 
     @Override
     protected final void setup(Context context) throws IOException, InterruptedException {
-        final Configuration config = context.getConfiguration();
-        Configurator.configure(config).injectMembers(this);
+        Guice.createInjector(new HadoopModule()).injectMembers(this);
         configure(context);
     }
 
-    protected void configure(Context context) throws IOException, InterruptedException {
-
-    }
+    protected abstract void configure(Context context) throws IOException, InterruptedException;
 
 }

@@ -45,6 +45,7 @@ public final class Hadoop extends Configured implements Tool {
             return 1;
         }
 
+        // TODO boot up injector in own class and move stuff below there
         final Injector injector = Guice.createInjector(new HadoopModule());
         final SqlParser sqlParser = injector.getInstance(SqlParser.class);
 

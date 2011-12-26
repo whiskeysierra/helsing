@@ -1,11 +1,14 @@
 package org.whiskeysierra.helsing.hadoop;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+import org.whiskeysierra.helsing.api.Functions;
 import org.whiskeysierra.helsing.hadoop.functions.Aggregator;
 import org.whiskeysierra.helsing.util.inject.MoreProviders;
 import org.whiskeysierra.helsing.util.io.FileFormat;
@@ -19,7 +22,9 @@ import java.util.Map.Entry;
 final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text, NullWritable, Text> {
 
     private FileFormat format;
-    private Map<Integer, Provider<Aggregator>> aggregators;
+    private Map<String, Provider<Aggregator>> functions;
+
+    private final Map<Integer, Provider<Aggregator>> aggregators = Maps.newHashMap();
     private List<Integer> groups;
 
     @Inject
@@ -28,13 +33,23 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
     }
 
     @Inject
-    public void setAggregators(Map<Integer, Provider<Aggregator>> aggregators) {
-        this.aggregators = aggregators;
+    public void setFunctions(@Functions Map<String, Provider<Aggregator>> functions) {
+        this.functions = functions;
     }
 
     @Override
     protected void configure(Context context) throws IOException, InterruptedException {
-        this.groups = SideData.deserializeList(context.getConfiguration().get(SideData.GROUPS, ""));
+        final Configuration config = context.getConfiguration();
+        this.groups = SideData.deserializeList(config.get(SideData.GROUPS));
+
+        final Map<Integer, String> indices = SideData.deserializeMap(config.get(SideData.FUNCTIONS));
+
+        for (Map.Entry<Integer, String> entry : indices.entrySet()) {
+            final int index = entry.getKey();
+            final String functionName = entry.getValue();
+
+            aggregators.put(index, functions.get(functionName));
+        }
     }
 
     private Map<Integer, Aggregator> getAggregators() {

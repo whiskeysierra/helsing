@@ -47,13 +47,17 @@ public final class SideData {
     }
 
     public static ImmutableList<Integer> deserializeList(String string) {
-        final ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+        if (string == null) {
+            return ImmutableList.of();
+        } else {
+            final ImmutableList.Builder<Integer> builder = ImmutableList.builder();
 
-        for (String index : SPLITTER.split(string)) {
-            builder.add(Integer.valueOf(index));
+            for (String index : SPLITTER.split(string)) {
+                builder.add(Integer.valueOf(index));
+            }
+
+            return builder.build();
         }
-
-        return builder.build();
     }
 
     public static String serialize(Map<Integer, String> map) {
@@ -61,13 +65,17 @@ public final class SideData {
     }
 
     public static ImmutableMap<Integer, String> deserializeMap(String string) {
-        final ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
+        if (string == null) {
+            return ImmutableMap.of();
+        } else {
+            final ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
 
-        for (Entry<String, String> entry : MAP_SPLITTER.split(string).entrySet()) {
-            builder.put(Integer.valueOf(entry.getKey()), entry.getValue());
+            for (Entry<String, String> entry : MAP_SPLITTER.split(string).entrySet()) {
+                builder.put(Integer.valueOf(entry.getKey()), entry.getValue());
+            }
+
+            return builder.build();
         }
-
-        return builder.build();
     }
 
 }

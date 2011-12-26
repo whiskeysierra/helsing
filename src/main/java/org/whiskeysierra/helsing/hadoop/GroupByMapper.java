@@ -22,8 +22,8 @@ final class GroupByMapper extends DependencyInjectionMapper<LongWritable, Text, 
 
     @Override
     protected void configure(Context context) throws IOException, InterruptedException {
-        this.indices = SideData.deserializeList(context.getConfiguration().get(SideData.PROJECTION, ""));
-        this.groups = SideData.deserializeList(context.getConfiguration().get(SideData.GROUPS, ""));
+        this.indices = SideData.deserializeList(context.getConfiguration().get(SideData.PROJECTION));
+        this.groups = SideData.deserializeList(context.getConfiguration().get(SideData.GROUPS));
     }
 
     @Override
