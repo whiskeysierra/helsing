@@ -11,6 +11,8 @@ import org.apache.hadoop.io.Writable;
 import org.whiskeysierra.helsing.hadoop.functions.Aggregator;
 import org.whiskeysierra.helsing.hadoop.io.Serializer;
 import org.whiskeysierra.helsing.hadoop.io.Types;
+import org.whiskeysierra.helsing.hadoop.io.Types.FunctionDefinition;
+import org.whiskeysierra.helsing.hadoop.io.Types.Functions;
 import org.whiskeysierra.helsing.hadoop.io.Types.Indices;
 import org.whiskeysierra.helsing.util.format.FileFormat;
 import org.whiskeysierra.helsing.util.format.Line;
@@ -29,6 +31,7 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
 
     private final Map<Integer, Provider<Aggregator>> aggregators = Maps.newHashMap();
     private List<Integer> groups;
+    private Functions indices;
 
     @Inject
     public void setFormat(FileFormat format) {
@@ -50,13 +53,11 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
         final Configuration config = context.getConfiguration();
         this.groups = serializer.deserialize(config.get(SideData.GROUPS), Indices.class);
 
-        final Map<Integer, String> indices = serializer.deserialize(config.get(SideData.FUNCTIONS), Types.Functions.class);
+        this.indices = serializer.deserialize(config.get(SideData.FUNCTIONS), Types.Functions.class);
 
-        for (Map.Entry<Integer, String> entry : indices.entrySet()) {
-            final int index = entry.getKey();
-            final String functionName = entry.getValue();
-
-            aggregators.put(index, functions.get(functionName));
+        for (int index : indices.keySet()) {
+            final FunctionDefinition definition = indices.get(index);
+            aggregators.put(index, functions.get(definition.getName()));
         }
     }
 
@@ -89,7 +90,8 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
             for (Entry<Integer, Aggregator> entry : aggregators.entrySet()) {
                 final int index = entry.getKey();
                 final Aggregator aggregator = entry.getValue();
-                aggregator.update(line.select(index));
+
+                aggregator.update(line.select(indices.get(index).getColumns()));
             }
 
             last = Objects.firstNonNull(last, line);

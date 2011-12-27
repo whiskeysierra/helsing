@@ -25,7 +25,7 @@ public final class DefaultSqlParserTest {
 
         Assert.assertEquals("country", statement.projection().get(0).as(SqlColumn.class).name());
         Assert.assertEquals("MAX", statement.projection().get(1).as(SqlFunction.class).name());
-        Assert.assertEquals("year", statement.projection().get(1).as(SqlFunction.class).column().name());
+        Assert.assertEquals("year", Iterables.getOnlyElement(statement.projection().get(1).as(SqlFunction.class).columns()).name());
         Assert.assertEquals("countries.csv", statement.from().name());
         Assert.assertEquals("country", Iterables.getOnlyElement(statement.groupBy()).name());
     }

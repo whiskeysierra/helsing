@@ -1,5 +1,6 @@
 package org.whiskeysierra.helsing.api.sql;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -22,17 +23,17 @@ final class DefaultSqlFunction extends AbstractSqlExpression implements SqlFunct
     }
 
     @Override
-    public SqlColumn column() {
+    public Iterable<SqlColumn> columns() {
         final ExpressionList parameters = function.getParameters();
         final List expressions = parameters.getExpressions();
         final Iterable<Column> columns = Iterables.filter(expressions, Column.class);
-        final Column column = Iterables.getOnlyElement(columns);
-        return new DefaultSqlColumn(column);
+
+        return Iterables.transform(columns, DefaultSqlColumn.NEW);
     }
 
     @Override
     public String toString() {
-        return name() + "(" + column() + ")";
+        return name() + "(" + Joiner.on(", ").join(columns()) + ")";
     }
 
 }

@@ -26,7 +26,7 @@ final class CorrelationCoefficient extends TwoArgumentNumericAggregator {
     }
 
     @Override
-    public Long getResult() {
+    public Double getResult() {
         return covariance.getResult() / (leftDeviation.getResult() * rightDeviation.getResult());
     }
 

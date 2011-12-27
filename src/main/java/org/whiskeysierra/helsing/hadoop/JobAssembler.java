@@ -2,7 +2,6 @@ package org.whiskeysierra.helsing.hadoop;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -19,12 +18,13 @@ import org.whiskeysierra.helsing.api.sql.SqlExpression;
 import org.whiskeysierra.helsing.api.sql.SqlFunction;
 import org.whiskeysierra.helsing.hadoop.io.Serializer;
 import org.whiskeysierra.helsing.hadoop.io.Types;
+import org.whiskeysierra.helsing.hadoop.io.Types.FunctionDefinition;
+import org.whiskeysierra.helsing.hadoop.io.Types.Functions;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 final class JobAssembler {
 
@@ -49,7 +49,7 @@ final class JobAssembler {
         final List<String> columns = Files.readLines(schema, Charsets.UTF_8);
 
         final List<Integer> projection = Lists.newLinkedList();
-        final Map<Integer, String> functions = Maps.newHashMap();
+        final Functions functions = new Functions();
 
         for (SqlExpression expression : statement.projection()) {
             if (expression.is(SqlColumn.class)) {
@@ -58,9 +58,16 @@ final class JobAssembler {
                 projection.add(columns.indexOf(name));
             } else if (expression.is(SqlFunction.class)) {
                 final SqlFunction function = expression.as(SqlFunction.class);
-                final String name = function.column().name();
-                projection.add(columns.indexOf(name));
-                functions.put(statement.projection().indexOf(function), function.name());
+
+                final List<Integer> columnIndices = Lists.newArrayList();
+                for (SqlColumn column : function.columns()) {
+                    final String name = column.name();
+                    projection.add(columns.indexOf(name));
+                    columnIndices.add(columns.indexOf(name));
+                }
+
+                functions.put(statement.projection().indexOf(function),
+                    new FunctionDefinition(function.name(), columnIndices));
             }
         }
 

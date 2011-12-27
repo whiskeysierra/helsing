@@ -25,6 +25,6 @@ abstract class NumericAggregator implements Aggregator {
     public abstract void update(List<Long> values);
 
     @Override
-    public abstract Long getResult();
+    public abstract Number getResult();
 
 }

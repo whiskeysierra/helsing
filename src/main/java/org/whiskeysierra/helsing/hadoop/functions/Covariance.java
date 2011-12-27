@@ -27,8 +27,8 @@ final class Covariance extends TwoArgumentNumericAggregator {
     }
 
     @Override
-    public Long getResult() {
-        return (sumOfProducts.getResult() - leftSum.getResult() * rightSum.getResult() / count.getResult()) / count.getResult();
+    public Double getResult() {
+        return ((double ) sumOfProducts.getResult() - leftSum.getResult() * rightSum.getResult() / count.getResult()) / count.getResult();
     }
 
 }
