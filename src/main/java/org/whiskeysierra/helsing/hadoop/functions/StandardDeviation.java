@@ -3,9 +3,9 @@ package org.whiskeysierra.helsing.hadoop.functions;
 @AggregateFunction("STDDEV")
 final class StandardDeviation extends LongAggregator {
 
-    private long sum = 0;
-    private long count = 0;
-    private long sumOfSquares = 0;
+    private long sum;
+    private long count;
+    private long sumOfSquares;
 
     @Override
     protected void update(long value) {
