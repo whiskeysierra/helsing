@@ -1,17 +1,17 @@
 package org.whiskeysierra.helsing.hadoop.functions;
 
 @AggregateFunction("SUM")
-final class Sum extends LongAggregator {
+final class Sum extends AbstractSingleArgumentNumericAggregator {
 
     private long sum;
 
     @Override
-    protected void update(long value) {
+    public void update(Long value) {
         sum += value;
     }
 
     @Override
-    protected long getLongResult() {
+    public Long getResult() {
         return sum;
     }
 

@@ -1,19 +1,19 @@
 package org.whiskeysierra.helsing.hadoop.functions;
 
 @AggregateFunction("AVG")
-final class Average extends LongAggregator {
+final class Average extends AbstractSingleArgumentNumericAggregator {
 
     private long sum;
     private long count;
 
     @Override
-    protected void update(long value) {
+    public void update(Long value) {
         sum += value;
         count++;
     }
 
     @Override
-    protected long getLongResult() {
+    public Long getResult() {
         return sum / count;
     }
 

@@ -100,7 +100,7 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
         for (Entry<Integer, Aggregator> entry : aggregators.entrySet()) {
             final int index = entry.getKey();
             final Aggregator aggregator = entry.getValue();
-            last.set(index, aggregator.getResult());
+            last.set(index, String.valueOf(aggregator.getResult()));
         }
 
         context.write(NullWritable.get(), last.toText());

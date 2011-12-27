@@ -1,17 +1,17 @@
 package org.whiskeysierra.helsing.hadoop.functions;
 
 @AggregateFunction("MIN")
-final class Minimum extends LongAggregator {
+final class Minimum extends AbstractSingleArgumentNumericAggregator {
 
     private long min = Integer.MAX_VALUE;
 
     @Override
-    protected void update(long value) {
+    public void update(Long value) {
         min = Math.min(min, value);
     }
 
     @Override
-    protected long getLongResult() {
+    public Long getResult() {
         return min;
     }
 

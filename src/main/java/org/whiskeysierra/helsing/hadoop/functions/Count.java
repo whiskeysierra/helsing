@@ -13,7 +13,7 @@ final class Count implements Aggregator {
     }
 
     @Override
-    public String getResult() {
-        return Long.toString(count);
+    public Long getResult() {
+        return count;
     }
 }

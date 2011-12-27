@@ -6,6 +6,6 @@ public interface Aggregator {
 
     void update(Line line);
 
-    String getResult();
+    Object getResult();
 
 }
