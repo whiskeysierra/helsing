@@ -1,4 +1,4 @@
-package org.whiskeysierra.helsing.util.io;
+package org.whiskeysierra.helsing.util.format;
 
 import org.apache.hadoop.io.Text;
 

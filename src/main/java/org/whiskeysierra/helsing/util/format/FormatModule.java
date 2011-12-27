@@ -1,8 +1,8 @@
-package org.whiskeysierra.helsing.util.io;
+package org.whiskeysierra.helsing.util.format;
 
 import com.google.inject.AbstractModule;
 
-public final class InputOutputModule extends AbstractModule {
+public final class FormatModule extends AbstractModule {
 
     @Override
     protected void configure() {

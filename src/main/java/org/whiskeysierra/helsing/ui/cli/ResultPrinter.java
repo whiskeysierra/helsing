@@ -14,8 +14,8 @@ import org.whiskeysierra.helsing.events.PrintLineEvent;
 import org.whiskeysierra.helsing.events.ResultEvent;
 import org.whiskeysierra.helsing.events.ResultEvent.Duration;
 import org.whiskeysierra.helsing.events.ResultPrintedEvent;
-import org.whiskeysierra.helsing.util.io.FileFormat;
-import org.whiskeysierra.helsing.util.io.Line;
+import org.whiskeysierra.helsing.util.format.FileFormat;
+import org.whiskeysierra.helsing.util.format.Line;
 import org.whiskeysierra.helsing.util.text.TimeFormatter;
 
 import javax.inject.Provider;

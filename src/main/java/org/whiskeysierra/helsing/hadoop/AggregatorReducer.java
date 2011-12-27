@@ -6,14 +6,15 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Stringifier;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.whiskeysierra.helsing.api.Functions;
 import org.whiskeysierra.helsing.hadoop.functions.Aggregator;
+import org.whiskeysierra.helsing.hadoop.io.Serializer;
+import org.whiskeysierra.helsing.hadoop.io.Types;
+import org.whiskeysierra.helsing.hadoop.io.Types.Indices;
+import org.whiskeysierra.helsing.util.format.FileFormat;
+import org.whiskeysierra.helsing.util.format.Line;
 import org.whiskeysierra.helsing.util.inject.MoreProviders;
-import org.whiskeysierra.helsing.util.io.FileFormat;
-import org.whiskeysierra.helsing.util.io.Line;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,8 +24,7 @@ import java.util.Map.Entry;
 final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text, NullWritable, Text> {
 
     private FileFormat format;
-    private Stringifier<List<Integer>> listStringifier;
-    private Stringifier<Map<Integer, String>> mapStringifier;
+    private Serializer serializer;
     private Map<String, Provider<Aggregator>> functions;
 
     private final Map<Integer, Provider<Aggregator>> aggregators = Maps.newHashMap();
@@ -36,26 +36,21 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
     }
 
     @Inject
-    public void setListStringifier(Stringifier<List<Integer>> listStringifier) {
-        this.listStringifier = listStringifier;
+    public void setSerializer(Serializer serializer) {
+        this.serializer = serializer;
     }
 
     @Inject
-    public void setMapStringifier(Stringifier<Map<Integer, String>> mapStringifier) {
-        this.mapStringifier = mapStringifier;
-    }
-
-    @Inject
-    public void setFunctions(@Functions Map<String, Provider<Aggregator>> functions) {
+    public void setFunctions(@org.whiskeysierra.helsing.api.Functions Map<String, Provider<Aggregator>> functions) {
         this.functions = functions;
     }
 
     @Override
     protected void configure(Context context) throws IOException, InterruptedException {
         final Configuration config = context.getConfiguration();
-        this.groups = listStringifier.fromString(config.get(SideData.GROUPS));
+        this.groups = serializer.deserialize(config.get(SideData.GROUPS), Indices.class);
 
-        final Map<Integer, String> indices = mapStringifier.fromString(config.get(SideData.FUNCTIONS));
+        final Map<Integer, String> indices = serializer.deserialize(config.get(SideData.FUNCTIONS), Types.Functions.class);
 
         for (Map.Entry<Integer, String> entry : indices.entrySet()) {
             final int index = entry.getKey();

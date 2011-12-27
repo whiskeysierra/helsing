@@ -3,7 +3,7 @@ package org.whiskeysierra.helsing.ui.cli;
 import com.google.common.collect.Maps;
 import com.google.common.io.LineProcessor;
 import com.google.inject.Inject;
-import org.whiskeysierra.helsing.util.io.FileFormat;
+import org.whiskeysierra.helsing.util.format.FileFormat;
 
 import java.io.IOException;
 import java.util.Map;

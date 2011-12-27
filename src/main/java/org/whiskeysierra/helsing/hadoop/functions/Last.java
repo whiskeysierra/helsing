@@ -1,7 +1,7 @@
 package org.whiskeysierra.helsing.hadoop.functions;
 
 import com.google.common.collect.Iterables;
-import org.whiskeysierra.helsing.util.io.Line;
+import org.whiskeysierra.helsing.util.format.Line;
 
 @AggregateFunction("LAST")
 final class Last implements Aggregator {

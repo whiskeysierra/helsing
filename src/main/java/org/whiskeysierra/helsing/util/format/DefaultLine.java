@@ -1,4 +1,4 @@
-package org.whiskeysierra.helsing.util.io;
+package org.whiskeysierra.helsing.util.format;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ForwardingList;

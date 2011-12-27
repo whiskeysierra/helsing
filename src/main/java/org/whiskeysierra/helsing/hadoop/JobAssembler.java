@@ -7,7 +7,6 @@ import com.google.common.io.Files;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Stringifier;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -18,6 +17,8 @@ import org.whiskeysierra.helsing.api.sql.SelectStatement;
 import org.whiskeysierra.helsing.api.sql.SqlColumn;
 import org.whiskeysierra.helsing.api.sql.SqlExpression;
 import org.whiskeysierra.helsing.api.sql.SqlFunction;
+import org.whiskeysierra.helsing.hadoop.io.Serializer;
+import org.whiskeysierra.helsing.hadoop.io.Types;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -30,16 +31,14 @@ final class JobAssembler {
     private final Configuration config;
     private final Options options;
     private final SelectStatement statement;
-    private final Stringifier<List<Integer>> listStringifier;
-    private final Stringifier<Map<Integer, String>> mapStringifier;
+    private final Serializer serializer;
 
     @Inject
-    public JobAssembler(Configuration config, Options options, SelectStatement statement, Stringifier<List<Integer>> listStringifier, Stringifier<Map<Integer, String>> mapStringifier) {
+    public JobAssembler(Configuration config, Options options, SelectStatement statement, Serializer serializer) {
         this.config = config;
         this.options = options;
         this.statement = statement;
-        this.listStringifier = listStringifier;
-        this.mapStringifier = mapStringifier;
+        this.serializer = serializer;
     }
 
     public Job assemble() throws IOException {
@@ -72,9 +71,9 @@ final class JobAssembler {
         }
 
         // IMPORTANT set parameters before passing the config to the job
-        config.set(SideData.PROJECTION, listStringifier.toString(projection));
-        config.set(SideData.FUNCTIONS, mapStringifier.toString(functions));
-        config.set(SideData.GROUPS, listStringifier.toString(groups));
+        config.set(SideData.PROJECTION, serializer.serialize(projection, Types.Indices.class));
+        config.set(SideData.FUNCTIONS, serializer.serialize(functions, Types.Functions.class));
+        config.set(SideData.GROUPS, serializer.serialize(groups, Types.Indices.class));
 
         final Job job = new Job(config, "Helsing");
 
