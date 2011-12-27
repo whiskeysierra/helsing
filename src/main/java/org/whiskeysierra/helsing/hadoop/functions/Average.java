@@ -1,20 +1,28 @@
 package org.whiskeysierra.helsing.hadoop.functions;
 
-@AggregateFunction("AVG")
-final class Average extends AbstractSingleArgumentNumericAggregator {
+import com.google.inject.Inject;
 
-    private long sum;
-    private long count;
+@AggregateFunction("AVG")
+final class Average extends SingleArgumentNumericAggregator {
+
+    private final Sum sum;
+    private final Count count;
+
+    @Inject
+    public Average(Sum sum, Count count) {
+        this.sum = sum;
+        this.count = count;
+    }
 
     @Override
     public void update(Long value) {
-        sum += value;
-        count++;
+        sum.update(value);
+        count.update();
     }
 
     @Override
     public Long getResult() {
-        return sum / count;
+        return sum.getResult() / count.getResult();
     }
 
 }

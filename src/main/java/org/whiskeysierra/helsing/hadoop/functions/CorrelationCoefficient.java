@@ -2,37 +2,32 @@ package org.whiskeysierra.helsing.hadoop.functions;
 
 import com.google.inject.Inject;
 
-import java.util.List;
-
 @AggregateFunction("CORR")
-final class CorrelationCoefficient extends AbstractNumericAggregator {
+final class CorrelationCoefficient extends TwoArgumentNumericAggregator {
 
     private final Covariance covariance;
-    private final StandardDeviation left;
-    private final StandardDeviation right;
+    private final StandardDeviation leftDeviation;
+    private final StandardDeviation rightDeviation;
 
     @Inject
-    public CorrelationCoefficient(Covariance covariance, StandardDeviation left, StandardDeviation right) {
+    public CorrelationCoefficient(Covariance covariance,
+        StandardDeviation leftDeviation, StandardDeviation rightDeviation) {
+
         this.covariance = covariance;
-        this.left = left;
-        this.right = right;
+        this.leftDeviation = leftDeviation;
+        this.rightDeviation = rightDeviation;
     }
 
     @Override
-    public void update(List<Long> values) {
-        covariance.update(values);
-        update(values.get(0), values.get(1));
-    }
-
-    private void update(Long left, Long right) {
-        this.left.update(left);
-        this.right.update(right);
-
+    public void update(Long left, Long right) {
+        covariance.update(left, right);
+        leftDeviation.update(left);
+        rightDeviation.update(right);
     }
 
     @Override
     public Long getResult() {
-        return covariance.getResult() / (left.getResult() * right.getResult());
+        return covariance.getResult() / (leftDeviation.getResult() * rightDeviation.getResult());
     }
 
 }

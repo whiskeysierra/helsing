@@ -4,8 +4,9 @@ import com.google.common.collect.Iterables;
 
 import java.util.List;
 
-abstract class AbstractSingleArgumentNumericAggregator extends AbstractNumericAggregator
-    implements SingleNumericAggregator {
+abstract class SingleArgumentNumericAggregator extends NumericAggregator {
+
+    public abstract void update(Long value);
 
     @Override
     public final void update(List<Long> values) {

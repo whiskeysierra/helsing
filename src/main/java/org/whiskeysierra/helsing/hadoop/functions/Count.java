@@ -9,6 +9,10 @@ final class Count implements Aggregator {
 
     @Override
     public void update(Line line) {
+        update();
+    }
+
+    public void update() {
         count++;
     }
 

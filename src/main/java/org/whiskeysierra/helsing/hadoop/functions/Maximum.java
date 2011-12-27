@@ -1,7 +1,7 @@
 package org.whiskeysierra.helsing.hadoop.functions;
 
 @AggregateFunction("MAX")
-final class Maximum extends AbstractSingleArgumentNumericAggregator {
+final class Maximum extends SingleArgumentNumericAggregator {
 
     private long max = Integer.MIN_VALUE;
 

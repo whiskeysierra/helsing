@@ -1,30 +1,34 @@
 package org.whiskeysierra.helsing.hadoop.functions;
 
-import java.util.List;
+import com.google.inject.Inject;
 
 @AggregateFunction("COVAR")
-final class Covariance extends AbstractNumericAggregator {
+final class Covariance extends TwoArgumentNumericAggregator {
 
-    private long sumOfProducts;
-    private long leftSum;
-    private long rightSum;
-    private long count;
+    private final Sum sumOfProducts;
+    private final Sum leftSum;
+    private final Sum rightSum;
+    private final Count count;
 
-    @Override
-    public void update(List<Long> values) {
-        update(values.get(0), values.get(1));
+    @Inject
+    public Covariance(Sum sumOfProducts, Sum leftSum, Sum rightSum, Count count) {
+        this.sumOfProducts = sumOfProducts;
+        this.leftSum = leftSum;
+        this.rightSum = rightSum;
+        this.count = count;
     }
 
-    private void update(Long left, Long right) {
-        sumOfProducts += left * right;
-        leftSum += left;
-        rightSum += right;
-        count++;
+    @Override
+    public void update(Long left, Long right) {
+        sumOfProducts.update(left * right);
+        leftSum.update(left);
+        rightSum.update(right);
+        count.update();
     }
 
     @Override
     public Long getResult() {
-        return (sumOfProducts - leftSum * rightSum / count) / count;
+        return (sumOfProducts.getResult() - leftSum.getResult() * rightSum.getResult() / count.getResult()) / count.getResult();
     }
 
 }
