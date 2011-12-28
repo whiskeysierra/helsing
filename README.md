@@ -54,12 +54,10 @@ The first steps included reading, describing, reflecting and rating the Google p
 
 #### Projection
     SELECT population, country FROM countries.csv
-
 #### Grouping
-    SELECT year FROM countries.csv GROUP BY year`
-
+    SELECT year FROM countries.csv GROUP BY year
 #### Grouping with multiple columns
-    SELECT year, continent FROM countries.csv GROUP BY continent, year`
+    SELECT year, continent FROM countries.csv GROUP BY continent, year
 #### Aggregation
     SELECT MAX(population) FROM countries.csv
 #### Aggregation with multiple functions
