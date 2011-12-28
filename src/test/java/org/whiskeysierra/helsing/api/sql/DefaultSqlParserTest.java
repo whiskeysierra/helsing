@@ -30,4 +30,19 @@ public final class DefaultSqlParserTest {
         Assert.assertEquals("country", Iterables.getOnlyElement(statement.groupBy()).name());
     }
 
+    @Test
+    public void multiColumnAggregate() {
+        final SqlParser unit = new DefaultSqlParser();
+        final String sql = "SELECT year, COVAR(population, population) FROM countries.csv GROUP BY year";
+        final SelectStatement statement = unit.parse(sql);
+
+        Assert.assertEquals("year", statement.projection().get(0).as(SqlColumn.class).name());
+        final SqlFunction function = statement.projection().get(1).as(SqlFunction.class);
+        Assert.assertEquals("COVAR", function.name());
+        Assert.assertEquals("population", Iterables.get(function.columns(), 0).name());
+        Assert.assertEquals("population", Iterables.get(function.columns(), 1).name());
+        Assert.assertEquals("countries.csv", statement.from().name());
+        Assert.assertEquals("year", Iterables.getOnlyElement(statement.groupBy()).name());
+    }
+
 }

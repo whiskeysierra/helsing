@@ -4,7 +4,7 @@ import com.google.common.base.Objects;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -40,7 +40,7 @@ final class AggregatorReducer extends DependencyInjectionReducer<Writable, Text,
     private Map<String, Provider<Aggregator>> functions;
 
     private SelectStatement statement;
-    private final Multimap<SqlFunction, String> aggregators = HashMultimap.create();
+    private final Multimap<SqlFunction, String> aggregators = ArrayListMultimap.create();
 
     private List<String> mapProjection;
 
