@@ -1,31 +1,21 @@
 package org.whiskeysierra.helsing.hadoop;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Joiner.MapJoiner;
-import com.google.common.base.Splitter;
-import com.google.common.base.Splitter.MapSplitter;
-
 final class SideData {
 
     /**
-     * A list of column indices.
+     * SQL query string.
      */
-    public static final String PROJECTION = "helsing.projection";
+    public static final String QUERY = "tenzing.query";
 
     /**
-     * A list of selected group indices.
+     * List of column names.
      */
-    public static final String GROUPS = "helsing.groups";
+    public static final String SCHEMA = "tenzing.schema";
 
     /**
-     * A map from selected column indices to function names.
+     * List of column names.
      */
-    public static final String FUNCTIONS = "helsing.functions";
-
-    public static final Joiner JOINER = Joiner.on(",");
-    public static final Splitter SPLITTER = Splitter.on(",");
-    public static final MapJoiner MAP_JOINER = JOINER.withKeyValueSeparator("=");
-    public static final MapSplitter MAP_SPLITTER = SPLITTER.withKeyValueSeparator("=");
+    public static final String MAP_PROJECTION = "tenzing.map_projection";
 
     private SideData() {
 

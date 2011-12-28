@@ -2,6 +2,7 @@ package org.whiskeysierra.helsing.hadoop;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -17,14 +18,13 @@ import org.whiskeysierra.helsing.api.sql.SqlColumn;
 import org.whiskeysierra.helsing.api.sql.SqlExpression;
 import org.whiskeysierra.helsing.api.sql.SqlFunction;
 import org.whiskeysierra.helsing.hadoop.io.Serializer;
-import org.whiskeysierra.helsing.hadoop.io.Types;
-import org.whiskeysierra.helsing.hadoop.io.Types.FunctionDefinition;
-import org.whiskeysierra.helsing.hadoop.io.Types.Functions;
+import org.whiskeysierra.helsing.hadoop.io.Types.Columns;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 final class JobAssembler {
 
@@ -48,26 +48,18 @@ final class JobAssembler {
         final File schema = new File(input.getParentFile(), input.getName().replace(".csv", ".schema.csv"));
         final List<String> columns = Files.readLines(schema, Charsets.UTF_8);
 
-        final List<Integer> projection = Lists.newLinkedList();
-        final Functions functions = new Functions();
+        // insertion order required!
+        final Set<String> mapProjection = Sets.newLinkedHashSet();
 
         for (SqlExpression expression : statement.projection()) {
             if (expression.is(SqlColumn.class)) {
                 final SqlColumn column = expression.as(SqlColumn.class);
-                final String name = column.name();
-                projection.add(columns.indexOf(name));
+                mapProjection.add(column.name());
             } else if (expression.is(SqlFunction.class)) {
                 final SqlFunction function = expression.as(SqlFunction.class);
-
-                final List<Integer> columnIndices = Lists.newArrayList();
                 for (SqlColumn column : function.columns()) {
-                    final String name = column.name();
-                    projection.add(columns.indexOf(name));
-                    columnIndices.add(columns.indexOf(name));
+                    mapProjection.add(column.name());
                 }
-
-                functions.put(statement.projection().indexOf(function),
-                    new FunctionDefinition(function.name(), columnIndices));
             }
         }
 
@@ -78,9 +70,9 @@ final class JobAssembler {
         }
 
         // IMPORTANT set parameters before passing the config to the job
-        config.set(SideData.PROJECTION, serializer.serialize(projection, Types.Indices.class));
-        config.set(SideData.FUNCTIONS, serializer.serialize(functions, Types.Functions.class));
-        config.set(SideData.GROUPS, serializer.serialize(groups, Types.Indices.class));
+        config.set(SideData.SCHEMA, serializer.serialize(columns, Columns.class));
+        config.set(SideData.MAP_PROJECTION, serializer.serialize(Lists.newArrayList(mapProjection), Columns.class));
+        config.set(SideData.QUERY, options.getQuery());
 
         final Job job = new Job(config, "Helsing");
 

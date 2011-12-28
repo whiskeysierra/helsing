@@ -4,4 +4,5 @@ public interface SqlGroupBy extends Iterable<SqlColumn> {
 
     boolean isEmpty();
 
+    Iterable<String> toStrings();
 }
