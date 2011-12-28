@@ -73,17 +73,17 @@ The first steps included reading, describing, reflecting and rating the Google p
 #### Grouping with multiple columns and aggregation with multiple functions
     SELECT year, continent, MIN(population), AVG(population), MAX(population) FROM countries.csv GROUP BY year, continent
 #### Aggregate functions:
-    -  `AVG`
-    - `COUNT`
-    - `FIRST`
-    - `LAST`
-    - `MAX`
-    - `MIN`
-    - `STDDEV`
-    - `SUM`
-    - `VAR`
-    - `COVAR`
-    - `CORR`
+- `AVG`
+- `COUNT`
+- `FIRST`
+- `LAST`
+- `MAX`
+- `MIN`
+- `STDDEV`
+- `SUM`
+- `VAR`
+- `COVAR`
+- `CORR`
 
 ## Remarks
 
