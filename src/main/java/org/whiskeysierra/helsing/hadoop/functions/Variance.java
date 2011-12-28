@@ -27,7 +27,7 @@ final class Variance extends SingleArgumentNumericAggregator {
     }
 
     @Override
-    public Long getResult() {
+    public Double getResult() {
         return Math.abs(sumOfSquares.getResult() - average.getResult() * sum.getResult()) / count.getResult();
     }
 

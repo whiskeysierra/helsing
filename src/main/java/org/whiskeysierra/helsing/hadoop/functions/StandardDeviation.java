@@ -27,8 +27,8 @@ final class StandardDeviation extends SingleArgumentNumericAggregator {
     }
 
     @Override
-    public Long getResult() {
-        return (long) Math.sqrt(Math.abs(sumOfSquares.getResult() - average.getResult() * sum.getResult()) / count.getResult());
+    public Double getResult() {
+        return Math.sqrt(Math.abs(sumOfSquares.getResult() - average.getResult() * (double) sum.getResult()) / (double) count.getResult());
     }
 
 }

@@ -21,8 +21,8 @@ final class Average extends SingleArgumentNumericAggregator {
     }
 
     @Override
-    public Long getResult() {
-        return sum.getResult() / count.getResult();
+    public Double getResult() {
+        return (double) sum.getResult() / (double) count.getResult();
     }
 
 }
