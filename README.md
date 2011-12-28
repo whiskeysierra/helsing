@@ -50,33 +50,40 @@ The first steps included reading, describing, reflecting and rating the Google p
         |                   Albania |           Europe | 2010 |    3659616 |
         ...
 
-- Currently the following features are supported:
-    - Projection
-        - `SELECT population, country FROM countries.csv`
-    - Grouping
-        - `SELECT year FROM countries.csv GROUP BY year`
-    - Grouping with multiple columns
-        - `SELECT year, continent FROM countries.csv GROUP BY continent, year`
-    - Aggregation
-        - `SELECT MAX(population) FROM countries.csv`
-    - Aggregation with multiple functions
-        - `SELECT MIN(population), MAX(population) FROM countries.csv`
-    - Grouping and aggregation
-        - `SELECT year, SUM(population) FROM countries.csv GROUP BY year`
-    - Grouping and aggregation with multiple columns
-        - `SELECT year, continent, SUM(population) FROM countries.csv GROUP BY year, continent`
-    - Grouping with multiple columns and aggregation with multiple functions
-        - `SELECT year, continent, MIN(population), AVG(population), MAX(population) FROM countries.csv GROUP BY year, continent`
-    - Aggregate functions:
-        - `AVG`
-        - `COUNT`
-        - `FIRST`
-        - `LAST`
-        - `MAX`
-        - `MIN`
-        - `STDDEV`
-        - `SUM`
-        - `VAR`
+### Currently the following features are supported:
+
+#### Projection
+    SELECT population, country FROM countries.csv
+
+#### Grouping
+    SELECT year FROM countries.csv GROUP BY year`
+
+#### Grouping with multiple columns
+    SELECT year, continent FROM countries.csv GROUP BY continent, year`
+#### Aggregation
+    SELECT MAX(population) FROM countries.csv
+#### Aggregation with multiple functions
+    SELECT MIN(population), MAX(population) FROM countries.csv
+#### Aggregation with multi-column function
+    SELECT country, CORR(year, population) FROM countries.csv GROUP BY country
+#### Grouping and aggregation
+    SELECT year, SUM(population) FROM countries.csv GROUP BY year
+#### Grouping and aggregation with multiple columns
+    SELECT year, continent, SUM(population) FROM countries.csv GROUP BY year, continent
+#### Grouping with multiple columns and aggregation with multiple functions
+    SELECT year, continent, MIN(population), AVG(population), MAX(population) FROM countries.csv GROUP BY year, continent
+#### Aggregate functions:
+    -  `AVG`
+    - `COUNT`
+    - `FIRST`
+    - `LAST`
+    - `MAX`
+    - `MIN`
+    - `STDDEV`
+    - `SUM`
+    - `VAR`
+    - `COVAR`
+    - `CORR`
 
 ## Remarks
 
