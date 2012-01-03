@@ -63,7 +63,7 @@ The first steps included reading, describing, reflecting and rating the Google p
 #### Aggregation with multiple functions
     SELECT MIN(population), MAX(population) FROM countries.csv
 #### Aggregation with multi-column function
-    SELECT country, CORR(year, population) FROM countries.csv GROUP BY country
+    SELECT CORR(year, population) FROM countries.csv
 #### Grouping and aggregation
     SELECT year, SUM(population) FROM countries.csv GROUP BY year
 #### Grouping and aggregation with multiple columns
