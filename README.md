@@ -1,4 +1,4 @@
-# Helsing - A Tenzing micro-prototype clone for Hadoop
+# Helsing - A micro-prototype Tenzing clone for Hadoop
 
 ## Introduction
 This project is part of an assignment for *Programming - Advanced Topics* at the [*Beuth University of Applied Sciences Berlin*](http://www.beuth-hochschule.de/).
