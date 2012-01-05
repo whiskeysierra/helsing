@@ -85,5 +85,5 @@ The first steps included reading, describing, reflecting and rating the Google p
 
 ## Remarks
 
-Sample data has been collected on [GeoHive](http://www.geohive.com/).
+Sample data has been collected on [GeoHive](http://www.geohive.com/) and [The World Bank Open Data](http://data.worldbank.org/).
 
