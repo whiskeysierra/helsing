@@ -1428,6 +1428,22 @@ Anzumerken wäre die Tatsache dass der verwendete SQL-Parser keine Sonderzeichen
 
 \section{Zusammenfassung}
 \label{sec:resume}
+In diesem Dokument wurden die Erkenntnisse über das Paper
+\begin{quotation}
+	\fullcite{Tenzing:2011}
+\end{quotation}
+sowie relevante Hintergrundinformationen gesammelt, untersucht, reflektiert und zu Papier gebracht. Ein großer Schwerpunkt lag auf der Darstellung des fachlichen und technischen Hintergrunds in Form von SQL und dem MapReduce-Programmiermodell. Insbesondere die sprachlichen Möglichkeiten von SQL sowie Implementierungsstrategien wurden erläutert. Zusätzlich wurde MapReduce, speziell dessen Funktionsweise, anhand von Beschreibungen und Beispielen vorgestellt.
+
+Die Motivation und Architektur von Tenzing, als verbindendes Element von SQL und MapReduce, wurde verdeutlicht und kurz vorgestellt. Zur Bewertung des bei Tenzing verwendeten Ansatzes wurden diverse OpenSource-Lösungen untersucht und basierend auf einzelnen Kriterien mit Tenzing verglichen. Drei dieser Lösungen zeichneten sich besonders aus: Hive\texttrademark bietet bereits jetzt eine funktionsfähige SQL-Schnittstelle für das Hadoop-MapReduce-Framework, arbeitet aber weiterhin batchorientiert und ist prinzipiell weniger gut für Echtzeitanfragen geeignet. HadoopDB verbindet lokale SQL-Datenbanken mit der Transportschicht auf Basis von Hadoop um eine performante OpenSource Alternative zu kommerziellen parallelen Datenbanken zu erschaffen. Zu guter Letzt wurde das PACT-Programmiermodell vorgestellt das sich selbst als Erweiterung von MapReduce versteht und es erlaubt komplexe Datenkorrelationen wesentlich einfacher auszudrücken als es mit MapReduce möglich wäre.
+
+In einem eigenen prototypischen Ansatz wurde ein minimaler SQL-Dialekt entwickelt und in Form eines Prototypen umgesetzt der es erlaubt SQL-Abfragen über ein Command-Line-Interface entgegen zu nehmen, diese in MapReduce-Jobs übersetzt und mithilfe von Hadoop ausführt.
+Als Ergebnis dieses Prototyps kann festgehalten werden, dass bestimmte Aspekte des MapReduce-Modells wie erwartet einfacher umzusetzen sind als andere. Im Rahmen des Prototyps wurden Projektion, Gruppierung und Aggregatfunktionen behandelt. Übrig bleiben weitere interessante Teilaspekte wie Konditionen, Ausdrücke, Sortierung, Joins und Subqueries.
+
+Anders als noch bei der Vorstellung des MapReduce-Programmiermodells durch das Paper
+\begin{quotation}
+\fullcite{MapReduce:2004}
+\end{quotation}
+ist das OpenSource-Angebot zum Ercheinungstermin des Tenzing-Papers wesentlich vielseitiger und ausgereifter was die Zusammenführung von SQL und MapReduce betrifft. Tenzing hat bereits jetzt hochkarätige OpenSource Konkurrenten die viele Teilaspekte bereits hervorragend umsetzen.
 
 \newpage
 
