@@ -42,25 +42,29 @@
 \newpage
 \section{Dokument-Historie}
 
-\begin{tabular}{ r  l  l }
+\begin{tabular*}{\textwidth}{ r  l  l }
 	\toprule
-	\textbf{Version} & \textbf{Datum} & \textbf{Inhalt} \\
+	\textbf{Version} & \textbf{Datum} & \textbf{Kapitel} \\
 	\midrule
-	0.1 & \date{30. Oktober 2011} & Kapitel SQL, MapReduce und Tenzing \\ 
-	0.2 & \date{4. Dezember 2011} & Kapitel Tenzing im Vergleich und Eigener Ansatz \\
+	0.1 & \date{23. Oktober 2011} & \nameref{sec:sql} \\
+	0.2 & \date{30. Oktober 2011} & \nameref{sec:mapreduce} und \nameref{sec:tenzing} \\ 
+	0.3 & \date{27. November 2011} & \nameref{sec:tenzing-comparision} \\
+	0.4 & \date{4. Dezember 2011} & \nameref{sec:approach} \\
+	0.5 & \date{8. Januar 2012} & \nameref{sec:prototype} \\
+	0.6 & \date{15. Januar 2012} & \nameref{sec:resume} \\
 	\bottomrule
-\end{tabular}
+\end{tabular*}
 
 \newpage
 \tableofcontents
 
 \newpage
 \section{Einleitung}
-Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzepte} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein wissenschaftlicher Artikel ausgewählt, untersucht und bewertet werden. Das Ziel dieses Dokumentes ist es die Ergebnisse dieser Semesterarbeit zusammenzufassen. Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{TENZING}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong. Tenzing ist eine SQL/92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MAPREDUCE}. Die beiden zugrundeliegenden Technologien werden in den Kapiteln \nameref{sql} und \nameref{mapreduce}, im Kontext des Hauptthemas, näher erläutert.
+Als Teil der Lehrveranstaltung \textit{Programmierung - Fortgeschrittene Konzepte} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Semesterarbeit ein wissenschaftlicher Artikel ausgewählt, untersucht und bewertet werden. Das Ziel dieses Dokumentes ist es die Ergebnisse dieser Semesterarbeit zusammenzufassen. Ausgewählt wurde das Google-Paper \textit{Tenzing A SQL Implementation On The MapReduce Framework} \cite{Tenzing:2011}. Erschienen ist das Paper als Teil der Proceedings zur 37th VLDB, der \textit{International Conference on Very Large Data Bases} im September 2011. Die Autoren sind die Google-Mitarbeiter Biswapesh Chattopadhyay, Liang Lin, Weiran Liu, Sagar Mittal, Prathyusha Aragonda, Vera Lychagina, Younghee Kwon und Michael Wong. Tenzing ist eine SQL/92-kompatible Implementierung auf Basis des Google-eigenen MapReduce-Frameworks \cite{MapReduce:2004}. Die beiden zugrundeliegenden Technologien werden in den Kapiteln \nameref{sec:sql} und \nameref{sec:mapreduce}, im Kontext des Hauptthemas, näher erläutert.
 
 \newpage
 \section{SQL}
-\label{sql}
+\label{sec:sql}
 SQL steht für \textit{Structured Query Language} und ist eine standardisierte, mengenorientierte und deklarative Datenbanksprache die in vielen Datenbank-Management-Systemen zum Einsatz kommt. SQL bietet Möglichkeiten zur Definition, Manipulation und zur Abfrage von Daten an \cite{Codd}. Für die Definition und die Manipulation existieren zwei Sprachen die jeweils eine Teilmenge von SQL bilden: die \textit{Data Definition Language} (DDL) und die \textit{Data Manipulation Language} (DML). Beide werden zwar zum Teil von Tenzing unterstützt, der eigentliche Schwerpunkt liegt aber klar auf der Abfrage von Daten. Aus diesem Grund wird in den folgenden Kapiteln verstärkt auf den Abfrage-Teil von SQL eingegangen.
 
 \subsection{Syntax und Sprachelemente}
@@ -842,7 +846,11 @@ Semi- und Anti-Joins haben eine Besonderheit die sie von allen anderen Join-Arte
 \begin{minted}{sql}
 SELECT *
 FROM Country country
-WHERE EXISTS (SELECT * FROM City city WHERE city.country_id = country.id);
+WHERE EXISTS (
+	SELECT * 
+	FROM City city 
+	WHERE city.country_id = country.id
+);
 \end{minted}
 \caption{SQL-Query für einen Semi-Join}
 \label{lst:semi-join}
@@ -862,6 +870,7 @@ WHERE EXISTS (SELECT * FROM City city WHERE city.country_id = country.id);
 \caption{Ergebnis eines Semi-Joins}
 \end{table}
 
+\newpage
 \subsubsection{Anti-Join}
 \label{sec:anti-join}
 Anti-Joins sind wie negierte Semi-Joins. Statt der Schlüsselwörter \texttt{EXISTS} und \texttt{IN} werden \texttt{NOT EXISTS} bzw. \texttt{NOT IN} verwendet. Der Name \textit{Anti}-Join rührt daher, dass klassische Joins dazu benutzt werden, um Zusammenhänge und Übereinstimmungen zu finden respektive auszunutzen. Anti-Joins hingegen sind der präferierte Weg wenn die Anforderung verlangt, dass Tupel in der linken Tabelle keine Treffer in der rechten haben.
@@ -870,7 +879,11 @@ Anti-Joins sind wie negierte Semi-Joins. Statt der Schlüsselwörter \texttt{EXI
 \begin{minted}{sql}
 SELECT country.name
 FROM Country country
-WHERE NOT EXISTS (SELECT * FROM City city WHERE city.country_id = country.id);
+WHERE NOT EXISTS (
+	SELECT * 
+	FROM City city 
+	WHERE city.country_id = country.id
+);
 \end{minted}
 \caption{SQL-Query für einen Anti-Join}
 \label{lst:anti-join}
@@ -990,12 +1003,12 @@ Durch die Nutzung von Hashfunktionen ist der Hash-Join-Algorithmus nur für Equi
 \newpage
 
 \section{MapReduce}
-\label{mapreduce}
+\label{sec:mapreduce}
 Da Tenzing auf Googles MapReduce-Framework aufbaut wird im folgenden Kapitel kurz die \nameref{sec:mapreduce-motivation} sowie die \nameref{sec:mapreduce-operation} erklärt.
 
 \subsection{Definition}
 \begin{quote}
-MapReduce is a programming model and an associated implementation for processing and generating large data sets. \cite{MAPREDUCE}
+MapReduce is a programming model and an associated implementation for processing and generating large data sets. \cite{MapReduce:2004}
 \end{quote}
 
 \begin{quote}
@@ -1003,14 +1016,14 @@ MapReduce is a software framework introduced by Google in 2004 to support distri
 \end{quote}
 
 \begin{quote}
-Hadoop MapReduce is a software framework for easily writing applications which process vast amounts of data (multi-terabyte data-sets) in-parallel on large clusters (thousands of nodes) of commodity hardware in a reliable, fault-tolerant manner. \cite{HADOOP}
+Hadoop MapReduce is a software framework for easily writing applications which process vast amounts of data (multi-terabyte data-sets) in-parallel on large clusters (thousands of nodes) of commodity hardware in a reliable, fault-tolerant manner. \cite{Hadoop}
 \end{quote}
 
 \subsection{Motivation}
 \label{sec:mapreduce-motivation}
-Googles Motivation für die Entwicklung des MapReduce-Frameworks ist die Analyse von Daten in extrem großen Mengen. Aktuell bewegen sich diese Datenmengen bereits im Petabyte-Bereich \cite{TENZING}. Die Verarbeitung dieser Datenmengen soll für den Anwender beziehungsweise den Programmierer so einfach wie möglich sein. Die Komplexität eines verteilten, nebenläufigen Systems soll abstrahiert werden. Zusätzlich spielt massive Skalierbarkeit natürlich eine große Rolle. Bei zunehmendem Datenbestand soll es möglich sein weitere Knoten zum Cluster hinzuzufügen und so die Rechenkraft linear zu steigern. Zu diesem Zweck verfolgt Google den Ansatz, statt weniger hochwertiger Server, viele dafür aber durchschnittliche Maschinen, so genannter \textit{Commodity Hardware} zu betreiben. Bei einem normalen Betrieb von mehreren Tausend, handelsüblichen Rechnern kommt selbstverständlich regelmäßig zu Ausfällen einzelner Knoten. MapReduce ist darauf ausgelegt mit dem Ausfall von Knoten umzugehen. 
+Googles Motivation für die Entwicklung des MapReduce-Frameworks ist die Analyse von Daten in extrem großen Mengen. Aktuell bewegen sich diese Datenmengen bereits im Petabyte-Bereich \cite{Tenzing:2011}. Die Verarbeitung dieser Datenmengen soll für den Anwender beziehungsweise den Programmierer so einfach wie möglich sein. Die Komplexität eines verteilten, nebenläufigen Systems soll abstrahiert werden. Zusätzlich spielt massive Skalierbarkeit natürlich eine große Rolle. Bei zunehmendem Datenbestand soll es möglich sein weitere Knoten zum Cluster hinzuzufügen und so die Rechenkraft linear zu steigern. Zu diesem Zweck verfolgt Google den Ansatz, statt weniger hochwertiger Server, viele dafür aber durchschnittliche Maschinen, so genannter \textit{Commodity Hardware} zu betreiben. Bei einem normalen Betrieb von mehreren Tausend, handelsüblichen Rechnern kommt selbstverständlich regelmäßig zu Ausfällen einzelner Knoten. MapReduce ist darauf ausgelegt mit dem Ausfall von Knoten umzugehen. 
 
-Googles Implementierung des MapReduce-Frameworks ist nicht öffentlich verfügbar. Die Apache Software Foundation hat sich mit dem Hadoop-Projekt zum Ziel gesetzt ein freies MapReduce-Ecosystem zu entwickeln. Der Erfolg von MapReduce geht Hand in Hand mit verteilten Dateisystemen. Google nutzt intern das Google File System \cite{GFS}. Hadoop bietet mit dem HDFS ebenfalls ein proprietäres, verteiltes Dateisystem an. Der Vorteil für MapReduce liegt darin, dass Persistierung und die Verarbeitung dieser Daten so optimiziert werden kann, dass wiederum viel Netzwerkverkehr eingespart werden kann. Diese Technik wird oft als \textit{Data Colocation} bezeichnet.
+Googles Implementierung des MapReduce-Frameworks ist nicht öffentlich verfügbar. Die Apache Software Foundation hat sich mit dem Hadoop-Projekt zum Ziel gesetzt ein freies MapReduce-Ecosystem zu entwickeln. Der Erfolg von MapReduce geht Hand in Hand mit verteilten Dateisystemen. Google nutzt intern das Google File System \cite{GoogleFileSystem:2003}. Hadoop bietet mit dem HDFS ebenfalls ein proprietäres, verteiltes Dateisystem an. Der Vorteil für MapReduce liegt darin, dass Persistierung und die Verarbeitung dieser Daten so optimiziert werden kann, dass wiederum viel Netzwerkverkehr eingespart werden kann. Diese Technik wird oft als \textit{Data Colocation} bezeichnet.
 
 \subsection{Funktionsweise}
 \label{sec:mapreduce-operation}
@@ -1068,6 +1081,7 @@ Abbildung \ref{fig:mapreduce} zeigt die Map- und Reduce-Phasen noch einmal in ei
 
 \newpage
 \section{Tenzing}
+\label{sec:tenzing}
 
 \subsection{Motivation}
 Die Autoren des Tenzing-Papers zählen viele Motivations-Faktoren auf. Die wichtigsten werden in den folgenden Abschnitten kurz genannt und erläutert.
@@ -1089,11 +1103,11 @@ Viel Entwicklungszeit ist bei Google bereits in die Entwicklung des Google File 
 
 \newpage
 \subsection{Architektur}
-Tenzing besteht aus vier Kern-Komponenten \cite{TENZING}:
+Tenzing besteht aus vier Kern-Komponenten \cite{Tenzing:2011}:
 
 \begin{figure}[H]
 \centering
-\digraph[height=0.7\textwidth]{architecture} {
+\digraph[height=0.7\textwidth]{tenzing} {
     node [shape="box"]
     edge [dir="both"]
     client [label="Client Interfaces"]
@@ -1124,10 +1138,12 @@ Der \textit{Metadata Server} speichert diverse Metadaten wie zum Beispiel Tabell
 
 \newpage
 \section{Tenzing im Vergleich}
+\label{sec:tenzing-comparision}
+
 In diesem Kapitel wird Tenzing mit diversen Systemen und Lösungsansätzen verglichen die eine ähnliche Zielsetzung haben wie Tenzing. Einige dieser Lösungen sind näher am Konzept von Tenzing, andere schlagen einen komplett unterschiedlichen Weg ein. Das Ziel dieser Vergleiche ist es Tenzing hinsichtlich bestimmter Eigenschaften fundierter bewerten zu können.
 
 \subsection{Apache Hadoop}
-Das Apache Hadoop Projekt hat es sich zum Ziel gesetzt die Technologien, die in den Papers \textit{MapReduce: Simplified Data Processing on Large Clusters} \cite{MAPREDUCE}, \textit{The Google File System} \cite{GFS} und \textit{BigTable: A Distributed Storage System for Structured Data} \cite{BigTable} beschrieben werden, als Open-Source-Implementierung bereitzustellen. Hadoop ist heute eines der größten Apache Top-Level-Projekte. Für viele Teilbereiche existieren mittlerweile Sub-Projekte die zusammen das Hadoop -Ökosystem bilden. Einige dieser Projekte werden in den folgenden Kapiteln mit Tenzing verglichen.
+Das Apache Hadoop Projekt hat es sich zum Ziel gesetzt die Technologien, die in den Papers \textit{MapReduce: Simplified Data Processing on Large Clusters} \cite{MapReduce:2004}, \textit{The Google File System} \cite{GoogleFileSystem:2003} und \textit{BigTable: A Distributed Storage System for Structured Data} \cite{BigTable} beschrieben werden, als Open-Source-Implementierung bereitzustellen. Hadoop ist heute eines der größten Apache Top-Level-Projekte. Für viele Teilbereiche existieren mittlerweile Sub-Projekte die zusammen das Hadoop -Ökosystem bilden. Einige dieser Projekte werden in den folgenden Kapiteln mit Tenzing verglichen.
 
 \begin{figure}[H]
 \centering
@@ -1150,7 +1166,7 @@ Das Apache Hadoop Projekt hat es sich zum Ziel gesetzt die Technologien, die in 
 \label{fig:hadoop-ecosystem}
 \end{figure}
 
-Abbildung \ref{fig:hadoop-ecosystem} zeigt die wichtigsten Teile des Hadoop-Ökosystems. HBase, Pig und Hive werden in den folgenden Kapiteln genauer untersucht. Das \textit{Job Scheduling/Execution System} ist direkt nach dem MapReduce-Paper und das verteilte Dateisystem \textit{HDFS} nach dem \textit{Google File System} \cite{GFS} modelliert. Sqoop hat es sich zum Ziel gesetzt Daten aus relationalen Datenbanken in HDFS zu im- und aus HDFS in relationale Datenbanken zu exportieren. Die typischen Anwendungsfälle von Tenzing und Sqoop unterscheiden sich sehr weshalb Sqoop in diesem Kapitel nicht genauer bearbeitet wird.
+Abbildung \ref{fig:hadoop-ecosystem} zeigt die wichtigsten Teile des Hadoop-Ökosystems. HBase, Pig und Hive werden in den folgenden Kapiteln genauer untersucht. Das \textit{Job Scheduling/Execution System} ist direkt nach dem MapReduce-Paper und das verteilte Dateisystem \textit{HDFS} nach dem \textit{Google File System} \cite{GoogleFileSystem:2003} modelliert. Sqoop hat es sich zum Ziel gesetzt Daten aus relationalen Datenbanken in HDFS zu im- und aus HDFS in relationale Datenbanken zu exportieren. Die typischen Anwendungsfälle von Tenzing und Sqoop unterscheiden sich sehr weshalb Sqoop in diesem Kapitel nicht genauer bearbeitet wird.
 
 \subsection{Apache HBase}
 Apache HBase \cite{HBase} gilt als die führende Open-Source-Implementierung der BigTable-Technologie\cite{BigTable}. HBase ist ein \enquote{sparse, distributed, persistent multidimensional sorted Map} \cite{JavaMagazin}. HBase arbeitet also nicht wie traditionelle Datenbanken sondern kann eher als ein mehrdimensionelles, assoziatives Array betrachtet werden. Spalten können beliebig hinzugefügt werden und nicht jede Zeile im Datenbestand muss einen Wert für diese Spalten enthalten. Zusätzlich zu den zwei Dimensionen (Spalten und Zeilen) werden Zellen über Zeitstempel versioniert.
@@ -1239,9 +1255,12 @@ Aufgrund der Tatsache, dass der Artikel über Tenzing erst im September 2011 ers
 
 \newpage
 \section{Eigener Ansatz}
+\label{sec:approach}
+
 In diesem Kapitel wird ein eigener Ansatz sowie die Idee und Architektur für einen Prototypen vorgestellt. Der Prototyp besteht aus einem eigenen SQL-Dialekt sowie einer Engine die Abfragen in diesem Dialekt in einen MapReduce-Job für das Hadoop-Framework übersetzt.
 
 \subsection{SQL-}
+\label{sec:sqlminus}
 Der SQL-Dialekt \textit{SQL-} (in Worten \textit{SQL Minus}), ist eine extrem kleine Teilmenge von SQL. Es werden ausschließlich Projektion und eine einfache Gruppierung mit einer Aggregation pro Abfrage. Als Aggregatfunktionen werden \texttt{SUM} und \texttt{AVG} unterstützt. Die folgenden Listings zeigen kompatible Queries. 
 
 \begin{listing}[H]
@@ -1330,20 +1349,90 @@ java -jar de.bht.pat.tenzing.Main
 \end{listing}
 
 \subsection{Architekturelle Herausforderungen}
+\label{sec:challenges}
 Zwei Teilaspekte des Prototypen erfordern ein genaues Planen, Einschätzen des Aufwandes sowie Abwägen von Alternativen. Der erste Aspekt betrifft das Parsen des SQL-Dialekts in eine verwertbare Struktur. Formal korrekt wäre die Definition einer Grammatik, vorzugsweise in Backus-Naur-Form, und das Erstellen eines Parsers mithilfe eines Parser Generators wie zum Beispiel ANTLR. Aufgrund mangelnden Vorwissens wird von dieser Strategie Abstand genommen. Eine Alternative für das Parsen wären Regulären Ausdrücke. Obwohl Reguläre Ausdrücke ein sehr mächtiges Werkzeug sind erscheinen sie für die Aufgabe doch zu fehleranfällig und nicht ausdrucksstark genug. Um den zeitlichen Aufwand in Grenzen zu halten wird versucht einen bestehenden Open-Source SQL-Parser \cite{SQLParser} für Java zu verwenden.
 
 Der zweite Aspekt der das Potential hat kompliziert zu werden ist die Tatsache, dass die Hadoop-API die Map- und Reduce-Funktionen in Form von Klassen und nicht als Instanzen akzeptiert. Konkret heißt das, dass die übergebenen Mapper und Reducer bereits zur Compiletime existieren müssen, da sie serialisiert und über das Netzwerk im Cluster verteilt werden müssen. Wie die Verwendung eines Parser Generators für den SQL-Dialekt gibt es auch hier eine Lösung die vermutlich die \textit{formal} korrekt wäre aber zu aufwändig ist: die Verwendung eines Bytecode-Generators \cite{Bytecode}. Stattdessen lässt sich die Simplizität des SQL-Dialekts ausnutzen. Es gibt nur zwei Varianten einer Projektion, mit und ohne Gruppierung. Falls in der Selektklausel keine Aggregatfunktion vorkommt reichen ein Mapper und ein Reducer: \texttt{SelectMapper} und \texttt{NoopReducer}. Der SelectMapper liefert nur die gewünschten Spalten, der NoopReducer gruppiert nach Schlüssel, wendet aber keine Aggregatfunktion an. Für den Fall dass in der Projektion eine Aggregatfunktion auftaucht wird wird ein spezieller Mapper, der \texttt{GroupByMapper}, und zwei spezielle Reducer, \texttt{SumReducer} und \texttt{AvgReducer}, benötigt. Da die entsprechenden Klassen bereits zur Compiletime existieren müssen ist es nötig Laufzeitinformationen wie die konkrete Liste der Spaltennamen etc. dynamisch im Cluster zu verteilen. Dazu lässt sich die Hadoop-Klasse \texttt{Configuration} verwendet die es erlaubt beliebige Konfigurationsparameter beim Start festzulegen, die dann für alle Knoten im Cluster verfügbar sind.
 
 \newpage
-\nocite{GOOGLE-TENZING}
-\nocite{GOOGLE-MAPREDUCE}
-\nocite{GOOGLE-GFS}
-\nocite{KemperEickler}
-\nocite{KandziaKlein}
-\nocite{Selinger}
-\nocite{Zeller}
-\nocite{Ioannidis}
+
+\section{Helsing - Eine Prototypische Umsetzung}
+\label{sec:prototype}
+
+Auf Basis des eigenen Ansatzes wurde \textit{Helsing} entwickelt - ein Micro-Prototyp auf Hadoop-Basis. Helsing ist eine teilweise Kombination aus den Worten \textit{Hadoop} und \textit{Tenzing}. Es gibt keine verlässliche Aussage darüber woher Tenzing seinen Namen hat; eine Möglichkeit ist Tenzing Norgay\cite{TenzingNorgay}. Als Anlehnung an diese Vermutung hat auch Helsing einen Namensvetter: Abraham van Helsing \cite{Helsing}.
+
+\subsection{Architektur}
+Helsing unterteilt sich streng genommen in zwei mehr oder weniger unabhängige Applikationen: das User Interface und die MapReduce-Applikation. Abbildung \ref{fig:helsing-architecture} zeigt die grundlegende Architektur des entwickelten Prototypen.
+
+\begin{figure}[H]
+\centering
+\digraph[height=\textwidth]{helsing} {
+    node [shape="box"]
+    edge [dir="both"]
+    EventBus -> CLI
+    EventBus -> SqlValidator
+    EventBus -> QueryProcessor
+    QueryProcessor -> Hadoop [color="0.0 1.0 0.65"]
+    Hadoop -> JobAssembler [dir="forward"]
+    JobAssembler -> GroupByMapper [dir="forward"]
+    JobAssembler -> AggregatorReducer [dir="forward"]
+    AggregatorReducer -> Sum [dir="forward"]
+    AggregatorReducer -> Average [dir="forward"]
+    AggregatorReducer -> Count [dir="forward"]
+    More [label="..."]
+    AggregatorReducer -> More [dir="forward"]
+}
+\caption{Helsing Achitektur}
+\label{fig:helsing-architecture}
+\end{figure}
+
+\subsubsection{User Interface}
+Die zentrale Rolle innerhalb des User Interfaces übernimmt der EventBus und die dazugehörigen Events. Die Kernkomponenten (CLI, SqlValidator und QueryProcessor) kommunizieren ausschließlich über Events. Der typische Eventfluss sieht wie folgt aus:
+
+\begin{itemize}
+	\item Der User gibt ein SQL-Statement ein.
+	\item Das Command Line Interface benachrichtigt den SqlValidator.
+	\item Im Falle eines gültigen Queries wird der QueryProcessor benachrichtigt.
+	\item Der QueryProcessor startet die MapReduce-Applikation als eigenständigen Prozess.
+	\item Das Ergebnis der MapReduce-Anwendung wird vom QueryProcessor per Event an das Command Line Interface übergeben.
+	\item Die Ergebnisse werden ausgegeben und es wird wieder auf die Eingabe des Users gewartet.
+\end{itemize}
+
+\subsubsection{MapReduce-Applikation}
+Innerhalb der MapReduce-Anwendung wird kein EventBus verwendet da alle relevanten Komponenten unabhängig agieren sollen. Eine normale Abarbeitung sieht wie folgt aus:
+
+\begin{itemize}
+	\item Mithilfe des JobAssemblers wird aus dem SQL-Statement eine Job-Konfiguration erstellt. Dazu zählen die Ermittlung aller benötigten Spalten, jeweils für die Gruppierung, Aggregation und die endgültige Projektion, sowie das Erstellen einer Liste von verwendeten Aggregatfunktionen.
+	\item Die ermittelten Informationen werden als Json-kodierte Strings in die Konfiguration des MapReduce-Jobs abgelegt.
+	\item Die so erzeugte Job-Konfiguration wird verwendet um mithilfe von Hadoop den eigentlichen Job zu startet.
+	\item Sowohl der Mapper als auch der Reducer lesen ihre jeweiligen Parameter ein und konfigurieren sich entsprechend.
+	\item Hadoop dürchläuft nun die typischen Schritte eines MapReduce-Jobs (s. Kapitel \nameref{sec:mapreduce-operation}).
+	\item Der Reducer übernimmt die Aufgabe der Datenaggregation indem er für jeden Input die entsprechende Aggregatfunktionen aufruft.
+	\item Nachdem der gesamte Input verarbeitet wurde wird der MapReduce-Prozess beendet.
+\end{itemize}
+
+\subsection{Abhängigkeiten}
+Helsing hat Abhängigkeiten an diverse Libraries und Frameworks. Die Grundidee war es, möglichst viele lauffähige und getestete OpenSource-Lösungen einzusetzen um genug Zeit für die eigentliche Aufgabe zu Verfügung zu haben.
+
+Helsing wurde gegen Java Version 1.7 programmiert. Für das Parsen der Command-Line-Argumente sowie des User-Inputs wurden Args4j\cite{Args4j} und JLine\cite{JLine} verwendet. Die EventBus-Implementierung kommt aus den Guava Libraries\cite{Guava}. Das User Interface, die MapReduce-Applikationen sowie der Mapper und der Reducer laufen jeweils in einem Dependency-Injection-Kontext. Als DI-Framework kam Guice\cite{Guice} zum Einsatz. Wie bereits im Kapitel \nameref{sec:challenges} geplant, wurde ein fertiger SQL-Parser auf Java-Basis eingesetzt: JSqlParser\cite{JSqlParser}. Das Serialisieren der Konfigurations-Parameter in Json wurde mit Gson\cite{Gson} realisiert.
+
+\subsection{Quellcode und Installation}
+Der gesamte Quellcode ist öffentlich auf Github.com verfügbar \url{https://github.com/whiskeysierra/helsing}. Ebenfalls auf Github befindet sich eine Anleitung zum Kompilieren und Ausführen von Helsing. Die aktuellste Entwicklungsversion kann entweder über Github oder direkt über den folgenden Link als Tarball heruntergeladen werden: \url{https://github.com/whiskeysierra/helsing/tarball/master}.
+
+\subsection{Funktionumfang}
+Der im Kapitel \nameref{sec:approach} definierte Funktionsumfang wird von Helsing komplett erfüllt und in einigen Punkten sogar noch erweitert. Neben den geplanten Aggregatfunktionen \texttt{SUM} und \texttt{AVG} unterstützt der Prototyp zusätzlich \texttt{COUNT}, \texttt{FIRST}, \texttt{LAST}, \texttt{MAX}, \texttt{MIN}, \texttt{STDDEV}, \texttt{VAR}, \texttt{COVAR} und \texttt{CORR}. \texttt{COUNT}, \texttt{FIRST} und \texttt{LAST} haben die Eigenschaft, dass sie auch auf nicht-numerische Spalten angewendet werden können während \texttt{COVAR} und \texttt{CORR} auf zwei Spalten arbeiten.
+Weiterhin erlaubt Helsing neben einer einfachen Gruppierung und der der Anwendung einer einzelnen Aggregatfunktion sowohl das Gruppieren über mehrere Spalten als auch das gleichzeitige Anwenden von mehreren Aggregatfunktionen.
+Anzumerken wäre die Tatsache dass der verwendete SQL-Parser keine Sonderzeichen in Tabellennamen erlaubt weshalb nicht wie gewünscht \texttt{hdfs://countries.csv} sondern einfach \texttt{countries.csv} als Tabellenbezeichner verwendet werden muss.
+
+\newpage
+
+\section{Zusammenfassung}
+\label{sec:resume}
+
+\newpage
+
 \addcontentsline{toc}{section}{Literatur}
+\nocite{*}
 \printbibliography
 
 \newpage
@@ -1358,4 +1447,3 @@ Der zweite Aspekt der das Potential hat kompliziert zu werden ist die Tatsache, 
 \listoflistings
 
 \end{document}
-
