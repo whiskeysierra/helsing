@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Helsing by whiskeysierra</title>
+    
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Helsing</h1>
+        <p></p>
+        <p class="view"><a href="https://github.com/whiskeysierra/helsing">View the Project on GitHub <small>whiskeysierra/helsing</small></a></p>
+        <ul>
+          <li><a href="https://github.com/whiskeysierra/helsing/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/whiskeysierra/helsing/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/whiskeysierra/helsing">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Helsing - A micro-prototype Tenzing clone for Hadoop</h1>
+
+<h2>Introduction</h2>
+
+<p>This project is part of an assignment for <em>Programming - Advanced Topics</em> at the <a href="http://www.beuth-hochschule.de/"><em>Beuth University of Applied Sciences Berlin</em></a>.
+The first steps included reading, describing, reflecting and rating the Google paper
+<a href="http://research.google.com/pubs/pub37200.html"><em>Tenzing - A SQL Implementation On The MapReduce Framework</em></a>.</p>
+
+<h2>Installation</h2>
+
+<h3>Requirements</h3>
+
+<ul>
+<li>Linux (or any posix compliant unix)</li>
+<li>JDK 7</li>
+<li>For installing JDK 7 on Mac OSX Lion follow <a href="http://code.google.com/p/openjdk-osx-build/">these</a> instructions</li>
+<li>Maven 3</li>
+</ul><h3>Hadoop</h3>
+
+<ul>
+<li>Run <code>bin/install-hadoop.sh</code> to install Hadoop 0.20.203.0 to the <code>hadoop</code> directory</li>
+</ul><h3>Compilation</h3>
+
+<ul>
+<li>Run <code>mvn clean package</code>
+</li>
+<li>Should produce two jar files
+
+<ul>
+<li><code>target/helsing-&lt;version&gt;.jar</code></li>
+<li><code>target/helsing-&lt;version&gt;-job.jar</code></li>
+</ul>
+</li>
+</ul><h2>Test drive</h2>
+
+<ul>
+<li>Run <code>bin/run.sh</code>
+</li>
+<li>An interactive prompt should appear which allows sql statements to be entered</li>
+<li>
+<p>The sample file shiped with this project (<a href="https://github.com/whiskeysierra/helsing/blob/master/data/countries.csv"><code>data/countries.csv</code></a>) has the following schema:</p>
+
+<pre><code>+--------------+------------------+------+------------+
+|      country |        continent | year | population |
++--------------+------------------+------+------------+
+|  Afghanistan |             Asia | 1950 |    8150368 |
+|  Afghanistan |             Asia | 1960 |    9829450 |
+|  Afghanistan |             Asia | 1970 |   12430623 |
+|  Afghanistan |             Asia | 1980 |   15112149 |
+|  Afghanistan |             Asia | 1990 |   14669339 |
+|  Afghanistan |             Asia | 2000 |   23898198 |
+|  Afghanistan |             Asia | 2010 |   34504794 |
+|  Afghanistan |             Asia | 2020 |   44546287 |
+|  Afghanistan |             Asia | 2030 |   56322744 |
+|  Afghanistan |             Asia | 2040 |   69094697 |
+|  Afghanistan |             Asia | 2050 |   81933479 |
+|      Albania |           Europe | 1950 |    1227156 |
+|      Albania |           Europe | 1960 |    1623114 |
+|      Albania |           Europe | 1970 |    2156612 |
+|      Albania |           Europe | 1980 |    2671412 |
+|      Albania |           Europe | 1990 |    3250778 |
+|      Albania |           Europe | 2000 |    3473835 |
+|      Albania |           Europe | 2010 |    3659616 |
+...
+</code></pre>
+
+<h3>Currently the following features are supported:</h3>
+</li>
+</ul><h4>Projection</h4>
+
+<pre><code>SELECT population, country FROM countries.csv
+</code></pre>
+
+<h4>Grouping</h4>
+
+<pre><code>SELECT year FROM countries.csv GROUP BY year
+</code></pre>
+
+<h4>Grouping with multiple columns</h4>
+
+<pre><code>SELECT year, continent FROM countries.csv GROUP BY continent, year
+</code></pre>
+
+<h4>Aggregation</h4>
+
+<pre><code>SELECT MAX(population) FROM countries.csv
+</code></pre>
+
+<h4>Aggregation with multiple functions</h4>
+
+<pre><code>SELECT MIN(population), MAX(population) FROM countries.csv
+</code></pre>
+
+<h4>Aggregation with multi-column function</h4>
+
+<pre><code>SELECT CORR(year, population) FROM countries.csv
+</code></pre>
+
+<h4>Grouping and aggregation</h4>
+
+<pre><code>SELECT year, SUM(population) FROM countries.csv GROUP BY year
+</code></pre>
+
+<h4>Grouping and aggregation with multiple columns</h4>
+
+<pre><code>SELECT year, continent, SUM(population) FROM countries.csv GROUP BY year, continent
+</code></pre>
+
+<h4>Grouping with multiple columns and aggregation with multiple functions</h4>
+
+<pre><code>SELECT year, continent, MIN(population), AVG(population), MAX(population) FROM countries.csv GROUP BY year, continent
+</code></pre>
+
+<h4>Aggregate functions:</h4>
+
+<ul>
+<li><code>AVG</code></li>
+<li><code>COUNT</code></li>
+<li><code>FIRST</code></li>
+<li><code>LAST</code></li>
+<li><code>MAX</code></li>
+<li><code>MIN</code></li>
+<li><code>STDDEV</code></li>
+<li><code>SUM</code></li>
+<li><code>VAR</code></li>
+<li><code>COVAR</code></li>
+<li><code>CORR</code></li>
+</ul><h2>Remarks</h2>
+
+<p>Sample data has been collected on <a href="http://www.geohive.com/">GeoHive</a> and <a href="http://data.worldbank.org/">The World Bank Open Data</a>.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/whiskeysierra">whiskeysierra</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
